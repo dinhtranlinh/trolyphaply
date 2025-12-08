@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F172A;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E1B4B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#450A0A;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1080" height="1350" fill="url(#bgGrad)"/>
+  
+  <!-- Top decorative pattern -->
+  <circle cx="540" cy="120" r="150" fill="url(#glowGrad)"/>
+  <path d="M 200 80 Q 540 150 880 80" stroke="#FFD700" stroke-width="2" fill="none" opacity="0.3"/>
+  <path d="M 150 120 Q 540 200 930 120" stroke="#FFA500" stroke-width="1.5" fill="none" opacity="0.2"/>
+  
+  <!-- Stars scattered on top -->
+  <circle cx="200" cy="60" r="3" fill="#FFD700" opacity="0.6"/>
+  <circle cx="350" cy="40" r="2" fill="#FFD700" opacity="0.5"/>
+  <circle cx="650" cy="50" r="2.5" fill="#FFA500" opacity="0.6"/>
+  <circle cx="850" cy="70" r="2" fill="#FFD700" opacity="0.5"/>
+  
+  <!-- Zodiac symbols faint in corners -->
+  <text x="80" y="180" font-family="serif" font-size="40" fill="#FFD700" opacity="0.15">☯</text>
+  <text x="950" y="180" font-family="serif" font-size="40" fill="#FFD700" opacity="0.15">☯</text>
+  
+  <!-- Central content area (450-1100) kept darker for text visibility -->
+  <rect x="0" y="250" width="1080" height="900" fill="#000000" opacity="0.3"/>
+  
+  <!-- Bottom decorative pattern -->
+  <circle cx="540" cy="1230" r="150" fill="url(#glowGrad)"/>
+  <path d="M 200 1270 Q 540 1200 880 1270" stroke="#FFD700" stroke-width="2" fill="none" opacity="0.3"/>
+  <path d="M 150 1230 Q 540 1150 930 1230" stroke="#FFA500" stroke-width="1.5" fill="none" opacity="0.2"/>
+  
+  <!-- Stars scattered on bottom -->
+  <circle cx="200" cy="1290" r="3" fill="#FFD700" opacity="0.6"/>
+  <circle cx="350" cy="1310" r="2" fill="#FFD700" opacity="0.5"/>
+  <circle cx="650" cy="1300" r="2.5" fill="#FFA500" opacity="0.6"/>
+  <circle cx="850" cy="1280" r="2" fill="#FFD700" opacity="0.5"/>
+  
+  <!-- Zodiac symbols at bottom corners -->
+  <text x="80" y="1170" font-family="serif" font-size="40" fill="#FFD700" opacity="0.15">★</text>
+  <text x="950" y="1170" font-family="serif" font-size="40" fill="#FFD700" opacity="0.15">★</text>
+</svg>

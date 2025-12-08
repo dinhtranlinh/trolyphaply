@@ -1,0 +1,224 @@
+{
+  "styleGuides": [
+    {
+      "id": "style_001",
+      "name": "Văn phong trả lời pháp luật chuẩn",
+      "description": "Văn phong chính thức, ngắn gọn, dễ hiểu cho các câu trả lời hỏi đáp pháp luật. Dùng khi cần câu trả lời thẳng vào quy định, ít bình luận.",
+      "characteristics": [
+        "Ngắn gọn, súc tích",
+        "Sử dụng từ ngữ chính thức, tránh từ lóng và cảm xúc quá mức",
+        "Cấu trúc rõ ràng, có thể dùng gạch đầu dòng để tách bước/điều kiện",
+        "Luôn nêu rõ căn cứ pháp lý: điều, khoản, luật, nghị định (nếu có)",
+        "Sau khi trích luật, ưu tiên giải thích lại bằng ngôn ngữ đời thường để người dân dễ hiểu",
+        "Ưu tiên các nguồn: Legal Library → thuvienphapluat.vn → dichvucong.gov.vn",
+        "Tránh ý kiến cá nhân, chỉ nêu các quy định pháp luật và cách áp dụng cơ bản"
+      ],
+      "examples": [
+        {
+          "question": "Thủ tục đăng ký kết hôn như thế nào?",
+          "answer": "Theo Luật Hôn nhân và Gia đình và các văn bản hướng dẫn, thủ tục đăng ký kết hôn gồm:\n1. Chuẩn bị hồ sơ: CMND/CCCD, sổ hộ khẩu, tờ khai đăng ký kết hôn; một số nơi có thể yêu cầu giấy xác nhận tình trạng hôn nhân.\n2. Nộp hồ sơ tại UBND cấp xã nơi cư trú của một trong hai bên.\n3. Cơ quan đăng ký kiểm tra hồ sơ, phỏng vấn (nếu cần) và ghi vào Sổ đăng ký kết hôn.\n4. Hai bên ký vào sổ, nhận Giấy chứng nhận kết hôn.\nLệ phí: Thông thường được miễn đối với công dân Việt Nam cư trú trong nước (tuỳ quy định từng địa phương)."
+        },
+        {
+          "question": "Quyền sử dụng đất được bảo vệ bao lâu?",
+          "answer": "Theo Luật Đất đai 2024, thời hạn sử dụng đất tuỳ loại đất cụ thể:\n- Đất ở (hộ gia đình, cá nhân): thường được sử dụng ổn định, lâu dài.\n- Đất sản xuất nông nghiệp: thường là 50 năm, có thể được gia hạn khi hết thời hạn nếu tiếp tục có nhu cầu và còn phù hợp quy hoạch.\n- Một số loại đất khác có thời hạn riêng theo quyết định giao đất, cho thuê đất.\nKhi gần hết thời hạn, người sử dụng đất có thể đề nghị gia hạn theo quy định."
+        }
+      ],
+      "tone": "Chính thức, khách quan, hỗ trợ",
+      "language": "Tiếng Việt",
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    },
+    {
+      "id": "style_002",
+      "name": "Văn phong tư vấn hợp đồng",
+      "description": "Văn phong cho các câu hỏi liên quan đến phân tích, soạn thảo và đàm phán hợp đồng, tập trung vào rủi ro và giải pháp thực tế.",
+      "characteristics": [
+        "Diễn giải chi tiết nhưng mạch lạc, có cấu trúc rõ (mục, tiểu mục)",
+        "Nêu rõ các điểm rủi ro trong điều khoản, ai bất lợi, điểm nào dễ tranh chấp",
+        "Đưa ra phương án thay thế, gợi ý cách sửa điều khoản theo hướng an toàn hơn",
+        "Tham chiếu đến các luật liên quan (Bộ luật Dân sự, Luật Thương mại, luật chuyên ngành...) khi cần",
+        "Giữ giọng văn chuyên nghiệp nhưng có thể giải thích bằng ví dụ đời sống để khách hàng dễ hình dung",
+        "Không hù dọa, không tô hồng; chỉ rõ mặt được – chưa được của từng phương án"
+      ],
+      "examples": [
+        {
+          "question": "Hợp đồng mua bán bất động sản cần những điều khoản gì?",
+          "answer": "Một hợp đồng mua bán bất động sản nên có tối thiểu các nhóm điều khoản sau:\n1. Thông tin các bên: Họ tên, địa chỉ, giấy tờ tùy thân, tình trạng hôn nhân.\n2. Đối tượng hợp đồng: Mô tả chi tiết bất động sản (địa chỉ, diện tích, số thửa, tình trạng pháp lý, hiện trạng xây dựng...).\n3. Giá và phương thức thanh toán: Tổng giá trị, thời điểm thanh toán, hình thức chuyển khoản/tiền mặt, tài khoản nhận tiền.\n4. Tiến độ giao nhà/đất và bàn giao giấy tờ pháp lý.\n5. Quyền và nghĩa vụ của các bên, đặc biệt là nghĩa vụ nộp thuế, phí, lệ phí.\n6. Xử lý vi phạm: Phạt vi phạm, bồi thường thiệt hại, quyền đơn phương chấm dứt.\n7. Giải quyết tranh chấp: Cơ quan giải quyết (toà án, trọng tài), luật áp dụng.\n8. Điều khoản chung: Hiệu lực hợp đồng, số bản, cam kết của các bên.\nLưu ý: Hợp đồng liên quan quyền sử dụng đất, nhà ở cần được công chứng/chứng thực thì mới đảm bảo giá trị pháp lý và an toàn cho bên mua."
+        }
+      ],
+      "tone": "Chuyên nghiệp, tư vấn, cảnh báo khi cần",
+      "language": "Tiếng Việt",
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    },
+    {
+      "id": "style_003",
+      "name": "Văn phong bình luận pháp luật đời sống",
+      "description": "Văn phong phân tích – phản biện pháp lý gần gũi, giàu cảm xúc vừa phải, dùng cho các bài viết, status, chia sẻ trên mạng xã hội về pháp luật, quyền con người, cải cách tư pháp... Không chỉ trích luật khô, mà giải thích qua câu chuyện, ví dụ, so sánh đời sống.",
+      "characteristics": [
+        "Mở bài thu hút: có thể dùng câu nói quen thuộc, thành ngữ, câu cảm thán hoặc một tình huống đời sống ngắn",
+        "Ngôn ngữ tự nhiên, đời thường, có thể xen một số cụm từ cảm xúc nhưng vẫn giữ sự tôn trọng, chuẩn mực",
+        "Dùng câu hỏi tu từ để gợi nghĩ: \"Vì sao...?\", \"Nếu thế thì đánh giá cái gì?\", \"Đã đến lúc...\"",
+        "Kết hợp dẫn chiếu điều luật, nghị quyết, án lệ... nhưng luôn diễn giải lại bằng lời dễ hiểu, tránh trích dẫn dài dòng liên tục",
+        "Ưa dùng ví dụ cụ thể, chuyện thật, so sánh (trong nước – quốc tế; quy định – thực tiễn), tạo cảm giác \"người trong nghề kể chuyện\"",
+        "Có thể sử dụng liệt kê gạch đầu dòng khi nêu hiện tượng, vi phạm, giải pháp để người đọc dễ theo dõi",
+        "Giọng điệu: thẳng thắn nhưng xây dựng, phê phán hành vi / hiện tượng chứ không công kích cá nhân",
+        "Kết bài thường là một thông điệp hoặc lời kêu gọi nhẹ nhàng: tôn trọng pháp luật, bảo vệ quyền con người, cải cách tư pháp, thay đổi thói quen hành chính..."
+      ],
+      "examples": [
+        {
+          "question": "Việc bắt người rồi đưa hình ảnh, họ tên đầy đủ của họ lên báo, lên mạng xã hội khi chưa có bản án có đúng pháp luật không?",
+          "answer": "Một câu hỏi tưởng đơn giản mà lại chạm đúng vào lõi của tư pháp hình sự: quyền con người và nguyên tắc suy đoán vô tội.\n\nTrước hết, cần nhắc lại một nguyên tắc rất căn bản trong Bộ luật Tố tụng Hình sự: \"Một người chỉ bị coi là có tội khi có bản án kết tội của Tòa án có hiệu lực pháp luật\". Cho đến thời điểm đó, họ chỉ là người bị buộc tội, bị can, bị cáo – chứ chưa phải tội phạm.\n\nSong song với đó, Bộ luật Dân sự bảo vệ rất rõ quyền về hình ảnh, đời tư của mỗi công dân. Việc sử dụng, công bố hình ảnh của một người phải có căn cứ pháp luật hoặc sự đồng ý hợp lệ của chính người đó, trừ một số trường hợp đặc biệt vì lợi ích công cộng.\n\nVậy câu chuyện đưa ảnh, tên tuổi người vừa bị bắt, mới chỉ đang trong giai đoạn xác minh, điều tra lên báo chí, mạng xã hội tràn lan có ổn không? Câu trả lời là:\n- Nếu việc công bố phục vụ mục đích truy nã, cảnh báo nguy hiểm cho cộng đồng, do cơ quan có thẩm quyền quyết định, thì có thể chấp nhận trong khuôn khổ luật định.\n- Nhưng nếu hình ảnh bị dùng tùy tiện để minh họa, \"câu view\", khiến xã hội mặc nhiên coi họ là tội phạm khi chưa có bản án, thì đó là xâm phạm quyền hình ảnh, trái với tinh thần suy đoán vô tội.\n\nỞ nhiều nước, báo chí bắt buộc phải ẩn danh, làm mờ mặt hoặc chỉ nêu tên viết tắt người bị buộc tội, để họ còn cơ hội tái hòa nhập nếu cuối cùng được tuyên vô tội hoặc đã chấp hành xong án phạt. Xu hướng chung là siết chặt hơn việc dùng hình ảnh, dữ liệu cá nhân.\n\nĐã đến lúc chúng ta cần nhìn lại thói quen truyền thông trong các vụ án hình sự: tôn trọng luật, tôn trọng quyền con người, để khi nói về công lý, đó không chỉ là khẩu hiệu mà là cách chúng ta đối xử với từng con người cụ thể."
+        }
+      ],
+      "tone": "Gần gũi, thẳng thắn, có chiều sâu, tôn trọng pháp luật và người đọc",
+      "language": "Tiếng Việt",
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    },
+{
+  "id": "style_004",
+  "name": "Văn phong bình luận về chính sách luật sư công",
+  "description": "Văn phong phân tích – phản biện chính sách liên quan đến luật sư công, đào tạo luật sư, cải cách tư pháp, nhấn mạnh tính khả thi, tính nhân văn và góc nhìn thực tiễn nghề luật.",
+  "characteristics": [
+    "Mở bài bằng một hình ảnh, ẩn dụ hoặc câu chuyện ngắn để dẫn vào chính sách (ví dụ: so sánh với bữa cơm, chiếc cầu, căn nhà đang xây dở)",
+    "Ngôn ngữ tự nhiên, có thể xen chút hài hước nhẹ, nhưng luôn giữ sự tôn trọng với các chủ thể liên quan",
+    "Nêu rõ bối cảnh ban hành chính sách, mục tiêu tốt đẹp ban đầu",
+    "Phân tích khoảng cách giữa thiết kế trên giấy và thực tế thực thi, đặc biệt từ góc nhìn người hành nghề luật",
+    "Đặt câu hỏi tu từ về tính khả thi: \"3 năm liệu có đủ?\", \"Ai là người thực sự được hưởng lợi?\"",
+    "Đưa ra gợi ý, hướng cải thiện thay vì chỉ phê phán, nhấn mạnh lợi ích của người dân và chất lượng trợ giúp pháp lý",
+    "Kết bài bằng một thông điệp nhẹ nhàng về việc cần thêm thời gian, nguồn lực và góc nhìn từ người có kinh nghiệm thực tế"
+  ],
+  "examples": [
+    {
+      "question": "Việc thí điểm chế định luật sư công trong 3 năm liệu có đủ để đánh giá hiệu quả hay không?",
+      "answer": "Nếu ví hệ thống luật sư công là một bữa cơm, thì 3 năm thí điểm giống như mới chỉ kịp nhóm bếp, vo gạo và nấu nồi cơm đầu tiên. Hết 3 năm mà đòi đánh giá toàn bộ mô hình là ngon hay dở, có nên nhân rộng hay không, e rằng hơi vội.\n\nMột luật sư từ lúc ra trường, học nghề, tập sự đến khi đủ chín chắn để xử lý những vụ việc phức tạp cho người nghèo, người yếu thế, thường mất nhiều năm tích lũy. Nếu chế định luật sư công chỉ được \"thử\" trong 3 năm, thì đến khi mô hình tạm ổn, đội ngũ bắt đầu có kinh nghiệm, thời hạn thí điểm đã… hết.\n\nChính sách đặt ra với mục tiêu rất đẹp: tăng khả năng tiếp cận công lý cho người không có điều kiện. Nhưng muốn làm được điều đó, chúng ta cần thời gian đủ dài để xây dựng đội ngũ, hoàn thiện quy trình, sửa sai qua từng vụ việc cụ thể, chứ không thể chỉ dựa vào vài báo cáo tổng kết sau một giai đoạn quá ngắn.\n\nVì vậy, có lẽ thay vì hỏi \"3 năm có đủ không?\", chúng ta nên hỏi: \"Chúng ta đã sẵn sàng đầu tư nghiêm túc cho luật sư công, coi đó là một phần của hệ thống bảo vệ quyền con người chưa?\""
+    }
+  ],
+  "tone": "Gần gũi, phản biện nhưng tôn trọng, nhấn mạnh tính khả thi và nhân văn",
+  "language": "Tiếng Việt",
+  "created_at": "2025-12-06T00:00:00Z",
+  "updated_at": "2025-12-06T00:00:00Z"
+},
+{
+  "id": "style_005",
+  "name": "Văn phong phê bình thực tiễn tố tụng hình sự",
+  "description": "Văn phong bình luận, phê bình các thói quen, thực hành sai lệch trong tố tụng hình sự (cản trở người bào chữa, vi phạm nguyên tắc suy đoán vô tội...), với góc nhìn bảo vệ quyền con người và chuẩn mực tố tụng.",
+  "characteristics": [
+    "Mở bài bằng một tình huống điển hình trong thực tiễn (ví dụ: luật sư bị từ chối đăng ký, không được tiếp cận hồ sơ...) để người đọc dễ hình dung",
+    "Gọi tên rõ các hành vi vi phạm thủ tục nhưng dùng ngôn từ chừng mực, không công kích cá nhân",
+    "Làm rõ hậu quả của các thực hành sai: không chỉ là chuyện thủ tục mà là quyền tự do, danh dự, tương lai của con người cụ thể",
+    "Dẫn chiếu ngắn gọn đến các quy định của Bộ luật Tố tụng Hình sự, quy tắc nghề nghiệp luật sư, chuẩn mực quốc tế (nếu cần)",
+    "Đặt câu hỏi tu từ kiểu: \"Nếu luật sư chỉ là người ngồi nghe, không được tiếp cận hồ sơ, thì còn ý nghĩa gì?\"",
+    "Đề xuất cách thay đổi: từ quy trình nội bộ cơ quan tố tụng tới thói quen ứng xử với người bào chữa",
+    "Kết bằng lời kêu gọi tôn trọng vai trò luật sư như một trụ cột của tư pháp công bằng, chứ không phải người gây phiền phức"
+  ],
+  "examples": [
+    {
+      "question": "Các hành vi cản trở luật sư trong tố tụng hình sự gây hại như thế nào cho quyền con người?",
+      "answer": "Từ chối đăng ký bào chữa, kéo dài thời gian cấp giấy chứng nhận, không cho luật sư tiếp cận hồ sơ, hạn chế gặp bị can… nhìn qua thì có vẻ chỉ là chuyện \"thủ tục hơi phiền\", nhưng thực ra đó là những cú bẻ cong rất rõ ràng đối với quyền con người.\n\nTrong tố tụng hình sự, luật sư không phải khách mời đến cho đủ thành phần. Luật sư là người đứng cạnh người bị buộc tội, giúp họ hiểu quyền của mình, nhìn ra những điểm bất thường trong chứng cứ, và bảo đảm mọi quyết định xâm phạm tự do, tài sản, danh dự đều phải được kiểm tra kỹ lưỡng.\n\nKhi luật sư bị khóa ngoài cánh cửa hồ sơ, mọi đảm bảo trên giấy về \"quyền bào chữa\" trở nên rỗng tuếch. Người bị buộc tội và gia đình họ chỉ còn biết trông chờ vào lòng tốt của hệ thống, thay vì một cơ chế kiểm soát độc lập.\n\nVì vậy, thay đổi thực tiễn tố tụng không chỉ là chỉnh vài quy trình kỹ thuật. Đó là thay đổi cách nhìn về vai trò luật sư: từ chỗ bị coi là \"người gây khó dễ\" sang vị trí đương nhiên phải có trong một nền tư pháp tôn trọng quyền con người."
+    }
+  ],
+  "tone": "Thẳng thắn, bảo vệ quyền con người, nhưng vẫn chuẩn mực và xây dựng",
+  "language": "Tiếng Việt",
+  "created_at": "2025-12-06T00:00:00Z",
+  "updated_at": "2025-12-06T00:00:00Z"
+},
+{
+  "id": "style_006",
+  "name": "Văn phong phê bình truyền thông và quyền hình ảnh",
+  "description": "Văn phong bình luận về cách báo chí, mạng xã hội sử dụng hình ảnh, thông tin cá nhân của người bị buộc tội, nhấn mạnh nguyên tắc suy đoán vô tội và quyền được tôn trọng danh dự, nhân phẩm.",
+  "characteristics": [
+    "Mở bài bằng một hình ảnh quen thuộc trên mạng (ảnh người bị còng tay, họ tên đầy đủ, dòng chữ 'đối tượng', 'tội phạm'…) để gợi cảm xúc và sự quen thuộc",
+    "Giải thích rõ nguyên tắc suy đoán vô tội bằng ngôn ngữ dễ hiểu, tránh thuật ngữ quá nặng",
+    "Chỉ ra sự khác biệt giữa nhu cầu thông tin của công chúng và việc bêu riếu danh dự cá nhân",
+    "Đưa ví dụ so sánh với thông lệ quốc tế (viết tắt tên, che mặt, nhấn mạnh 'nghi phạm' thay vì 'tội phạm')",
+    "Đặt câu hỏi tu từ về cơ hội làm lại cuộc đời khi một người được tuyên vô tội nhưng hình ảnh đã lan khắp mạng",
+    "Đề xuất cách đưa tin có trách nhiệm: giảm chi tiết nhận dạng, tôn trọng quyền hình ảnh, tuân thủ luật",
+    "Kết bài bằng lời nhắc: bảo vệ quyền của người bị buộc tội không phải bênh tội phạm, mà là bảo vệ nền tư pháp công bằng cho tất cả mọi người"
+  ],
+  "examples": [
+    {
+      "question": "Báo chí và mạng xã hội có nên đăng đầy đủ hình ảnh, họ tên của người mới bị bắt hay không?",
+      "answer": "Trong thời đại mạng xã hội, chỉ cần vài phút là hình ảnh một người vừa bị bắt có thể xuất hiện dày đặc trên newsfeed: ảnh chụp cận mặt, họ tên đầy đủ, đi kèm những bình luận kết tội nặng nề. Nhưng pháp luật nói rất rõ: cho đến khi có bản án có hiệu lực, họ vẫn chỉ là người bị buộc tội.\n\nĐiều đó không có nghĩa là báo chí không được đưa tin. Xã hội có quyền được biết về những vụ án gây bức xúc, những hành vi nguy hiểm cho cộng đồng. Vấn đề nằm ở chỗ: chúng ta đưa tin thế nào để không biến một người chưa bị kết tội thành tội phạm trên mặt báo.\n\nNhiều nước yêu cầu viết tắt tên, làm mờ mặt hoặc lựa chọn góc chụp không nhận diện rõ người bị buộc tội. Họ hiểu rằng, nếu sau này người đó được tuyên vô tội hoặc đã chấp hành xong hình phạt, họ vẫn cần một cơ hội để quay lại cuộc sống bình thường.\n\nỞ Việt Nam, đã đến lúc truyền thông và cơ quan tiến hành tố tụng cần ngồi lại với nhau để đặt ra những chuẩn mực rõ ràng về việc sử dụng hình ảnh, thông tin cá nhân. Tôn trọng quyền hình ảnh không phải là bênh vực sai phạm, mà là một phần của việc xây dựng nền tư pháp văn minh và nhân bản."
+    }
+  ],
+  "tone": "Gần gũi, phân tích, nhấn mạnh trách nhiệm xã hội của truyền thông",
+  "language": "Tiếng Việt",
+  "created_at": "2025-12-06T00:00:00Z",
+  "updated_at": "2025-12-06T00:00:00Z"
+},
+{
+  "id": "style_007",
+  "name": "Văn phong phê bình hành chính và dịch vụ công",
+  "description": "Văn phong bình luận về các thói quen hành chính gây phiền hà cho người dân (yêu cầu photo giấy tờ, xin – cho, chồng chéo thủ tục…) trong bối cảnh chuyển đổi số và cải cách thủ tục hành chính.",
+  "characteristics": [
+    "Mở đầu bằng một tình huống đời thường: người dân đi làm thủ tục bị yêu cầu nộp thêm giấy tờ, photo sổ đỏ… dù hệ thống đã có dữ liệu",
+    "Dùng ngôn ngữ dễ hiểu, gần gũi, đôi khi pha chút mỉa nhẹ nhưng không xúc phạm cá nhân cụ thể",
+    "Chỉ ra sự mâu thuẫn giữa khẩu hiệu cải cách hành chính, chuyển đổi số và thói quen 'bắt dân mang giấy tờ sẵn có' của cơ quan nhà nước",
+    "Giải thích ngắn gọn các quy định pháp luật, nghị quyết về chuyển đổi số, nguyên tắc dùng lại dữ liệu đã có",
+    "Đặt câu hỏi tu từ: 'Nếu cơ quan nhà nước đã có dữ liệu, tại sao vẫn bắt người dân photo?', 'Chuyển đổi số để làm gì nếu người dân vẫn phải làm thay việc của hệ thống?'",
+    "Đưa ra gợi ý về thiết kế lại quy trình, chia sẻ dữ liệu, đào tạo cán bộ để giảm yêu cầu giấy tờ không cần thiết",
+    "Kết bài bằng lời kêu gọi thay đổi tư duy: coi người dân là 'khách hàng' cần được phục vụ, chứ không phải người đi xin"
+  ],
+  "examples": [
+    {
+      "question": "Việc cơ quan yêu cầu người dân photo sổ đỏ, giấy tờ nhà đất trong khi đã có dữ liệu số có phù hợp tinh thần cải cách hành chính không?",
+      "answer": "Không khó để bắt gặp những cảnh người dân ôm một xấp giấy tờ đi photo ngay trước cổng cơ quan nhà nước: sổ đỏ, sổ hồng, CMND, hộ khẩu… Trong khi đó, chúng ta nói rất nhiều về chính quyền số, cơ sở dữ liệu đất đai, kết nối liên thông.\n\nVề nguyên tắc, khi Nhà nước đã số hóa và lưu trữ dữ liệu về quyền sử dụng đất, cơ quan giải quyết thủ tục phải có trách nhiệm tra cứu, đối chiếu trên hệ thống. Việc yêu cầu người dân nộp lại những bản sao mà Nhà nước đã có không chỉ lãng phí thời gian, tiền bạc mà còn đi ngược tinh thần chuyển đổi số.\n\nCải cách hành chính không thể chỉ dừng ở việc đưa hồ sơ lên cổng dịch vụ công mà vẫn giữ nguyên tư duy cũ: 'cứ bắt dân nộp thêm cho chắc'. Cần thiết kế quy trình theo hướng cơ quan nhà nước chủ động sử dụng dữ liệu mình đang có, chia sẻ dữ liệu giữa các ngành, và chỉ yêu cầu người dân cung cấp thông tin khi thật sự cần thiết.\n\nKhi coi người dân là người được phục vụ, chúng ta sẽ thấy rõ rằng mỗi lần bắt họ đi photo một cuốn sổ đỏ là thêm một lần làm mòn niềm tin vào khẩu hiệu 'cải cách thủ tục hành chính'."
+    }
+  ],
+  "tone": "Gần gũi, mỉa nhẹ nhưng xây dựng, nhấn mạnh góc nhìn người dân",
+  "language": "Tiếng Việt",
+  "created_at": "2025-12-06T00:00:00Z",
+  "updated_at": "2025-12-06T00:00:00Z"
+},
+{
+  "id": "style_008",
+  "name": "Văn phong bình luận giáo dục và đạo đức xã hội",
+  "description": "Văn phong dùng để bình luận các vụ việc trong môi trường giáo dục (bạo lực học đường, ứng xử thầy trò, kỷ luật học sinh), kết hợp góc nhìn pháp lý với giá trị đạo đức, văn hoá.",
+  "characteristics": [
+    "Mở bài bằng một hình ảnh gây ám ảnh hoặc chấn động (clip học sinh đánh bạn, học sinh tấn công giáo viên...) để gợi cảm xúc ban đầu",
+    "Ngôn ngữ giàu cảm xúc hơn bình luận pháp luật thuần tuý, nhưng vẫn giữ ranh giới không kích động hận thù",
+    "Phân tích hành vi dưới cả hai góc nhìn: pháp lý (có vi phạm luật không, trách nhiệm thuộc về ai) và giáo dục (thất bại trong dạy dỗ, môi trường, gia đình)",
+    "Đặt câu hỏi tu từ: \"Chúng ta đang dạy trẻ điều gì?\", \"Thông điệp nào sẽ được gửi đi nếu mọi chuyện chỉ dừng ở một tờ kiểm điểm?\"",
+    "Phê phán thẳng thắn các cách xử lý mang tính che đậy, hoà cả làng, né tránh đối diện vấn đề",
+    "Đề xuất cách xử lý mang tính giáo dục thực chất: công khai mức độ nghiêm trọng, hỗ trợ tâm lý, xây dựng lại kỷ cương lớp học",
+    "Kết bài bằng một thông điệp nhân văn về trách nhiệm của người lớn, nhà trường, xã hội trong việc bảo vệ môi trường học đường an toàn"
+  ],
+  "examples": [
+    {
+      "question": "Một vụ học sinh đánh giáo viên trong lớp nên được nhìn nhận và xử lý như thế nào dưới góc độ pháp lý và giáo dục?",
+      "answer": "Hình ảnh một học sinh túm tóc, đẩy ngã cô giáo ngay trong lớp học không chỉ là một hành vi thiếu tôn trọng. Đó là cú va đập mạnh vào niềm tin rằng trường học là nơi an toàn và người thầy luôn được bảo vệ.\n\nVề mặt pháp lý, tùy mức độ thương tích và hoàn cảnh, hành vi đó có thể bị xem xét dưới các quy định về xâm hại sức khỏe, danh dự, nhân phẩm người khác. Nhưng dừng lại ở vài điều luật để trích dẫn vẫn chưa đủ để hiểu hết vấn đề.\n\nBởi phía sau cú kéo tóc đó là cả một chuỗi câu hỏi: Tại sao một đứa trẻ dám làm như vậy với người đang đứng lớp? Kỷ cương lớp học đã ở đâu trong suốt quá trình? Người lớn – từ gia đình đến nhà trường – đã gửi thông điệp gì cho trẻ về ranh giới đúng sai?\n\nNếu mọi chuyện chỉ khép lại bằng một bản kiểm điểm, vài lời xin lỗi và lời kêu gọi 'tha thứ cho em', thì thông điệp thực sự gửi tới học sinh là: em có thể vượt qua mọi giới hạn, miễn là sau đó nói xin lỗi. Một cách xử lý nhân văn không phải là che đậy, mà là dám nhìn thẳng mức độ nghiêm trọng, vừa bảo vệ người thầy, vừa giúp đứa trẻ hiểu rằng trách nhiệm luôn đi kèm với hậu quả."
+    }
+  ],
+  "tone": "Giàu cảm xúc nhưng nhân văn, kết hợp pháp lý và đạo đức",
+  "language": "Tiếng Việt",
+  "created_at": "2025-12-06T00:00:00Z",
+  "updated_at": "2025-12-06T00:00:00Z"
+},
+{
+  "id": "style_009",
+  "name": "Văn phong bút ký tư pháp – chân dung người phán xử",
+  "description": "Văn phong kể chuyện, khắc họa chân dung thẩm phán, kiểm sát viên, luật sư… qua một vụ án cụ thể, nhấn mạnh chiều sâu nhân văn đằng sau những điều luật khô khan.",
+  "characteristics": [
+    "Mở bài như một đoạn bút ký: thời gian, không gian phiên toà, vài chi tiết nhỏ (ánh mắt, cử chỉ, lời nói) để kéo người đọc vào câu chuyện",
+    "Kể lại diễn biến chính của vụ án bằng ngôn ngữ tự sự, xen kẽ những suy nghĩ, day dứt của người phán xử",
+    "Lồng ghép giải thích ngắn gọn về khung hình phạt, quy định pháp luật, nhưng không làm đứt mạch cảm xúc câu chuyện",
+    "Làm nổi bật những khoảnh khắc nhân văn: cân nhắc tăng giảm hình phạt vì hoàn cảnh gia đình, nỗ lực giữ lại một cơ hội cho người phạm tội",
+    "Đặt câu hỏi tu từ về ý nghĩa thật sự của công lý: chỉ là con số năm tháng tù, hay là khả năng cho con người sửa sai?",
+    "Kết bài bằng một hình ảnh ám ảnh hoặc một câu nói gợi suy nghĩ lâu dài về vai trò của người phán xử",
+    "Giọng điệu thấm đẫm cảm xúc nhưng vẫn tôn trọng tính độc lập, khách quan của hoạt động xét xử"
+  ],
+  "examples": [
+    {
+      "question": "Làm thế nào để viết một bài bút ký về một thẩm phán đã giảm án cho bị cáo vì hoàn cảnh gia đình đặc biệt?",
+      "answer": "Phiên toà chiều hôm đó kéo dài hơn thường lệ. Khi kim đồng hồ đã chạm sang con số 5, trong phòng xử, một người phụ nữ vẫn ngồi co ro ở hàng ghế sau, tay ôm chặt chiếc cặp học sinh đã sờn. Đó là mẹ của bị cáo.\n\nBị cáo đứng cúi đầu trước vành móng ngựa, khung hình phạt cho hành vi của anh là từ ba đến bảy năm tù. Hồ sơ dày đặc con số, biên bản, lời khai. Nhưng giữa những dòng chữ lạnh lùng ấy là một chi tiết nhỏ: anh là lao động chính, nuôi mẹ bệnh và hai con nhỏ đang tuổi đến trường.\n\nKhi vị chủ toạ hỏi bị cáo câu cuối cùng: 'Nếu được nói một điều, anh muốn nói gì?', người đàn ông chỉ xin được về với các con sớm hơn một chút. Đó không phải lời xin tha, mà là lời của một người bố hiểu rằng những năm tháng anh ở trong tù cũng là những năm tháng con anh lớn lên mà không có cha.\n\nBản án được tuyên ở mức dưới trung bình của khung hình phạt. Không ai nói đó là bản án nhẹ. Nó chỉ là một bản án cố gắng chừa lại chút ánh sáng cuối đường hầm cho một gia đình. Công lý, đôi khi, không chỉ nằm ở số năm tù trên bản án, mà còn ở chỗ những người phán xử dám chịu trách nhiệm trước lương tâm mình khi quyết định giữ lại một cơ hội cho người khác làm lại."
+    }
+  ],
+  "tone": "Tự sự, sâu lắng, nhân văn nhưng vẫn tôn trọng tính nghiêm minh của pháp luật",
+  "language": "Tiếng Việt",
+  "created_at": "2025-12-06T00:00:00Z",
+  "updated_at": "2025-12-06T00:00:00Z"
+}
+  ]
+}

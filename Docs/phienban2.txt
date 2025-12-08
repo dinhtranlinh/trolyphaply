@@ -1,0 +1,304 @@
+Ok, mình sẽ **redesign lại đúng màn hình Home** bạn gửi, theo kiểu “mở Figma lên là vẽ được ngay”.
+Mình giữ layout hiện tại, nhưng nâng cấp màu, cấu trúc, độ nổi, tính chuyên nghiệp.
+
+---
+
+## 0. FRAME & BACKGROUND
+
+**Frame chính (Desktop)**
+
+* Name: `Desktop / Home – TroLyPhapLy`
+* Size: **1440 × 1024**
+* Background:
+
+  * Fill: `linear-gradient(180deg, #F9FBFF 0%, #EEF2F8 100%)`
+
+**Content container**
+
+* Frame con, centered:
+
+  * Width: **1080**
+  * Auto-layout vertical, center horizontally.
+  * Constraints: `Center / Top`
+  * Padding top: **80px**, bottom: **80px**
+
+---
+
+## 1. HEADER (TOP NAV)
+
+**Frame: `Header`**
+
+* Position: top trong content container (không full 1440, chỉ 1080).
+* Size: **1080 × 72**
+* Layout: Auto Layout – Horizontal
+* Alignment: `Space between`, center vertically
+* Padding: `0 / 0` (vì đã nằm trong container 1080)
+* Background: **#FFFFFF**
+* Stroke bottom: `1px solid rgba(10, 22, 70, 0.06)`
+* Effect: `Drop shadow`: 0 1 2 `rgba(0,0,0,0.05)` (rất nhẹ)
+
+**Left group: Logo + Name**
+
+* Auto-layout Horizontal, gap: **8px**
+
+1. **Logo circle**
+
+   * Frame 32×32, radius 999
+   * Fill: `#1F4FB2`
+   * Icon “scale/justice” 18px, màu trắng.
+
+2. **App name**
+
+   * Text: `Trợ Lý Pháp Lý`
+   * Style: `H3` → 20px, weight 600, color `#1A2B49`
+
+**Right group (tạm minimalist)**
+
+* Auto-layout Horizontal, gap: 16px
+* Elements:
+
+  * Text link: `Về dự án` – 14px / 500 / `#44536E`
+  * Text link: `Đăng nhập` – 14px / 500 / `#1F4FB2`
+
+> *Nếu chưa cần auth, bạn có thể để 1 link duy nhất: “Góp ý & Liên hệ”*
+
+---
+
+## 2. HERO SECTION – HỎI VỀ PHÁP LUẬT & THỦ TỤC
+
+**Frame: `Hero`**
+
+* Auto-layout Vertical
+* Width: **760** (center trong container 1080)
+* Margin top: **40px**
+* Gap: **16px**
+* Alignment: `Center`
+
+### 2.1. Title + Subtitle
+
+**Title row**
+
+* Text: `Hỏi về Pháp Luật & Thủ Tục`
+* 32px / 700 / color `#1A2B49`
+* Icon cột tòa án đặt bên trái (nếu muốn):
+
+  * Auto-layout Horizontal, gap: 8px
+  * Icon 24px, màu `#1F4FB2`
+
+**Subtitle text**
+
+* Text: `Tư vấn nhanh, không thay thế dịch vụ pháp lý chính thức`
+* Style: Body-md (16px), 400, color `#7D8DA6`
+* Text-align: Center, max width 640.
+
+---
+
+### 2.2. Question Card
+
+**Frame: `QuestionCard`**
+
+* Width: 760
+* Auto-layout Vertical
+* Padding: `24px 24px 20px 24px`
+* Gap: **16px**
+* Fill: `#FFFFFF`
+* Corner radius: **20px**
+* Stroke: `1px solid #EEF1F4`
+* Shadow: `0 4 12 rgba(0,0,0,0.08)`
+
+#### 2.2.1. Textarea input
+
+**Frame: `InputArea`** (nằm trong card)
+
+* Auto-layout Vertical
+* Gap: 8px
+
+**Textarea**
+
+* Frame: width = fill, height = **140**
+* Corner: 12px
+* Stroke: `1px solid #D6DFEA`
+* Fill: `#F9FAFC`
+* Padding inside: `12px 14px`
+* Placeholder:
+
+  * Text: `Nhập câu hỏi của bạn về pháp luật, thủ tục hành chính…`
+  * 14px, color `#8897AC`
+
+**Char counter**
+
+* Corner bottom-right trong frame InputArea.
+* Text: `0/1000`
+* 12px, `#8897AC`
+* Align: Right (Auto-layout align end).
+
+#### 2.2.2. Category Chips
+
+**Frame: `ChipsRow`**
+
+* Auto Layout Horizontal, wrap ON (Figma: “Wrap”)
+* Gap: 8px
+* Padding-top: 0
+
+**Chip component** (`Chip / Category`)
+
+* Height: **32px**
+* Auto-layout Horizontal, padding: `6px 14px`
+* Corner radius: 999
+* Fill: `#F3F5F9`
+* Stroke: `1px solid #D6DFEA`
+* Text: 14px / 500 / color `#44536E`
+* Hover (variant): Fill `#E8F0FF`, Stroke `#B2D4FF`, Text `#1F4FB2`
+
+Text mẫu:
+
+* `Thủ tục dân sự`
+* `Thuế & Doanh nghiệp`
+* `Hộ khẩu & Cư trú`
+* `Phạt hành chính`
+* `Lao động`
+* `Đất đai`
+
+#### 2.2.3. Button row
+
+**Frame: `ActionRow`**
+
+* Auto-layout Horizontal, justify: `Space between`, align center
+
+Left:
+
+* Caption nhỏ:
+
+  * Text: `AI hỗ trợ • Beta`
+  * 12px / 500 / color `#8897AC`
+
+Right:
+
+* **Button chính: `Hỏi ngay`**
+
+**Component: `Button / Primary`**
+
+* Height: **48px**
+* Min width: **160**
+* Auto-layout Horizontal, padding: `0 20px`
+* Fill: Gradient:
+
+  * `linear-gradient(90deg, #F0CD71, #E9C35A)`
+* Radius: **12px**
+* Shadow: `0 4 10 rgba(0,0,0,0.08)`
+
+Text:
+
+* 16px / 600 / color `#1A2B49`
+* Icon arrow-right 18px, màu `#1A2B49`, đặt bên phải text, gap = 8px
+
+Hover variant:
+
+* Gradient sáng hơn 5%
+  Pressed:
+* Tối hơn 8%
+
+---
+
+## 3. SECTION: CÂU HỎI PHỔ BIẾN
+
+**Frame: `PopularQuestions`**
+
+* Width: 760
+* Auto-layout Vertical
+* Margin-top: **40px**
+* Gap: **16px**
+
+### 3.1. Header
+
+**Title text:**
+
+* `Câu hỏi phổ biến` – H3, 20px / 600 / `#1A2B49`
+
+**Subtitle (optional):**
+
+* `Một số câu hỏi thường gặp về thủ tục và quy định`
+* 14px / 400 / `#7D8DA6`
+
+### 3.2. List item component
+
+**Component: `ListItem / Question`**
+
+* Frame width: 760, height: **56px**
+* Auto-layout Horizontal, `Space between`, center vertically
+* Padding: `0 16px`
+* Fill: `#FFFFFF`
+* Radius: **12px**
+* Stroke: `1px solid #EEF1F4`
+
+Left group (icon + text):
+
+* Icon frame 24×24
+
+  * Circle 20×20 fill `#FFF8E6`
+  * `?` icon 14px, color `#E9C35A`
+* Text:
+
+  * Style: 15–16px / 500, color `#44536E`
+
+Right:
+
+* Icon: `chevron-right` 18px, `#C0CAD8`
+
+Hover state:
+
+* Fill: `#F9FBFF`
+* Stroke: `#D6DFEA`
+* Question text color: `#1F4FB2`
+* Chevron color: `#1F4FB2`
+
+Mỗi câu hỏi là 1 instance:
+
+* `Thủ tục đăng ký kết hôn cần những giấy tờ gì?`
+* `Cách tính thuế thu nhập cá nhân năm 2026?`
+* ... (như bạn đang có)
+
+---
+
+## 4. BOTTOM NAV (MOBILE ONLY)
+
+Trên desktop **ẩn hoàn toàn**.
+Trong Figma, bạn tạo thêm frame `Mobile / Home – 390 × 844` và reuse token, nhưng:
+
+* Height: 64
+* Frame pinned bottom, full width
+* Background: `#FFFFFF`
+* Border-top: `1px solid #E5EAF1`
+
+Item: icon 24 + label 12, auto-layout vertical, gap 4, color:
+
+* Active: icon `#1F4FB2`, label `#1F4FB2`
+* Inactive: icon `#8897AC`, label `#8897AC`
+
+Tabs: `Trang chủ / Pháp luật / Prompts / Mini Apps` như bạn.
+
+---
+
+## 5. AUTOLAYOUT & NAMING GỢI Ý (CHO DỄ DEV)
+
+Trong Figma, bạn nên đặt tên:
+
+* `AppShell / Header`
+* `Page / Home`
+* `Section / Hero`
+* `Section / PopularQuestions`
+* `Component / Button / Primary`
+* `Component / Chip / Category`
+* `Component / ListItem / Question`
+
+Mỗi thành phần dùng **Auto Layout** để khi responsive sang Tablet/Mobile chỉ cần co frame là bố cục tự bay vào giữa.
+
+---
+
+## 6. TÓM TẮT NHỮNG LỢI ÍCH SAU REDESIGN
+
+* Giao diện **đậm hơn**, rõ layer (background gradient + card shadow).
+* Content **tập trung ở 760px**, không bị loãng trên desktop.
+* Hero card trông như “cổng hỏi đáp chính thức”, đủ trang trọng.
+* List câu hỏi phổ biến nhìn **gọn & clickable**, giống dịch vụ công hiện đại.
+* Dễ chuyển sang Tailwind/Next vì toàn bộ đã chuẩn hóa spacing, radius, typography.

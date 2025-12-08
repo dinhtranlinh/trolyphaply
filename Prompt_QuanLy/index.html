@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Manager</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .prompt-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .prompt-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .prompt-card-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-bottom: 2px solid #e9ecef;
+            padding: 1.25rem;
+        }
+        
+        .prompt-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #212529;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .badge-custom {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+        }
+        
+        .btn-action {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .search-box {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 1.5rem;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            transition: all 0.3s;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: transparent;
+        }
+        
+        .json-viewer {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .json-viewer pre {
+            margin: 0;
+            color: #f8f8f2;
+        }
+        
+        .voiceover-editor {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .voiceover-editor textarea {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            min-height: 120px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+        
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9998;
+        }
+        
+        .copy-btn-float {
+            position: sticky;
+            top: 1rem;
+            float: right;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="overlay" id="loadingOverlay"></div>
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header class="app-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-file-earmark-text"></i> Prompt Manager
+                    </h1>
+                    <p class="mb-0 mt-1 opacity-75">Quản lý và tổ chức AI Video Prompts</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <button class="btn btn-light btn-lg" onclick="showCreateModal()">
+                        <i class="bi bi-plus-circle"></i> Thêm Prompt Mới
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container my-4">
+        <!-- List View -->
+        <div id="listView">
+            <!-- Search Bar -->
+            <div class="row mb-4">
+                <div class="col-md-8 mx-auto">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control search-box border-start-0" 
+                               id="searchInput" placeholder="Tìm kiếm prompt theo tên hoặc title...">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prompts Grid -->
+            <div id="promptsList" class="row g-4">
+                <!-- Prompts will be loaded here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="bi bi-inbox"></i>
+                <h4>Chưa có Prompt nào</h4>
+                <p class="text-muted">Nhấn nút "Thêm Prompt Mới" để bắt đầu</p>
+            </div>
+        </div>
+        
+        <!-- Detail View -->
+        <div id="detailView" style="display: none;">
+            <div class="mb-3">
+                <button class="btn btn-outline-secondary" onclick="showListView()">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </button>
+            </div>
+            
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white border-bottom">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="mb-0" id="detailTitle">Prompt Title</h4>
+                            <small class="text-muted" id="detailInfo"></small>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                            <button class="btn btn-outline-primary btn-sm" onclick="editPrompt()">
+                                <i class="bi bi-pencil"></i> Sửa
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deletePrompt()">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-0">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs px-3 pt-3" id="segmentTabs" role="tablist">
+                        <!-- Tabs will be generated here -->
+                    </ul>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="segmentTabContent">
+                        <!-- Tab panes will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Create/Edit Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm Prompt Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="promptForm">
+                        <div class="mb-3">
+                            <label for="promptName" class="form-label fw-bold">Tên Prompt *</label>
+                            <input type="text" class="form-control" id="promptName" 
+                                   placeholder="Ví dụ: VideoKhaisinh" required>
+                            <div class="form-text">
+                                Chỉ dùng chữ, số, gạch ngang. Không dấu, không khoảng trắng.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="promptContent" class="form-label fw-bold">JSON Content *</label>
+                            <textarea class="form-control font-monospace" id="promptContent" 
+                                      rows="20" placeholder='Paste JSON content here...' required></textarea>
+                            <div class="form-text">
+                                JSON phải có cấu trúc: {"common": {...}, "segments": [...]}
+                            </div>
+                        </div>
+                        
+                        <div id="formError" class="alert alert-danger" style="display: none;"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="savePrompt()">
+                        <i class="bi bi-save"></i> Lưu Prompt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    
+    <script>
+        // Global state
+        let currentPrompts = [];
+        let currentPromptName = '';
+        let isEditMode = false;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPrompts();
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase();
+                filterPrompts(query);
+            });
+        });
+        
+        // API calls
+        async function apiCall(action, method = 'GET', data = null) {
+            showLoading(true);
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`api.php?action=${action}`, options);
+                const result = await response.json();
+                
+                if (!result.success && result.error) {
+                    throw new Error(result.error);
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                alert('Lỗi: ' + error.message);
+                throw error;
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Load all prompts
+        async function loadPrompts() {
+            try {
+                const result = await apiCall('list');
+                currentPrompts = result.prompts || [];
+                renderPromptsList(currentPrompts);
+            } catch (error) {
+                console.error('Failed to load prompts:', error);
+            }
+        }
+        
+        // Render prompts list
+        function renderPromptsList(prompts) {
+            const container = document.getElementById('promptsList');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (prompts.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = prompts.map(prompt => `
+                <div class="col-md-6 col-lg-4 prompt-item" data-name="${prompt.name.toLowerCase()}" 
+                     data-title="${prompt.title.toLowerCase()}">
+                    <div class="card prompt-card shadow-sm h-100">
+                        <div class="prompt-card-header">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary badge-custom">
+                                    <i class="bi bi-file-text"></i> ${prompt.name}
+                                </span>
+                                <span class="badge bg-secondary badge-custom">
+                                    ${prompt.segments} segments
+                                </span>
+                            </div>
+                            <h5 class="prompt-title">${escapeHtml(prompt.title)}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-primary btn-sm btn-action flex-fill" 
+                                        onclick="viewPrompt('${prompt.name}')">
+                                    <i class="bi bi-eye"></i> Xem
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm btn-action" 
+                                        onclick="editPromptByName('${prompt.name}')">
+                                    <i class="bi bi-pencil"></i> Sửa
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm btn-action" 
+                                        onclick="deletePromptByName('${prompt.name}')">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light small text-muted">
+                            <i class="bi bi-clock"></i> ${formatDate(prompt.created)}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filter prompts
+        function filterPrompts(query) {
+            const items = document.querySelectorAll('.prompt-item');
+            let visibleCount = 0;
+            
+            items.forEach(item => {
+                const name = item.dataset.name;
+                const title = item.dataset.title;
+                
+                if (name.includes(query) || title.includes(query)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('emptyState').style.display = 
+                visibleCount === 0 ? 'block' : 'none';
+        }
+        
+        // View prompt detail
+        async function viewPrompt(name) {
+            currentPromptName = name;
+            
+            try {
+                const result = await apiCall(`read&name=${name}&segment=Full`);
+                const data = result.data;
+                
+                // Update detail view
+                document.getElementById('detailTitle').textContent = data.common.project_title;
+                document.getElementById('detailInfo').textContent = 
+                    `${name} • ${data.segments.length} segments`;
+                
+                // Generate tabs
+                const tabsHtml = ['Full', ...Array.from({length: data.segments.length}, (_, i) => `P${i+1}`)]
+                    .map((tab, index) => `
+                        <li class="nav-item">
+                            <button class="nav-link ${index === 0 ? 'active' : ''}" 
+                                    data-bs-toggle="tab" data-bs-target="#tab-${tab}">
+                                ${tab}
+                            </button>
+                        </li>
+                    `).join('');
+                
+                document.getElementById('segmentTabs').innerHTML = tabsHtml;
+                
+                // Generate tab content
+                const tabContent = await generateTabContent(name, data);
+                document.getElementById('segmentTabContent').innerHTML = tabContent;
+                
+                // Apply syntax highlighting
+                Prism.highlightAll();
+                
+                // Show detail view
+                document.getElementById('listView').style.display = 'none';
+                document.getElementById('detailView').style.display = 'block';
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            } catch (error) {
+                console.error('Failed to view prompt:', error);
+            }
+        }
+        
+        // Generate tab content
+        async function generateTabContent(name, fullData) {
+            const tabs = ['Full'];
+            const segmentCount = fullData.segments.length;
+            
+            for (let i = 1; i <= segmentCount; i++) {
+                tabs.push(`P${i}`);
+            }
+            
+            let html = '';
+            
+            for (let i = 0; i < tabs.length; i++) {
+                const tab = tabs[i];
+                const isActive = i === 0;
+                
+                // For Full tab, use already loaded data
+                let data, rawJson;
+                if (tab === 'Full') {
+                    data = fullData;
+                    rawJson = JSON.stringify(fullData, null, 2);
+                } else {
+                    // Load individual segment data
+                    try {
+                        const result = await apiCall(`read&name=${name}&segment=${tab}`);
+                        data = result.data;
+                        rawJson = result.raw;
+                    } catch (error) {
+                        console.error(`Failed to load ${tab}:`, error);
+                        continue;
+                    }
+                }
+                
+                const segment = data.segments[0];
+                
+                html += `
+                    <div class="tab-pane fade ${isActive ? 'show active' : ''}" id="tab-${tab}">
+                        ${tab !== 'Full' ? `
+                            <!-- Voiceover Editor -->
+                            <div class="voiceover-editor">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-mic"></i> Voiceover (${segment.segment_id})
+                                </label>
+                                <textarea class="voiceover-text" data-segment="${tab}">${escapeHtml(segment.voiceover)}</textarea>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-success" onclick="saveVoiceover('${name}', '${tab}')">
+                                        <i class="bi bi-save"></i> Lưu Voiceover
+                                    </button>
+                                    <span class="text-muted small ms-2">Duration: ${segment.duration_seconds}s</span>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- JSON Viewer -->
+                        <div class="position-relative">
+                            <button class="btn btn-outline-primary btn-sm copy-btn-float" 
+                                    onclick="copyToClipboard('json-${tab}')">
+                                <i class="bi bi-clipboard"></i> Copy JSON
+                            </button>
+                            <div class="json-viewer">
+                                <pre><code class="language-json" id="json-${tab}">${escapeHtml(rawJson)}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+        
+        // Save voiceover
+        async function saveVoiceover(name, segment) {
+            const textarea = document.querySelector(`textarea[data-segment="${segment}"]`);
+            const newVoiceover = textarea.value;
+            
+            try {
+                // Load full prompt
+                const fullResult = await apiCall(`read&name=${name}&segment=Full`);
+                const fullData = fullResult.data;
+                
+                // Find and update the specific segment
+                const segmentIndex = parseInt(segment.replace('P', '')) - 1;
+                fullData.segments[segmentIndex].voiceover = newVoiceover;
+                
+                // Update prompt
+                await apiCall('update', 'POST', {
+                    name: name,
+                    content: JSON.stringify(fullData)
+                });
+                
+                // Show success message
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check"></i> Đã lưu!';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-success');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-outline-success');
+                    btn.classList.add('btn-success');
+                }, 2000);
+                
+            } catch (error) {
+                alert('Lỗi khi lưu voiceover: ' + error.message);
+            }
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check"></i> Đã copy!';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('Không thể copy: ' + err);
+            });
+        }
+        
+        // Show create modal
+        function showCreateModal() {
+            isEditMode = false;
+            document.getElementById('modalTitle').textContent = 'Thêm Prompt Mới';
+            document.getElementById('promptName').value = '';
+            document.getElementById('promptName').disabled = false;
+            document.getElementById('promptContent').value = '';
+            document.getElementById('formError').style.display = 'none';
+            
+            const modal = new bootstrap.Modal(document.getElementById('createModal'));
+            modal.show();
+        }
+        
+        // Edit prompt
+        function editPrompt() {
+            editPromptByName(currentPromptName);
+        }
+        
+        async function editPromptByName(name) {
+            isEditMode = true;
+            currentPromptName = name;
+            
+            try {
+                const result = await apiCall(`read&name=${name}&segment=Full`);
+                
+                document.getElementById('modalTitle').textContent = 'Sửa Prompt';
+                document.getElementById('promptName').value = name;
+                document.getElementById('promptName').disabled = true;
+                document.getElementById('promptContent').value = JSON.stringify(result.data, null, 2);
+                document.getElementById('formError').style.display = 'none';
+                
+                const modal = new bootstrap.Modal(document.getElementById('createModal'));
+                modal.show();
+            } catch (error) {
+                alert('Không thể load prompt: ' + error.message);
+            }
+        }
+        
+        // Save prompt
+        async function savePrompt() {
+            const name = document.getElementById('promptName').value.trim();
+            const content = document.getElementById('promptContent').value.trim();
+            const errorDiv = document.getElementById('formError');
+            
+            // Validate
+            if (!name || !content) {
+                errorDiv.textContent = 'Vui lòng điền đầy đủ thông tin';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Validate name format
+            if (!/^[a-zA-Z0-9-]+$/.test(name)) {
+                errorDiv.textContent = 'Tên prompt chỉ được chứa chữ, số và gạch ngang';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Validate JSON
+            try {
+                JSON.parse(content);
+            } catch (e) {
+                errorDiv.textContent = 'JSON không hợp lệ: ' + e.message;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                if (isEditMode) {
+                    await apiCall('update', 'POST', { name, content });
+                    alert('Cập nhật prompt thành công!');
+                } else {
+                    await apiCall('create', 'POST', { name, content });
+                    alert('Tạo prompt thành công!');
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createModal'));
+                modal.hide();
+                
+                // Reload list
+                await loadPrompts();
+                
+                // If in detail view, reload detail
+                if (document.getElementById('detailView').style.display === 'block') {
+                    await viewPrompt(name);
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Delete prompt
+        function deletePrompt() {
+            deletePromptByName(currentPromptName);
+        }
+        
+        async function deletePromptByName(name) {
+            if (!confirm(`Bạn có chắc muốn xóa prompt "${name}"?\n\nHành động này sẽ xóa file Full và tất cả file segments.`)) {
+                return;
+            }
+            
+            try {
+                await apiCall('delete', 'DELETE', { name });
+                alert('Xóa prompt thành công!');
+                
+                // If in detail view, go back to list
+                if (document.getElementById('detailView').style.display === 'block') {
+                    showListView();
+                }
+                
+                // Reload list
+                await loadPrompts();
+            } catch (error) {
+                alert('Lỗi khi xóa: ' + error.message);
+            }
+        }
+        
+        // Show list view
+        function showListView() {
+            document.getElementById('listView').style.display = 'block';
+            document.getElementById('detailView').style.display = 'none';
+            window.scrollTo(0, 0);
+        }
+        
+        // Utility functions
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            const spinner = document.querySelector('.loading-spinner');
+            
+            if (show) {
+                overlay.style.display = 'block';
+                spinner.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+                spinner.style.display = 'none';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatDate(timestamp) {
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>

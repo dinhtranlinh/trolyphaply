@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Admin user model
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // hashed password
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+// App configuration model
+model App {
+  id             String   @id @default(uuid())
+  slug           String   @unique
+  name           String
+  description    String?
+  status         String   @default("draft") // 'draft' | 'active' | 'inactive'
+  type           String   // 'text_only' | 'image_canvas' | 'image_ai'
+  inputSchema    Json     @map("input_schema")
+  promptTemplate String   @map("prompt_template")
+  outputSchema   Json?    @map("output_schema")
+  renderConfig   Json?    @map("render_config")
+  shareConfig    Json?    @map("share_config")
+  limits         Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  results      Result[]
+  statsDaily   AppStatsDaily[]
+  events       AppEvent[]
+
+  @@map("apps")
+}
+
+// Result model
+model Result {
+  id         String   @id @default(uuid())
+  appId      String   @map("app_id")
+  inputData  Json     @map("input_data")
+  outputData Json?    @map("output_data")
+  imageUrl   String?  @map("image_url")
+  metadata   Json?    // For input hash, cache info, etc
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  app    App        @relation(fields: [appId], references: [id], onDelete: Cascade)
+  events AppEvent[]
+
+  @@map("results")
+}
+
+// Daily statistics model
+model AppStatsDaily {
+  appId          String   @map("app_id")
+  date           DateTime @db.Date
+  views          Int      @default(0)
+  submits        Int      @default(0)
+  shares         Int      @default(0)
+  affiliateClicks Int     @default(0) @map("affiliate_clicks")
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, date])
+  @@map("app_stats_daily")
+}
+
+// Event log model
+model AppEvent {
+  id        BigInt   @id @default(autoincrement())
+  appId     String   @map("app_id")
+  eventType String   @map("event_type") // 'view' | 'submit' | 'share' | 'error'
+  resultId  String?  @map("result_id")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  app    App     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  result Result? @relation(fields: [resultId], references: [id], onDelete: SetNull)
+
+  @@map("app_events")
+}

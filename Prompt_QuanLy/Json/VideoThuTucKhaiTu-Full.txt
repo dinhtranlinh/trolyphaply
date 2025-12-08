@@ -1,0 +1,84 @@
+{
+    "common": {
+        "project_title": "Proactive death registration service (procedure 1.000656)",
+        "language": "vi-VN",
+        "video_usage": "Web and YouTube, landscape format",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Hybrid of simple live-action shots and clean 3D motion graphics in a calm, government-tech style. The visuals should feel respectful, modern and minimal, without flashy effects.",
+            "aesthetics": "Ultra-minimal, trustworthy and quiet, with smooth camera motion and gentle pacing that matches a sensitive administrative procedure related to death registration.",
+            "color_palette": "Soft cool tones with light blue, white and grey as the main colors, with limited accent colors to highlight data flows and system icons. Avoid aggressive colors and strong contrasts.",
+            "ui_elements": "STRICT NO-TEXT MODE. Do NOT render any readable text, letters or numbers in the image. All interfaces must use only icons, shapes, color blocks, progress bars, simple pictograms and abstract symbols, without any letters A–Z or digits 0–9. If a button, chart or timeline is needed, show it as blank shapes or icons with no labels. Do not create captions, titles, tooltips, or any random strings that look like text. Every concept must be expressed only through icons, colors and composition, not through words."
+        },
+        "characters": {
+            "family": "A Vietnamese family member in their 40s or 50s, dressed simply and respectfully, representing the relative of the deceased person.",
+            "officials": "Civil servants working in a modern, paperless digital office environment, using large transparent displays instead of stacks of paper.",
+            "medical_staff": "Hospital medical staff in standard uniforms, seen briefly when entering data into the hospital information system."
+        },
+        "audio_style": {
+            "music": "Soft, subtle ambient music without vocals, with a slow, steady tempo that feels respectful and calm, not dramatic.",
+            "sound_effects": "Very light interface sounds such as soft whooshes when data flows and gentle confirmation chimes. Avoid loud or playful effects.",
+            "voiceover_note": "Vietnamese voiceover with clear diction and full diacritics, using short, simple sentences suitable for about 8 seconds per segment. All information for citizens is conveyed via the voiceover and visuals; there is absolutely no on-screen text."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_01_medical_data_to_proactive_system",
+            "duration_seconds": 8,
+            "voiceover": "Khi một người qua đời tại cơ sở y tế, dữ liệu hồ sơ được chuyển sang hành chính chủ động. Từ đó, hệ thống tự phát hiện nhu cầu đăng ký khai tử.",
+            "scene_description": "Inside a modern hospital corridor, a family member quietly waits outside a patient room. The mood is calm and respectful. The scene then transitions into an abstract digital space representing the hospital information system connecting to the proactive administration platform.",
+            "data_visualization": "From a simple hospital icon, a glowing medical data block appears, containing only medical pictograms such as a heartbeat symbol, a patient file icon and a clock. This block moves along a soft light path towards a central platform icon that represents the proactive administration system. As the block reaches the platform, it is absorbed as an input source, indicating that the system has received medical data about the death event.",
+            "camera": "Begin with a slow, static shot of the hospital corridor, then gently cross-fade into the digital space. Track the medical data block as it travels from the hospital icon into the central proactive administration platform, ending on a centered view of the platform.",
+            "onscreen_text": "No text at all. The meaning is conveyed only by the hospital icon, the medical data block and the central proactive administration platform."
+        },
+        {
+            "segment_id": "segment_02_draft_death_registration_file",
+            "duration_seconds": 8,
+            "voiceover": "Hệ thống Hành chính chủ động tự động tạo bản dự thảo hồ sơ đăng ký khai tử dựa trên dữ liệu y tế nhận được.",
+            "scene_description": "Inside the abstract digital platform of the proactive administration system, a new case file begins to form in the center of the screen.",
+            "data_visualization": "Small glowing data fragments flow into a central empty frame. These fragments assemble themselves into a folder or document icon representing a draft death registration file. A simple pencil icon or small gear icon appears next to it to indicate the draft and processing state, all without any text.",
+            "camera": "Hold a centered shot on the empty frame as the data fragments arrive, then slowly push in as the folder icon becomes complete and the small draft-status icon appears beside it.",
+            "onscreen_text": "No text. The concept of a drafted file is shown by the forming folder and a small pencil or gear icon."
+        },
+        {
+            "segment_id": "segment_03_crosscheck_population_database",
+            "duration_seconds": 8,
+            "voiceover": "Tiếp theo, hệ thống đối chiếu thông tin người chết với Cơ sở dữ liệu quốc gia về dân cư để kiểm tra căn cước công dân và nơi thường trú.",
+            "scene_description": "The draft death registration file stays at the center while a new data block representing the national population database appears nearby.",
+            "data_visualization": "A large, calm data block appears with icons such as an ID card, a person silhouette and a house symbol for permanent residence. Light lines connect the draft file icon to this population data block. Within the population block, an abstract card with an ID icon and a house icon glows. Then green check icons appear next to these pictograms to show successful crosschecking, all without any words or digits.",
+            "camera": "Start from a medium shot showing both the draft file and the population database block. Slowly dolly closer to highlight the flow of light between them and end on the draft file icon being surrounded by small confirmation check icons.",
+            "onscreen_text": "No text. Crosschecking is expressed by links between the draft file and the population database icons, plus green check symbols."
+        },
+        {
+            "segment_id": "segment_04_crosscheck_civil_status_database",
+            "duration_seconds": 8,
+            "voiceover": "Đồng thời, hệ thống tra cứu Cơ sở dữ liệu hộ tịch điện tử do Bộ Tư pháp quản lý để đối chiếu và bổ sung thông tin hộ tịch của người chết.",
+            "scene_description": "A second data block appears on the other side of the draft file, representing the electronic civil status database managed by the Ministry of Justice.",
+            "data_visualization": "This civil status block contains icons such as a registry book, a seal symbol and a small set of family icons representing civil status records. Light flows from the draft death file to this block and back. As data returns to the draft file, additional icons light up on the file, and more green check symbols appear along its edges, showing that civil status information has been verified and enriched. No labels or numbers are shown.",
+            "camera": "Frame the draft file in the middle with the population database block on one side and the civil status block on the other. Use a slow, symmetrical zoom-in as data flows in both directions and the draft file becomes more complete and brighter.",
+            "onscreen_text": "No text. Civil status verification is represented by a registry book icon, seal icon and returning data flows with checkmarks."
+        },
+        {
+            "segment_id": "segment_05_notification_and_relative_confirmation",
+            "duration_seconds": 8,
+            "voiceover": "Sau đó, hệ thống gửi thông báo đến thân nhân hoặc người liên quan để xác nhận sự kiện tử vong và bổ sung các thông tin còn thiếu nếu cần thiết.",
+            "scene_description": "Switch to a quiet home setting where a family member sits at a table holding a smartphone. The environment is simple and respectful.",
+            "data_visualization": "A notification icon appears above the smartphone, showing a bell symbol emitting a soft pulse. On the phone screen, show a vertical list of blank bars with simple icons on the side: some with green check symbols for information that is already complete, and one or two with plus or question mark icons indicating missing details. As the relative taps the screen, the plus or question icons animate and turn into green check icons, symbolizing that missing information has been provided. No words or numbers appear anywhere on the phone.",
+            "camera": "Use a medium shot of the relative holding the phone, then cut to an over-the-shoulder close-up of the smartphone screen as icons change from incomplete to complete. Finish with a gentle pull-back showing the relative slightly nodding.",
+            "onscreen_text": "No text. Notification and confirmation are shown through a bell icon, list bars and icons changing from plus or question marks to green checks."
+        },
+        {
+            "segment_id": "segment_06_result_and_e_death_certificate",
+            "duration_seconds": 8,
+            "voiceover": "Khi thông tin đã được xác nhận đầy đủ, hệ thống hoàn tất xử lý và trả Giấy khai tử điện tử, đồng thời thông báo việc trả bản giấy cho thân nhân hoặc người liên quan.",
+            "scene_description": "Return to the digital proactive administration space where the draft death registration file becomes a finalized, approved document.",
+            "data_visualization": "The draft file icon brightens and a large green approval check or a symbolic seal icon appears over it, indicating completion. From this approved file, two visual branches are created: one branch flows to a smartphone icon held by the relative, where an electronic document icon appears on the phone screen; the other branch flows to an office or one-stop-service building icon where a physical paper sheet icon is shown. The physical sheet is represented as a blank document shape with a small seal icon, but with no readable text. Both branches glow softly to show that results are ready.",
+            "camera": "Start with a close-up of the file as it becomes approved, then pan to follow one data branch to the smartphone and briefly show the relative viewing the electronic document. Then pan or cut to the office building icon and the physical paper icon, ending on a calm, wide shot that shows both the digital and physical result paths.",
+            "onscreen_text": "No text. The electronic and paper death certificates are represented by an approved file icon branching to a phone and to an office building with a paper icon."
+        }
+    ]
+}

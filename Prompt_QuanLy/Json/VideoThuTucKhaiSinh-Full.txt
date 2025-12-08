@@ -1,0 +1,110 @@
+{
+    "common": {
+        "project_title": "Birth registration, permanent residence registration and health insurance card issuance for children under six years old (procedure 3.285)",
+        "language": "vi-VN",
+        "video_usage": "Web and YouTube, landscape format",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Hybrid of cinematic live-action and high-end 3D motion graphics in a clean, government-tech style, similar to a polished government digital service commercial",
+            "aesthetics": "Ultra-modern, minimalist, trustworthy and informative look, with smooth camera motion and calm pacing appropriate for an explainer video for citizens",
+            "color_palette": "Cool tones with dominant tech blue, white and soft gray, accented by warm highlights for human scenes and yellow data streams that stand out clearly on a darker background",
+            "ui_elements": "STRICT NO-TEXT MODE. Do NOT render any readable text, letters, numbers or words in the image. All interfaces must use only icons, shapes, color bars, progress bars, simple pictograms and abstract symbols, without any letters A–Z or digits 0–9. If a button, chart or timeline is needed, show it as blank shapes or icons with no labels. Do not create captions, titles, tooltips, or any random strings that look like text. Every concept must be expressed only through icons, colors and composition, not through text."
+        },
+        "characters": {
+            "family": "Vietnamese couple around thirty years old living in Da Nang, warm and relatable, wearing simple modern clothes, holding their newborn baby",
+            "officials": "Civil servants and leaders working in a modern, paperless digital office environment, using large transparent displays instead of stacks of paper"
+        },
+        "audio_style": {
+            "music": "Soft, modern electronic ambient music without vocals, steady tempo that feels technological and optimistic but not aggressive",
+            "sound_effects": "Light humming of servers, gentle whooshing sounds when data flows, soft beeps on system confirmations and subtle clicks when officials approve documents",
+            "voiceover_note": "Vietnamese voiceover với đầy đủ dấu, câu văn rõ ràng, tốc độ tự nhiên, giải thích cho người dân từng bước trong quy trình. Tuyệt đối không có chữ trên màn hình, toàn bộ thông tin chữ được truyền qua lời thuyết minh và hình ảnh."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_00_intro_simple_flow",
+            "duration_seconds": 8,
+            "voiceover": "Quy trình dịch vụ Hành chính chủ động: liên thông khai sinh, đăng ký thường trú và cấp thẻ bảo hiểm y tế.",
+            "scene_description": "A very simple, minimalistic intro showing a clean white or light background with a single thin line or arrow that connects three flat icons representing birth registration, residence registration and health insurance, all controlled by one central proactive administration symbol.",
+            "data_visualization": "In the center of the frame, show a simple circular icon representing the proactive administration system. From left to right, draw one thin horizontal line that passes through three step icons: a baby icon for birth registration, a house icon for permanent residence, and a card icon for health insurance. Use only one or two calm colors, mainly light gray and soft blue, with no gradients or flashy effects. The icons are flat, simple and clearly spaced. IMPORTANT: do not render any letters, words or numbers anywhere in the image. No labels, no titles, no captions. The idea of the linked process is shown only by the line and the three icons connected to the central circle.",
+            "camera": "Hold a static, centered shot for the whole 8 seconds with a very gentle slow zoom-in toward the three icons and the central circle, just enough to create a soft introduction.",
+            "onscreen_text": "No text at all. All meaning is conveyed only through the central system circle, the connecting line and the three simple icons."
+        },
+        {
+            "segment_id": "segment_01_intro_birth",
+            "duration_seconds": 8,
+            "voiceover": "Gia đình chào đón một em bé mới sinh tại bệnh viện, mở đầu cho các thủ tục khai sinh, đăng ký thường trú và cấp thẻ bảo hiểm y tế.",
+            "scene_description": "Warm scene inside a modern Vietnamese hospital delivery room where the newborn is placed gently into the mother’s arms, the father đứng bên cạnh chăm sóc.",
+            "data_visualization": "A soft glowing life-event icon appears above the newborn and slowly pulses, with subtle lines suggesting it will connect to digital systems, no text.",
+            "camera": "Slow push-in on the family, then a slight tilt up to reveal the glowing life-event icon above them.",
+            "onscreen_text": "Visual idea only: a new life event starts the administrative process, expressed by a single glowing icon, no words."
+        },
+        {
+            "segment_id": "segment_02_hospital_data_entry",
+            "duration_seconds": 8,
+            "voiceover": "Ngay sau ca sinh, nhân viên y tế nhập thông tin ca sinh của mẹ và trẻ vào hệ thống thông tin y tế của bệnh viện.",
+            "scene_description": "A nurse or doctor ngồi tại máy tính trong phòng hành chính của bệnh viện, nhìn vào màn hình với giao diện hiện đại.",
+            "data_visualization": "On the transparent screen, blank rows and blocks light up as the staff gõ trên bàn phím; mỗi hàng hiện thêm biểu tượng người mẹ, em bé, ngày giờ, nhưng chỉ bằng icon và màu sắc, không có chữ.",
+            "camera": "Over-the-shoulder shot showing the staff entering data, then a close-up of the abstract data blocks filling in.",
+            "onscreen_text": "Visual idea only: medical staff enter birth data into the hospital system, shown as structured blocks with person and clock icons, no text."
+        },
+        {
+            "segment_id": "segment_03_sync_and_file_creation",
+            "duration_seconds": 8,
+            "voiceover": "Hệ thống hành chính chủ động đã đồng bộ với hệ thống y tế, cơ sở dữ liệu hộ tịch và cơ sở dữ liệu dân cư nên tự động nhận dữ liệu ca sinh.",
+            "scene_description": "Transition to a digital platform hub representing the proactive administration system at the center.",
+            "data_visualization": "Three colored database icons appear around the hub: one linked visually với biểu tượng y tế, một với biểu tượng hộ tịch, một với biểu tượng dân cư. Dòng dữ liệu ánh sáng chảy từ cả ba kho dữ liệu vào trung tâm, không có chữ.",
+            "camera": "Top-down view of the three databases feeding the central hub, then tilt down toward the hub as it brightens.",
+            "onscreen_text": "Visual idea only: proactive administration system synchronizes data from health, civil status and population databases, using three distinct icons, no labels."
+        },
+        {
+            "segment_id": "segment_04_birth_file_draft_notify_citizen",
+            "duration_seconds": 8,
+            "voiceover": "Từ các nguồn dữ liệu này, hệ thống hành chính chủ động tạo lập hồ sơ khai sinh cho trẻ và gửi thông báo tới công dân.",
+            "scene_description": "Inside the digital hub, a new case file icon forms from merging streams of data, rồi đường kết nối chạy đến biểu tượng một chiếc điện thoại thông minh.",
+            "data_visualization": "A folder icon representing the birth registration file is built from stacked blocks in three colors tương ứng với ba cơ sở dữ liệu. Một đường sáng vạch ra hành trình từ hồ sơ tới biểu tượng smartphone đang rung lên, tất cả không chữ.",
+            "camera": "Follow the path of light as it constructs the folder icon, then pan to the smartphone icon glowing to indicate a notification.",
+            "onscreen_text": "Visual idea only: the system drafts the birth registration file and notifies the citizen’s phone, purely with icons and motion."
+        },
+        {
+            "segment_id": "segment_05_citizen_confirms_file",
+            "duration_seconds": 8,
+            "voiceover": "Cha mẹ mở điện thoại, kiểm tra thông tin tóm tắt của hồ sơ khai sinh, bổ sung nếu cần và xác nhận một lần.",
+            "scene_description": "At home, the parents sit together on a sofa, người mẹ bế em bé, người cha cầm smartphone.",
+            "data_visualization": "On the phone screen, một danh sách các thanh ngang trống với icon màu xanh lá ở bên phải thể hiện thông tin đã đúng, và một thanh có icon dấu cộng để bổ sung. Ở dưới cùng là một nút tròn lớn với dấu tích, không có chữ.",
+            "camera": "Medium shot of the family, then over-the-shoulder close-up of the phone as the father chạm vào nút xác nhận; các icon chuyển sang trạng thái đã hoàn tất.",
+            "onscreen_text": "Visual idea only: parents review a summary and confirm once, shown by checkmark icons and a confirm circle, no text."
+        },
+        {
+            "segment_id": "segment_06_send_to_public_service_and_status",
+            "duration_seconds": 8,
+            "voiceover": "Sau khi công dân xác nhận, hệ thống hành chính chủ động gửi hồ sơ khai sinh tới hệ thống dịch vụ công và cập nhật trạng thái xử lý cho công dân.",
+            "scene_description": "The confirmed birth file icon di chuyển từ nền tảng hành chính chủ động tới một cụm icon tòa nhà chính quyền tượng trưng cho cổng dịch vụ công.",
+            "data_visualization": "A progress track with vài chặng biểu tượng tròn, mỗi chặng sáng lên lần lượt khi hồ sơ di chuyển. Trên điện thoại của công dân, một vòng tròn tiến trình đơn giản quay và dần đầy màu, hoàn toàn không chữ.",
+            "camera": "Side view following the file icon along the track tới cụm tòa nhà, xen kẽ shot màn hình điện thoại đang hiển thị vòng tròn trạng thái.",
+            "onscreen_text": "Visual idea only: proactive administration sends the file to the public service system and shows status via a simple progress icon, no labels."
+        },
+        {
+            "segment_id": "segment_07_result_and_e_birth_certificate",
+            "duration_seconds": 8,
+            "voiceover": "Khi cơ quan có thẩm quyền xử lý xong, hệ thống hành chính chủ động thông báo kết quả và gửi giấy khai sinh điện tử để gia đình lưu trữ.",
+            "scene_description": "Back in the digital space, the file icon nhận một dấu xác nhận màu xanh, sau đó biến thành biểu tượng giấy khai sinh điện tử sáng rõ.",
+            "data_visualization": "The electronic birth certificate appears dưới dạng một tấm thẻ hoặc tờ giấy số hóa với biểu tượng mã QR và dấu chứng thực, nhưng không có bất kỳ ký tự chữ hay số nào. Một bản sao icon được hiển thị trên smartphone của cha mẹ.",
+            "camera": "Close-up on the certificate icon as it appears, rồi kéo ra để thấy cha mẹ mỉm cười nhìn vào điện thoại.",
+            "onscreen_text": "Visual idea only: result notification and e-birth certificate delivered to the family, shown by certified document and phone icons, no text."
+        },
+        {
+            "segment_id": "segment_08_overview_data_sources_diagram",
+            "duration_seconds": 8,
+            "voiceover": "Tổng thể, hồ sơ khai sinh của trẻ được tạo lập tự động từ dữ liệu y tế, dữ liệu hộ tịch và dữ liệu dân cư, bảo đảm đầy đủ và chính xác ngay từ đầu.",
+            "scene_description": "A clean overview diagram fills the screen, cho thấy ba khối cơ sở dữ liệu ở phía trên và hồ sơ khai sinh hoàn chỉnh ở phía dưới.",
+            "data_visualization": "Show three data blocks at the top of the screen and one central birth registration file icon at the bottom. The left block represents health data using only medical icons such as a stethoscope, a heart, a baby scale and a clock. The middle block represents civil status using only icons such as a family book, two parents and one child. The right block represents population data using only icons such as an ID card, a house and a location pin. From each of the three blocks, a stream of colored particles flows down into the central birth file icon. The birth file icon is divided into three colored sections matching the three data sources. IMPORTANT: do NOT render any letters, words or numbers inside the blocks or on the document. If a title bar or label area would normally appear, keep it completely blank or replace it with a simple solid color bar with no characters. The entire diagram must be built only from shapes, icons, colors and particle flows, with absolutely no readable text anywhere.",
+            "camera": "Static wide shot of the diagram, với chuyển động nhẹ của các dòng dữ liệu chảy xuống hồ sơ, sau đó chậm rãi zoom-in vào hồ sơ khai sinh trung tâm.",
+            "onscreen_text": "Visual idea only: overview of all data sources feeding the birth registration file; each section of the file colored by its source, no written labels."
+        }
+    ]
+}

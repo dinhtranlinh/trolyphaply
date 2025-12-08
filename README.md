@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Trợ Lý Pháp Lý (TroLyPhapLy)
 
-## Getting Started
+Ứng dụng web tư vấn pháp luật và thủ tục hành chính với AI.
 
-First, run the development server:
+## Công nghệ
 
-```bash
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Database:** PostgreSQL (Supabase)
+- **ORM:** Prisma 7
+- **AI:** Google Gemini API
+- **Storage:** Supabase Storage
+
+## Cấu trúc dự án
+
+\\\
+trolyphaply/
+ app/                    # Next.js App Router
+    (main)/            # Route group chính
+       page.tsx       # Home (Q&A Hub)
+       law/           # Legal Library
+       prompts/       # Prompt Hub
+       apps/          # Fun AI Apps
+    api/               # Backend APIs
+    admin/             # Admin Dashboard
+ components/
+    layout/            # AppShell, Header, BottomNav
+    ui/                # Atomic components
+    legal/             # Legal-specific components
+ lib/
+    prisma.ts          # DB client
+    gemini.ts          # Gemini AI wrapper
+    storage.ts         # Supabase storage
+    auth.ts            # Admin authentication
+ prisma/
+     schema.prisma      # Database schema
+\\\
+
+## Database Models
+
+- \\AdminUser\\ - Admin authentication
+- \\LegalDocument\\ - Văn bản pháp luật
+- \\Procedure\\ - Thủ tục hành chính
+- \\Prompt\\ - AI prompts library
+- \\App\\ - Fun AI apps (migrated from FacebookApp)
+- \\Result\\ - App execution results
+
+## Setup Development
+
+\\\ash
+# Install dependencies
+npm install
+
+# Setup database
+npx prisma generate
+npx prisma db push
+
+# Seed data
+npm run db:seed
+
+# Run dev server (port 6666)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+\\\
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+See \\.env.example\\ for required environment variables.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment
 
-## Learn More
+- **Domain:** trolyphaply.vn
+- **Platform:** Vercel
+- **Database:** Supabase (Production)
 
-To learn more about Next.js, take a look at the following resources:
+## Related Projects
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **FacebookApp** (Tử Vi) - tuvi.trolyphaply.vn
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Version:** 1.0.0  
+**Created:** December 2025

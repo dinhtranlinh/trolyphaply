@@ -1,0 +1,111 @@
+{
+  "common": {
+    "project_title": "Video quảng cáo App Tử Vi - Hotgirl & người yêu tương lai",
+    "language": "vi-VN",
+    "video_usage": "TikTok, Instagram Reels, YouTube Shorts",
+    "format": {
+      "aspect_ratio": "9:16",
+      "resolution": "4K",
+      "frame_rate": 30
+    },
+    "visual_style": {
+      "overall_look": "Live-action kết hợp motion graphics vui nhộn, phong cách mạng xã hội hiện đại",
+      "aesthetics": "Tươi sáng, pastel, năng động, trẻ trung, bắt trend Gen Z",
+      "color_palette": "Tone hồng, pastel, ánh sáng tự nhiên, sạch và dễ thương",
+      "ui_elements": "TUYỆT ĐỐI KHÔNG hiển thị bất kỳ văn bản nào. Giao diện chỉ hiển thị icon, biểu tượng, sticker, emoji, không chữ hoặc số."
+    },
+    "characters": {
+      "main_character": {
+        "role": "Người dùng chính",
+        "description": "Hotgirl Gen Z người Việt Nam, khoảng 22–25 tuổi, có biểu cảm sinh động, phong cách đáng yêu, năng động. Tóc nhuộm sáng (vàng hoặc nâu khói), mặc đồ ngủ pastel (pijama kiểu Hàn Quốc), phòng ngủ nữ tính, trang điểm nhẹ tự nhiên, thường cầm điện thoại. Có tính cách hài hước, hơi 'nghiện app', hay tự nói một mình theo kiểu vlog."
+      }
+    },
+    "audio_style": {
+      "music": "Nhạc TikTok Việt remix không lời, tiết tấu vui vẻ (BPM 100–110)",
+      "sound_effects": "Sticker popping, icon flying, ping khi hiện quẻ, whoosh khi chuyển cảnh",
+      "voiceover_note": "Voiceover tiếng Việt đầy đủ dấu, vui vẻ, tự nhiên, đúng ngữ điệu mạng xã hội, không quá trịnh trọng"
+    }
+  },
+  "segments": [
+    {
+      "segment_id": "segment_01",
+      "duration_seconds": 8,
+      "voiceover": "Tui mới chia tay hôm qua á... Đang buồn thì nhỏ bạn gửi cái app Tử Vi 2026.",
+      "scene_description": "Hotgirl ngồi buồn trên giường, phòng tone hồng pastel. Mặt buồn, cầm điện thoại.",
+      "data_visualization": "Mưa hoạt họa rơi, icon buồn ☁️💧 bay nhẹ xung quanh",
+      "camera": "Góc thấp hướng lên nhẹ, ánh sáng dịu, quay cận cảnh biểu cảm buồn"
+    },
+    {
+      "segment_id": "segment_02",
+      "duration_seconds": 8,
+      "voiceover": "Tui định bấm chơi cho vui… ai ngờ…",
+      "scene_description": "Cô vuốt điện thoại, mở app, nhập ngày sinh, giới tính, chọn quẻ",
+      "data_visualization": "Motion graphics giao diện app hiện lên – đầy biểu tượng cute, không chữ",
+      "camera": "Quay từ phía sau lưng, chuyển sang cận cảnh màn hình"
+    },
+    {
+      "segment_id": "segment_03",
+      "duration_seconds": 8,
+      "voiceover": "Hiện lên cái quẻ ghi… 'Cuối 2026 có thể gặp một người đặc biệt'…",
+      "scene_description": "Gương mặt ngạc nhiên, mắt tròn, hơi nghiêng đầu",
+      "data_visualization": "Sticker “❤️❗” bật ra từ điện thoại + hiệu ứng glow nhẹ",
+      "camera": "Zoom chậm vào mặt biểu cảm"
+    },
+    {
+      "segment_id": "segment_04",
+      "duration_seconds": 8,
+      "voiceover": "Ủa alo? Cái gì vậy? Hợp gu tui dữ thần luôn á…",
+      "scene_description": "Biểu cảm chuyển từ sốc sang thẹn thùng, rồi cười tủm tỉm",
+      "data_visualization": "Emoji bay quanh đầu 😳✨🥰",
+      "camera": "Máy quay xoay 180 độ quanh nhân vật"
+    },
+    {
+      "segment_id": "segment_05",
+      "duration_seconds": 8,
+      "voiceover": "Ủa mà biết đâu… trúng thiệt? Ghê thiệt á!",
+      "scene_description": "Cô ôm gối cuộn tròn, lăn nhẹ trên giường như mê đắm",
+      "data_visualization": "Hiệu ứng sparkle sao bay + mặt glowing",
+      "camera": "Góc quay từ trên cao, ánh sáng mềm"
+    },
+    {
+      "segment_id": "segment_06",
+      "duration_seconds": 8,
+      "voiceover": "Tui share story liền, cho đám bạn ghen chơi 😌",
+      "scene_description": "Cô cười khoái chí, chọn nút chia sẻ, quay góc selfie đáng yêu",
+      "data_visualization": "Sticker story flash 📸🌈 + emoji reaction",
+      "camera": "Selfie cam quay chính diện"
+    },
+    {
+      "segment_id": "segment_07",
+      "duration_seconds": 8,
+      "voiceover": "Không biết trúng không… chứ vui quá trời rồi đó nha!",
+      "scene_description": "Cô cười lăn trên giường, vừa ôm gối vừa lắc đầu kiểu “trúng ghê”",
+      "data_visualization": "Bong bóng emoji 🎈🎀 xuất hiện bay nhẹ",
+      "camera": "Góc quay ngang tầm với hành động"
+    },
+    {
+      "segment_id": "segment_08",
+      "duration_seconds": 8,
+      "voiceover": "Coi quẻ xong… tự nhiên thấy yêu đời ghê á!",
+      "scene_description": "Cô đứng trước gương tạo dáng xinh xắn, xoay người tạo hiệu ứng",
+      "data_visualization": "Sticker trái tim bay ra từ gương + emoji 😚✌️💖",
+      "camera": "Quay phản chiếu trong gương, ánh sáng sáng đều"
+    },
+    {
+      "segment_id": "segment_09",
+      "duration_seconds": 8,
+      "voiceover": "App Tử Vi gì đâu… cute muốn xỉu!",
+      "scene_description": "Hotgirl mở điện thoại lần nữa, tươi cười bấm tạo quẻ tiếp theo",
+      "data_visualization": "SFX “ting ting” + icon loading chuyển động",
+      "camera": "Cận tay bấm + góc từ vai lên"
+    },
+    {
+      "segment_id": "segment_10",
+      "duration_seconds": 8,
+      "voiceover": "Tui tạo thêm 5 cái quẻ nữa luôn rồi… 😳",
+      "scene_description": "Cảnh tua nhanh 5 lần tạo quẻ, mặt cô càng lúc càng 'nghiện'",
+      "data_visualization": "Sticker emoji xoay vòng 🤯🤣 + icon đếm lượt quay",
+      "camera": "Jumpcut nhanh với góc thay đổi liên tục"
+    }
+  ]
+}

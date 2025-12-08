@@ -1,26 +1,300 @@
 @import "tailwindcss";
 
+/* ========================================
+   TROLYPHAPLY - LEGAL THEME
+   Mobile-First Legal Assistant Platform
+   ======================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Colors - Navy Blue (Professional, Trustworthy) */
+  --color-primary: #0B3B70;
+  --color-primary-light: #1F4E82;
+  --color-primary-soft: #E6EEF7;
+  
+  /* Accent Colors - Gold (CTAs, Highlights) */
+  --color-accent: #E5A100;
+  --color-accent-soft: #FFF4D6;
+  
+  /* Background Colors */
+  --color-bg: #F5F7FA;
+  --color-surface: #FFFFFF;
+  
+  /* Text Colors */
+  --color-text-main: #1F2933;
+  --color-text-muted: #6B7280;
+  
+  /* Border Colors */
+  --color-border-subtle: #E5E7EB;
+  
+  /* Status Colors */
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-error: #DC2626;
+  
+  /* Legacy (for compatibility) */
+  --background: var(--color-surface);
+  --foreground: var(--color-text-main);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Custom Colors */
+  --color-primary-*: initial;
+  --color-primary: #0B3B70;
+  --color-primary-light: #1F4E82;
+  --color-primary-soft: #E6EEF7;
+  
+  --color-accent-*: initial;
+  --color-accent: #E5A100;
+  --color-accent-soft: #FFF4D6;
+  
+  /* Background & Surface */
+  --color-bg: #F5F7FA;
+  --color-surface: #FFFFFF;
+  
+  /* Text Colors */
+  --color-text-*: initial;
+  --color-text-main: #1F2933;
+  --color-text-muted: #6B7280;
+  
+  /* Borders */
+  --color-border-*: initial;
+  --color-border-subtle: #E5E7EB;
+  
+  /* Status */
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-error: #DC2626;
+  
+  /* Fonts */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Base Styles */
+body {
+  background: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Scale */
+.page-title {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  line-height: 1.75rem;
+  color: var(--color-text-main);
+}
+
+.section-title {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  line-height: 1.5rem;
+  color: var(--color-text-main);
+}
+
+.body-text {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: var(--color-text-main);
+}
+
+.label-text {
+  font-size: 0.75rem; /* 12px */
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* Card Component */
+.card {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  padding: 0.75rem 1rem;
+}
+
+.card-shadow {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Button Base Styles */
+.btn {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-light);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary-soft);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-text-main);
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+}
+
+.btn-accent:hover {
+  background: #D49400;
+}
+
+/* Input Styles */
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  background: var(--color-surface);
+  color: var(--color-text-main);
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Chip/Tag Styles */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chip:hover {
+  background: var(--color-primary-light);
+  color: white;
+}
+
+.chip-active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Utility Classes */
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.border-subtle {
+  border-color: var(--color-border-subtle);
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Line Clamp Utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile-First Responsive Utilities */
+@media (min-width: 640px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.25rem;
+  }
 }

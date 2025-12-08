@@ -1,0 +1,140 @@
+{
+    "common": {
+        "project_title": "Proactive food safety certificate issuance (procedure 1.013855.H17)",
+        "language": "vi-VN",
+        "video_usage": "Web and YouTube, landscape format",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Hybrid of simple live-action shots and clean 3D motion graphics in a calm, government-tech style. The visuals should feel professional, modern and minimal, without flashy effects.",
+            "aesthetics": "Ultra-minimal, trustworthy and clear, with smooth camera motion and gentle pacing suitable for an administrative process about food safety certification.",
+            "color_palette": "Soft cool tones with light blue, white and grey as the main colors, with limited accent colors to highlight data flows and system icons. Avoid aggressive colors and strong contrasts.",
+            "ui_elements": "ABSOLUTE NO-TEXT POLICY. Do NOT render any readable text, letters, numbers or words in the image under any circumstances. This includes titles, headers, labels, button captions, tooltips, status messages and database names. All visible UI and documents must be built only from icons, shapes, color blocks, progress bars, simple pictograms and abstract symbols. If a button, card, header bar, folder, database block or document would normally contain text, show it as a plain shape or a solid color bar with no characters, or as a blurred area where no individual letters can be recognized. IMPORTANT: All words and phrases in this prompt are instructions only and must NEVER appear as on-screen text. Do not copy or approximate any of these words (such as 'owner', 'national population database', 'food business case', etc.) into the video. If the model starts to create any letters or pseudo-words, replace them with neutral visual noise or blur so that nothing is legible.",
+            "extra_text_suppression": "The model must suppress all text-like patterns. Do NOT generate any shapes that resemble letters, numbers or typographic glyphs. This includes avoiding sequences of vertical\/horizontal strokes, repeated patterns that look like alphabetic characters, or grouped rectangles that suggest paragraph lines. If the model attempts to create any UI block that usually contains text, it must render it as one of the following only: (1) a solid color rectangle with NO inner marks, (2) a soft blurred patch with NO distinguishable symbols, (3) a gradient bar with zero internal shapes. Completely prohibit pseudo-text, scrambled text, or noise text such as 'ownen', 'repsihciert', 'populitue', or any invented word. If text generation is attempted, immediately replace it with abstract texture or smooth blur. NEVER render any icon or block that contains placeholder lines representing text."
+        },
+        "characters": {
+            "business_owner": "A Vietnamese restaurant or food production facility owner in their 30s–50s, dressed simply and professionally.",
+            "officials": "Civil servants working in a modern, paperless digital office environment, using large transparent displays instead of stacks of paper.",
+            "inspectors": "Food safety inspectors wearing simple, neutral outfits or light protective gear when visiting the kitchen.",
+            "medical_staff": "Hospital medical staff in standard uniforms, briefly seen when entering health check data into hospital systems."
+        },
+        "audio_style": {
+            "music": "Soft, subtle ambient background music without vocals, with a slow, steady tempo that feels calm and professional, not dramatic.",
+            "sound_effects": "Very light interface sounds such as soft whooshes when data flows and gentle confirmation chimes when steps are completed. Avoid loud or playful effects.",
+            "voiceover_note": "Vietnamese voiceover with clear diction and full diacritics, using short, simple sentences suitable for about 8 seconds per segment. All information for citizens is conveyed via the voiceover and visuals; there is absolutely no on-screen text. Any textual information mentioned in the script must be spoken only, never shown in writing."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_01_intro_old_vs_proactive",
+            "duration_seconds": 8,
+            "voiceover": "Trước đây, xin giấy chứng nhận an toàn thực phẩm, chủ cơ sở phải chuẩn bị hồ sơ, đi lại nhiều lần và chờ đợi rất lâu.",
+            "scene_description": "A traditional administrative office with a food business owner holding a thick stack of paper documents while waiting in a long line at a counter.",
+            "data_visualization": "Show multiple paper folders piled on the counter and in the owner’s hands. Then the papers gradually dissolve into glowing data cubes that float toward an abstract central platform representing the proactive administration system. IMPORTANT: the paper pages must not contain any readable words or numbers, only blank surfaces or simple lines.",
+            "camera": "Start with a medium shot of the owner in the queue, then slowly dolly sideways to reveal more stacks of paper. As the papers dissolve into data cubes, transition to a wide shot centered on the digital platform receiving the cubes.",
+            "onscreen_text": "No text. The transition from manual paperwork to digital processing is shown only by paper stacks turning into floating data cubes."
+        },
+        {
+            "segment_id": "segment_02_detect_need_for_food_safety_service",
+            "duration_seconds": 8,
+            "voiceover": "Với Hành chính chủ động, khi cơ sở đăng ký ngành nghề ăn uống hoặc sản xuất thực phẩm, hệ thống tự nhận diện nhu cầu cấp giấy chứng nhận an toàn thực phẩm.",
+            "scene_description": "A clean digital space where a restaurant or food factory icon is linked to a business registration data block, which then connects to the proactive administration platform.",
+            "data_visualization": "Show a building icon with a bowl and chopsticks or a small factory to represent the food business. Next to it, a business registration data block appears with icons for a license sheet, a person silhouette and a location pin. A light link runs from this block into the central proactive administration platform. A new case icon with a small food safety shield appears on the platform, indicating that the need for a food safety certificate has been detected automatically. No labels or text are shown.",
+            "camera": "Use a medium-wide shot including the business icon, the business registration block and the platform. Slowly pan across as the link is created and the new food safety case icon appears on the platform.",
+            "onscreen_text": "No text. Automatic detection of the service need is shown by the new case icon with a food safety shield symbol."
+        },
+        {
+            "segment_id": "segment_03_connect_enterprise_registration_db",
+            "duration_seconds": 8,
+            "voiceover": "Trước hết, hệ thống kết nối Cơ sở dữ liệu đăng ký doanh nghiệp để lấy tên cơ sở, mã số, địa chỉ và ngành nghề kinh doanh liên quan đến thực phẩm.",
+            "scene_description": "The proactive administration platform pulls structured data from an enterprise registration database managed by the planning and investment authority.",
+            "data_visualization": "On one side, show a large enterprise registration database block with icons: a license document, a building, a tag icon for ID number and a list icon for business lines. Data lines flow from this block into the central food business case. Inside the case, separate slots fill with icons: a name-tag icon for facility name, a number tag icon for enterprise ID, a location pin icon for registered address and a bowl or factory icon for the food-related business line. Each slot receives a green check icon once filled. No words, acronyms or numbers are visible.",
+            "camera": "Frame the enterprise registration block on the left and the food business case in the center. Slowly push in as data streams fill the slots inside the case and checkmarks appear.",
+            "onscreen_text": "No text. Enterprise registration data is represented only by icons for license, ID tag, address and business line, each gaining a green check."
+        },
+        {
+            "segment_id": "segment_04_connect_national_population_db",
+            "duration_seconds": 8,
+            "voiceover": "Tiếp theo, hệ thống kết nối Cơ sở dữ liệu quốc gia về dân cư để đối chiếu căn cước công dân, họ tên và nơi thường trú của chủ cơ sở.",
+            "scene_description": "The proactive administration platform now connects to the national population database to verify the legal representative of the food business.",
+            "data_visualization": "Show a population database block with icons such as an ID card, a person silhouette and a small house for permanent residence. A data line connects this block to the food business case. Inside the case, a dedicated section for the owner or legal representative lights up: icons for an ID card, a person and a house appear, each followed by a green check symbol, indicating that the person’s identity and permanent address have been verified. No text or digit strings appear anywhere.",
+            "camera": "Use a wide shot to show the population database block and the case. Then gently zoom into the owner section of the case as the ID card and house icons light up with green checks.",
+            "onscreen_text": "No text. Population data is expressed through ID card, person and house icons that gain green checkmarks after crosschecking."
+        },
+        {
+            "segment_id": "segment_05_connect_health_certificate_from_hospital_HIS",
+            "duration_seconds": 8,
+            "voiceover": "Đồng thời, hệ thống khai thác dữ liệu giấy khám sức khỏe của người trực tiếp chế biến, kinh doanh thực phẩm từ hệ thống bệnh viện.",
+            "scene_description": "The proactive administration platform connects to hospital information systems to retrieve health certificate data for key food handlers.",
+            "data_visualization": "Show one or more hospital icons feeding a health data block labeled visually with medical pictograms only: a stethoscope, a heart, a medical cross and a calendar icon for the health check date. Data lines flow from this health block into a staff section within the food business case. In that section, show rows of small person icons, each with an attached health card icon and a green check if a valid health certificate exists, or a warning icon if missing or expired. All indication is via icons; no names, dates or text strings are shown.",
+            "camera": "Pan from the hospital icons and health data block toward the staff section of the case, then slowly move down the rows of staff icons to show health card icons turning into green checks.",
+            "onscreen_text": "No text. Health certificates are represented by medical icons and cards attached to staff icons, with green checks or warning symbols."
+        },
+        {
+            "segment_id": "segment_06_connect_food_safety_training_database",
+            "duration_seconds": 8,
+            "voiceover": "Hệ thống cũng đối chiếu Cơ sở dữ liệu tập huấn an toàn thực phẩm để kiểm tra chứng chỉ tập huấn của chủ cơ sở và nhân viên chủ chốt.",
+            "scene_description": "The proactive administration platform connects to a food safety training database managed by the food safety authority or Ministry of Health.",
+            "data_visualization": "Show a training database block with icons such as a graduation cap, a certificate badge and a group of people. Data flows from this block into the same staff section of the food business case. Next to each key staff icon, a training certificate badge appears. Valid training is shown by a green check on the badge; missing or expired training is shown with a small warning triangle. No course names, codes or dates are displayed as text; only pictograms and status icons are used.",
+            "camera": "Start with a shot of the training database block and then track the data flow into the staff section. Move closer to one or two staff icons to highlight how the training badge icons change to green checks.",
+            "onscreen_text": "No text. Training status is shown only by certificate badge icons with green checks or warning triangles."
+        },
+        {
+            "segment_id": "segment_07_system_compiles_draft_application_and_checklist",
+            "duration_seconds": 8,
+            "voiceover": "Từ những dữ liệu này, hệ thống tự động lập bản dự thảo hồ sơ xin cấp giấy chứng nhận, kèm danh mục hồ sơ, giấy tờ cần thiết cho thẩm định.",
+            "scene_description": "Within the proactive administration platform, all imported data pieces assemble into a structured draft application and checklist for the food safety certificate.",
+            "data_visualization": "Show the food business case transforming into a larger folder icon labeled visually with a shield and utensils symbol. Inside, separate blocks appear: one block with license and owner icons for enterprise registration data, one with location and map icons, one with staff plus health and training icons. Alongside, a vertical checklist column appears using only icons: a document icon for the application form, a house-plan icon for layout, an equipment rack icon, a health card stack icon and a training certificate stack icon. Each checklist item receives a green check if fully backed by data, or a plus or warning icon if additional uploads are still needed. No textual labels are shown.",
+            "camera": "Use a slow zoom-in on the folder as internal blocks and the icon-only checklist slide into place. Focus briefly on the checklist icons as some turn to green checks while others remain marked as needing input.",
+            "onscreen_text": "No text. The draft application and checklist are represented only by grouped icons and checkmarks for each document type."
+        },
+        {
+            "segment_id": "segment_08_notify_owner_to_review_and_upload",
+            "duration_seconds": 8,
+            "voiceover": "Chủ cơ sở nhận thông báo, xem hồ sơ dự thảo trên điện thoại, tải lên sơ đồ bếp, danh mục thiết bị, tài liệu tự kiểm tra vệ sinh rồi xác nhận thực hiện thủ tục.",
+            "scene_description": "Back in the real world, the business owner sits inside the food facility, using a smartphone to review and complete the application.",
+            "data_visualization": "On the phone screen, show a simple stack of icon-only cards: one with a floor plan icon for the kitchen layout, one with equipment icons like stoves and shelves, and one with a clipboard icon for hygiene self-check records. Some cards already have green check icons; others display plus icons indicating missing uploads. As the owner taps on each card, small animated previews of layout, equipment and checklist icons float into the card, and the plus icon turns into a green check. At the bottom, a large confirm circle with a check symbol appears, representing final confirmation.",
+            "camera": "Begin with a medium shot of the owner holding the phone, then cut to an over-the-shoulder view of the screen as the owner taps and the icons change. Finish with a slight pull-back as the confirm circle glows.",
+            "onscreen_text": "No text. The owner’s review and upload actions are shown entirely through icon cards and checkmarks on the phone screen."
+        },
+        {
+            "segment_id": "segment_09_forward_e_dossier_to_food_safety_authority",
+            "duration_seconds": 8,
+            "voiceover": "Sau khi xác nhận, hồ sơ điện tử hoàn chỉnh được hệ thống gửi đến Ban Quản lý an toàn thực phẩm để thẩm định và sắp xếp kiểm tra thực tế khi cần.",
+            "scene_description": "The completed electronic dossier moves from the proactive administration platform to the food safety authority office.",
+            "data_visualization": "Show the now fully checked folder icon traveling along a bright path from the platform to an official building icon with a fork-and-spoon shield symbol. Inside a transparent digital desk in the building, multiple sections of the dossier appear: business info, location, staff health, staff training, layout and equipment, each represented with icons and rows of green checks. A calendar icon and magnifying glass icon appear and connect visually to the restaurant icon, indicating planning of an on-site inspection when needed.",
+            "camera": "Track the folder icon along the bright path into the authority building, then cut to a medium shot of a civil servant facing a transparent screen, with a gentle zoom onto the dossier sections and the calendar–inspection link.",
+            "onscreen_text": "No text. The transfer and assessment preparation are shown by the approved folder entering the authority building, with icon-only dossier sections and an inspection calendar."
+        },
+        {
+            "segment_id": "segment_10_on_site_inspection_and_evaluation",
+            "duration_seconds": 8,
+            "voiceover": "Cán bộ chuyên môn sử dụng hồ sơ điện tử để chuẩn bị kiểm tra, đánh giá điều kiện thực tế tại cơ sở và nhập kết quả thẩm định lên hệ thống.",
+            "scene_description": "A short sequence of an on-site inspection at the food premise, combined with digital recording of the inspection results back into the system.",
+            "data_visualization": "Show an inspector visiting the kitchen area: icons for a thermometer, cleaning spray and checklist are overlaid subtly on the scene to indicate hygiene checks. Then cut to the inspector using a tablet, where the same icons appear inside a digital checklist interface: layout, equipment, hygiene practices, staff health and training all show green checks or, if needed, warning symbols. These icons then flow back into the main dossier, updating a dedicated inspection result block next to the application.",
+            "camera": "Alternate between a handheld-style shot following the inspector in the kitchen and a stable shot of the inspector using the tablet. Then cut to the digital space where the inspection result block attaches to the dossier and glows softly.",
+            "onscreen_text": "No text. The on-site inspection and its digital recording are indicated by overlays of inspection icons and a digital checklist feeding into the dossier."
+        },
+        {
+            "segment_id": "segment_11_approval_and_issue_e_certificate",
+            "duration_seconds": 8,
+            "voiceover": "Khi đáp ứng đầy đủ điều kiện, lãnh đạo cơ quan thẩm định phê duyệt trên hệ thống, và Hành chính chủ động phát hành giấy chứng nhận an toàn thực phẩm điện tử, đồng thời in bản giấy khi cần.",
+            "scene_description": "In the digital office, a leader reviews the completed dossier and approves the issuance of the food safety certificate, triggering both e-certificate and paper certificate flows.",
+            "data_visualization": "Show the dossier folder with all sections and the inspection result block glowing in green. A leader icon taps an approval circle on a transparent screen. A large seal or approval check icon appears over a certificate document icon. From this approved certificate, two branches emerge: one goes to the owner’s smartphone icon, showing a digital certificate document symbol with a seal; the other goes to the authority building icon, where a blank paper certificate with a seal icon is prepared for printing. Additional subtle data lines extend from the certificate to a monitoring database icon, indicating storage for future inspections and renewals.",
+            "camera": "Begin with a medium shot of the leader at a workstation, then zoom into the digital certificate as the approval seal appears. Follow the data branches to the smartphone and to the building, ending on a wide shot showing phone, paper certificate and monitoring database together.",
+            "onscreen_text": "No text. Approval and issuance are shown by an approved certificate icon branching into a phone, an office printer path and a monitoring database."
+        },
+        {
+            "segment_id": "segment_12_overview_food_safety_data_and_documents",
+            "duration_seconds": 8,
+            "voiceover": "Tổng thể, hồ sơ cấp giấy chứng nhận an toàn thực phẩm được tạo lập tự động từ dữ liệu đăng ký doanh nghiệp, dữ liệu dân cư, dữ liệu y tế, dữ liệu tập huấn và kết quả kiểm tra thực tế, giúp rút ngắn thời gian xử lý và minh bạch hóa quản lý.",
+            "scene_description": "A clean overview diagram showing all key data sources at the top and the final food safety certificate file and related documents at the bottom.",
+            "data_visualization": "At the top of the frame, display five separate data blocks: an enterprise registration block with license and building icons; a population block with ID card, person and house icons; a health data block with stethoscope and health card icons; a training block with graduation cap and certificate badge icons; and an inspection block with checklist, thermometer and calendar icons. From each block, a colored particle stream flows downward into a large central food safety certificate file icon. Around this central file, show three smaller document icons: an application form icon, a staff list icon with health and training badges, and an inspection report icon with a shield symbol. The central certificate file is visually divided into colored segments corresponding to the five data sources, illustrating which part comes from which database or document. IMPORTANT: do NOT render any letters, words or numbers in any block or document. If any area might typically have a title bar, show it as a solid color bar with no characters. The entire overview must rely only on shapes, icons, colors and particle flows.",
+            "camera": "Hold a static wide shot of the full diagram while the colored streams gently flow from the five data blocks into the central certificate file. Then perform a slow zoom-in toward the certificate file and the surrounding document icons to emphasize the integrated, automated process.",
+            "onscreen_text": "Visual idea only: a complete overview of all data sources and documents feeding into the food safety certificate file; each part of the file is color-coded by its source, with no written labels."
+        }
+    ]
+}

@@ -1,0 +1,113 @@
+{
+  "common": {
+    "project_title": "Birth registration, permanent residence registration and health insurance card issuance for children under six years old",
+    "language": "vi-VN",
+    "video_usage": "Web and YouTube, landscape format",
+    "format": {
+      "aspect_ratio": "16:9",
+      "resolution": "4K",
+      "frame_rate": 25
+    },
+    "visual_style": {
+      "overall_look": "Hybrid of cinematic live-action and high-tech motion graphics, clean and modern, similar to a polished government digital service commercial",
+      "aesthetics": "Ultra-modern, minimalist, trustworthy and institutional, with subtle depth of field, smooth transitions and calm pacing appropriate for an explainer video for citizens",
+      "color_palette": "Cool tones with dominant tech blue, white and metallic gray, accented by neon green and warm yellow data streams that stand out clearly on a darker background",
+      "ui_elements": "Floating three-dimensional user interfaces, clear icons of government agencies, database symbols, holographic labels, simple infographics and step-by-step captions. All on-screen text, labels, buttons and captions must be in clean English only, with no Vietnamese characters or accents. Use short English words such as 'Confirm', 'Submit', 'Approved', 'Processing', 'Birth record', 'Residence', 'Health insurance'. The font must be a simple, modern sans-serif typeface, no handwritten or distorted fonts."
+    },
+    "characters": {
+      "family": "Vietnamese couple around thirty years old living in Da Nang, warm and relatable, wearing simple modern clothes, holding their newborn baby",
+      "officials": "Vietnamese civil servants from justice, police and social insurance offices, wearing shirts or light suits with ID badges, working in bright, orderly government offices",
+      "voiceover_voice": "Northern Vietnamese narrator voice, clear and warm, speaking at a natural pace suitable for about fifteen seconds per segment",
+      "people_nationality": "All people in the video are Vietnamese, with typical East Asian facial features and natural expressions"
+    },
+    "data_visualization": {
+      "core_metaphor": "Data is visualized as bright neon light streaks, glowing glass cubes, tiny shimmering energy orbs and a flowing digital river that connects systems",
+      "movement": "Data moves at very high speed, flows inside transparent fiber-optic tubes, is pulled into a central processing core, splits into multiple smaller streams and then converges back together, changing color when processed and finally dropping into a glowing data lake for storage",
+      "environment": "A futuristic data center with tall server racks and thousands of blinking LED lights, combined with abstract three-dimensional matrix space and a digital city at night where data moves like light vehicles on superhighways"
+    },
+    "cinematography": {
+      "camera_motion": "Many smooth tracking shots that follow the data streams and the characters, gentle fly-throughs inside digital pipelines and servers, with slow, stable pauses whenever text needs to be read clearly",
+      "angles": "Wide angles to show entire rooms and digital cities, medium shots on characters for emotion, top-down shots for data flow diagrams, and extreme close-ups on data packets and interface elements",
+      "effects": "Subtle motion blur on fast-moving data, strong bloom around glowing data, gentle lens flares when the camera crosses bright light sources, and soft depth of field to keep focus on important elements"
+    },
+    "audio_style": {
+      "music": "Soft, modern electronic ambient music without vocals, steady tempo that feels technological and optimistic but not aggressive",
+      "sound_effects": "Light humming of servers, gentle whooshing sounds when data flows, soft beeps on system confirmations and subtle clicks when officials approve documents",
+      "voiceover_note": "Vietnamese voiceover with full diacritics, no abbreviations inside the spoken text, sentences are complete and easy to follow at a natural pace. The voiceover is Vietnamese, but every written word visible in the video image must be in English."
+    }
+  },
+  "segments": [
+    {
+      "segment_id": "segment_01",
+      "duration_seconds": 15,
+      "voiceover": "Trước đây, một thủ tục hành chính thường đòi hỏi nhiều lần kê khai và nộp hồ sơ giấy. Theo Nghị quyết số 214 ngày hai mươi ba tháng bảy năm hai nghìn không trăm hai mươi lăm, Hành chính chủ động mở ra cách làm mới dựa trên dữ liệu đã được xác minh.",
+      "scene_description": "Open on a medium shot of a Vietnamese couple in their small but tidy apartment in Da Nang, holding their newborn baby. On the coffee table there is a messy pile of paper forms, household registration booklets and application envelopes. The parents look tired and a bit overwhelmed. The camera slowly pulls back to reveal a stylized digital map of Da Nang appearing in the air above the table, with multiple red pins marking different government offices. After a brief moment, all of the red pins fade out and are replaced by one central glowing icon labeled in English as 'Proactive e-Administration System' floating in the middle of the scene, hinting that a new, data-driven model is being introduced under the policy framework.",
+      "data_visualization": "Around the central system icon, multiple neon light streaks in blue and green begin to flow inwards from the corners of the frame, representing many separate procedures converging into one integrated process. A soft, shimmering digital river appears beneath the icon, suggesting that complex paper-based steps are being transformed into streamlined digital data flows that will be used for management and service delivery.",
+      "camera": "Start with a medium eye-level shot on the family, then slowly dolly backward to reveal the floating digital map and pins. Transition to a slightly elevated angle that clearly shows the unified system icon in the center as the red pins dissolve and the neon data streams appear.",
+      "onscreen_text": "From paper-based procedures to a data-driven proactive system."
+    },
+    {
+      "segment_id": "segment_02",
+      "duration_seconds": 15,
+      "voiceover": "Khi bé chào đời, hệ thống tự động phát hiện nhu cầu làm khai sinh, đăng ký thường trú và thẻ bảo hiểm y tế cho trẻ. Hành chính chủ động nhận diện sự kiện này để chuẩn bị thủ tục cho gia đình ngay từ đầu.",
+      "scene_description": "Cut to a bright, modern delivery room in a Vietnamese hospital in Da Nang. A Vietnamese doctor in clean white uniform gently hands the newborn baby to the mother lying on the bed, while a nurse smiles supportively. The camera then glides to a nearby desk where a medical staff member is entering information on a computer. On the screen we see a clear English-language digital birth record form. When the staff member clicks a button labeled 'Submit event', the form emits a soft glow and a notification symbol appears above it, showing that the proactive system has detected the need for related administrative procedures.",
+      "data_visualization": "The digital birth record icon sends out three small neon streams labeled in English as 'Birth certificate', 'Residence' and 'Health insurance'. These streams travel toward the central 'Proactive e-Administration System' core, illustrating that the system is automatically identifying which procedures are needed based on a single real-world event.",
+      "camera": "Use a gentle tracking shot from the mother and baby to the side desk and monitor. As the medical staff member submits the event, move into a close-up on the screen, then perform a short fly-out that follows the three neon streams as they leave the birth record and head toward the central core.",
+      "onscreen_text": "The system detects all related procedures from one life event."
+    },
+    {
+      "segment_id": "segment_03",
+      "duration_seconds": 15,
+      "voiceover": "Thay vì yêu cầu cha mẹ tự kê khai, Hành chính chủ động tự chuẩn bị thành phần hồ sơ từ dữ liệu đã được xác minh. Các thông tin về sự kiện sinh được lấy từ hệ thống y tế và cơ sở dữ liệu hộ tịch điện tử.",
+      "scene_description": "Transition into an abstract digital environment where a glowing, floating book-shaped structure appears, labeled in English as 'Civil Status Database'. Neon data streams representing verified birth events flow from this database and from a smaller 'Health system records' icon into the central core. Next to the core, a large holographic digital birth certificate form appears in English, with empty fields ready to be filled automatically.",
+      "data_visualization": "Short English labels such as 'Verified birth', 'Mother info' and 'Hospital data' float beside the incoming streams. As each verified data element arrives, it locks into the matching field on the birth certificate interface. Every completed field lights up in soft blue, making it clear that the system prepares the document using data that has already been checked and stored in official databases.",
+      "camera": "Begin with a wide shot of the civil status database and health system icons, then move closer to follow the data streams as they reach the central core and the holographic birth certificate. End on a medium close-up of the draft certificate filling itself in.",
+      "onscreen_text": "Verified civil status and health data auto-fill the birth certificate draft."
+    },
+    {
+      "segment_id": "segment_04",
+      "duration_seconds": 15,
+      "voiceover": "Tiếp đó, hệ thống dùng dữ liệu dân cư đã được xác minh để chuẩn bị phần đăng ký thường trú cho bé. Thông tin căn cước, hộ khẩu và địa chỉ được lấy trực tiếp từ Cơ sở dữ liệu quốc gia về dân cư.",
+      "scene_description": "The digital space transforms into a stylized three-dimensional city made of glowing glass cubes, each cube representing a household. On one side, a tall tower labeled in English as 'National Population Database' emits precise blue data streams. These streams flow toward the specific household cube where the family lives, identified by subtle English text hovering above it.",
+      "data_visualization": "As the data reaches the correct household cube, a green ring of light appears. English labels such as 'ID number', 'Household', and 'Address' appear and then slide into a draft residence registration interface for the baby hovering above the cube. The interface fields fill automatically, showing that the system uses pre-verified population data instead of asking the parents to re-enter the same information.",
+      "camera": "Start with a wide establishing shot of the digital city, then smoothly track alongside a single data stream as it moves from the population database tower to the family’s household cube. Finish on a closer angle that clearly shows the residence registration draft being filled.",
+      "onscreen_text": "Pre-verified population data prepares the residence registration."
+    },
+    {
+      "segment_id": "segment_05",
+      "duration_seconds": 15,
+      "voiceover": "Đồng thời, Hành chính chủ động khai thác dữ liệu bảo hiểm xã hội để dự thảo phần cấp thẻ bảo hiểm y tế cho trẻ dưới sáu tuổi. Quyền lợi được xác định trước trên cơ sở dữ liệu đã được quản lý tập trung.",
+      "scene_description": "Now the scene changes to a futuristic digital tower labeled in English as 'Social Insurance Database', surrounded by rings of light representing different benefit groups. Neon data streams from the family’s household cube travel into this tower and then onward to the central core. A holographic child health insurance card interface appears in English, waiting for entitlement information to be filled in.",
+      "data_visualization": "As the verified social insurance data arrives, English fields like 'Child under six', 'Benefit code' and 'Coverage' fill in automatically on the digital card. A subtle glowing seal appears next to the card, suggesting that the entitlement has been derived from a trusted, centrally managed database rather than manual calculation.",
+      "camera": "Use an orbiting shot that circles around the social insurance data tower, then fly inward with the data streams toward the health insurance card. Slowly push in on the card as its fields are filled and the glowing seal appears.",
+      "onscreen_text": "Central social insurance data defines the child’s health insurance rights."
+    },
+    {
+      "segment_id": "segment_06",
+      "duration_seconds": 15,
+      "voiceover": "Sau khi các thành phần hồ sơ được chuẩn bị từ dữ liệu đã xác minh, hệ thống gửi thông báo chủ động cho cha mẹ. Người dân chỉ cần mở điện thoại, kiểm tra lại và xác nhận một lần cho cả ba thủ tục.",
+      "scene_description": "Return to the family’s living room in Da Nang. The mother sits on the sofa holding the baby, while the father holds a smartphone. On the screen, a clean English interface of the proactive system shows a notification card titled 'New services for your child'. Below it, a unified form summarizes three procedures with short English lines like 'Birth certificate', 'Residence registration' and 'Health insurance'. Most fields are already filled. There is a large blue button labeled 'Confirm once' at the bottom.",
+      "data_visualization": "As the father taps the 'Confirm once' button, a circular pulse of light expands from the button and the form converts into three compact icons. These icons rise from the phone and turn into three colored neon data streams heading toward stylized icons of the justice office, police office and social insurance office, all labeled in simple English.",
+      "camera": "Use a close-up shot on the phone screen as the unified form and 'Confirm once' button are shown clearly. Follow the father’s finger as he taps, then switch to a dynamic shot that tracks the three growing data streams as they leave the phone and move into the digital space toward the agency icons.",
+      "onscreen_text": "Citizens just review the draft and confirm once for all three services."
+    },
+    {
+      "segment_id": "segment_07",
+      "duration_seconds": 15,
+      "voiceover": "Ở phía cơ quan nhà nước, công chức nhận bộ hồ sơ điện tử đã được hệ thống chuẩn bị sẵn. Họ kiểm tra tính pháp lý, chỉnh sửa nếu cần và trình lãnh đạo ký số theo đúng quy định.",
+      "scene_description": "In the digital realm, the three data streams arrive at three glowing buildings labeled in English as 'Justice office', 'Police office' and 'Social insurance office'. Inside each building, we see a modern office where a Vietnamese civil servant sits at a workstation. On each monitor, a drafted electronic file is open in English, showing the birth certificate draft, residence registration draft and child health insurance draft. The officials review the contents and click a button labeled 'Approve and sign'.",
+      "data_visualization": "When an official approves, a bright green checkmark appears above the respective file, and a digital signature seal animates onto the corner of the document. A subtle status bar labeled 'Legal review' moves to 'Completed' for each document, emphasizing that human authorities still make the final legal decision even though the data preparation was automated.",
+      "camera": "Begin with a fly-through shot along the three data streams into the three digital buildings. Cut to over-the-shoulder angles behind each official, showing the English interfaces and the 'Approve and sign' buttons being pressed. Finish on a wide composite view of all three documents with green checkmarks and signature seals.",
+      "onscreen_text": "Officials review drafted files and apply legally valid e-signatures."
+    },
+    {
+      "segment_id": "segment_08",
+      "duration_seconds": 15,
+      "voiceover": "Nhờ phát hiện nhu cầu thủ tục tự động và chuẩn bị hồ sơ từ dữ liệu đã được xác minh trước, thời gian giải quyết được rút ngắn, số lần kê khai giảm rõ rệt. Hành chính chủ động giúp Nhà nước chỉ đạo, điều hành và giải quyết thủ tục theo Nghị quyết số 214 một cách minh bạch và hiệu quả hơn.",
+      "scene_description": "The digital office scenes gently fade back into the family’s living room. The father now shows his phone to the mother. On the screen, three clear English icons appear side by side with green checkmarks: 'Birth certificate', 'Residence', and 'Health insurance card'. A simple English line below reads 'Processing time: about 1 working day'. Behind the family, a calm digital river of blue light flows horizontally, connecting icons labeled in English as 'Civil status data', 'Population data', 'Social insurance data' and 'City shared data platform'.",
+      "data_visualization": "Along the glowing digital river, small English tags appear, such as 'Verified data', 'Policy-based processing' and 'Transparent trace'. The river moves steadily, not too fast, symbolizing stable data infrastructure used for both administrative procedures and managerial decision-making, consistent with a clear legal resolution framework.",
+      "camera": "Use a medium shot of the family on the sofa, then slowly move closer to the phone to show the three results and the processing time text. Pull back slightly to reveal the blue digital river and the data source icons behind them. End with a centered shot on a clean proactive administration logo and a short English tagline on a calm dark blue background.",
+      "onscreen_text": "Proactive administration: automatic detection, verified data, faster and clearer services."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+    "common": {
+        "project_title": "Proactive food safety certificate issuance (procedure 1.013855.H17)",
+        "language": "vi-VN",
+        "video_usage": "Web and YouTube, landscape format",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Hybrid of simple live-action shots and clean 3D motion graphics in a calm, government-tech style. The visuals should feel professional, modern and minimal, without flashy effects.",
+            "aesthetics": "Ultra-minimal, trustworthy and clear, with smooth camera motion and gentle pacing suitable for an administrative process about food safety certification.",
+            "color_palette": "Soft cool tones with light blue, white and grey as the main colors, with limited accent colors to highlight data flows and system icons. Avoid aggressive colors and strong contrasts.",
+            "ui_elements": "ABSOLUTE NO-TEXT POLICY. Do NOT render any readable text, letters, numbers or words in the image under any circumstances. This includes titles, headers, labels, button captions, tooltips, status messages and database names. All visible UI and documents must be built only from icons, shapes, color blocks, progress bars, simple pictograms and abstract symbols. If a button, card, header bar, folder, database block or document would normally contain text, show it as a plain shape or a solid color bar with no characters, or as a blurred area where no individual letters can be recognized. IMPORTANT: All words and phrases in this prompt are instructions only and must NEVER appear as on-screen text. Do not copy or approximate any of these words (such as 'owner', 'national population database', 'food business case', etc.) into the video. If the model starts to create any letters or pseudo-words, replace them with neutral visual noise or blur so that nothing is legible.",
+            "extra_text_suppression": "The model must suppress all text-like patterns. Do NOT generate any shapes that resemble letters, numbers or typographic glyphs. This includes avoiding sequences of vertical\/horizontal strokes, repeated patterns that look like alphabetic characters, or grouped rectangles that suggest paragraph lines. If the model attempts to create any UI block that usually contains text, it must render it as one of the following only: (1) a solid color rectangle with NO inner marks, (2) a soft blurred patch with NO distinguishable symbols, (3) a gradient bar with zero internal shapes. Completely prohibit pseudo-text, scrambled text, or noise text such as 'ownen', 'repsihciert', 'populitue', or any invented word. If text generation is attempted, immediately replace it with abstract texture or smooth blur. NEVER render any icon or block that contains placeholder lines representing text."
+        },
+        "characters": {
+            "business_owner": "A Vietnamese restaurant or food production facility owner in their 30s–50s, dressed simply and professionally.",
+            "officials": "Civil servants working in a modern, paperless digital office environment, using large transparent displays instead of stacks of paper.",
+            "inspectors": "Food safety inspectors wearing simple, neutral outfits or light protective gear when visiting the kitchen.",
+            "medical_staff": "Hospital medical staff in standard uniforms, briefly seen when entering health check data into hospital systems."
+        },
+        "audio_style": {
+            "music": "Soft, subtle ambient background music without vocals, with a slow, steady tempo that feels calm and professional, not dramatic.",
+            "sound_effects": "Very light interface sounds such as soft whooshes when data flows and gentle confirmation chimes when steps are completed. Avoid loud or playful effects.",
+            "voiceover_note": "Vietnamese voiceover with clear diction and full diacritics, using short, simple sentences suitable for about 8 seconds per segment. All information for citizens is conveyed via the voiceover and visuals; there is absolutely no on-screen text. Any textual information mentioned in the script must be spoken only, never shown in writing."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_06_connect_food_safety_training_database",
+            "duration_seconds": 8,
+            "voiceover": "Hệ thống cũng đối chiếu Cơ sở dữ liệu tập huấn an toàn thực phẩm để kiểm tra chứng chỉ tập huấn của chủ cơ sở và nhân viên chủ chốt.",
+            "scene_description": "The proactive administration platform connects to a food safety training database managed by the food safety authority or Ministry of Health.",
+            "data_visualization": "Show a training database block with icons such as a graduation cap, a certificate badge and a group of people. Data flows from this block into the same staff section of the food business case. Next to each key staff icon, a training certificate badge appears. Valid training is shown by a green check on the badge; missing or expired training is shown with a small warning triangle. No course names, codes or dates are displayed as text; only pictograms and status icons are used.",
+            "camera": "Start with a shot of the training database block and then track the data flow into the staff section. Move closer to one or two staff icons to highlight how the training badge icons change to green checks.",
+            "onscreen_text": "No text. Training status is shown only by certificate badge icons with green checks or warning triangles."
+        }
+    ]
+}

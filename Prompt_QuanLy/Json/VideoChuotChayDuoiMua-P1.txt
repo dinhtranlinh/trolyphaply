@@ -1,0 +1,37 @@
+{
+    "common": {
+        "project_title": "Inner Strength: Stylized Watercolor Cartoon",
+        "language": "en-US",
+        "video_usage": "Artistic Short Clip, YouTube, focus on emotional animation and watercolor texture",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Stylized illustration, blending **Japanese Watercolor** and **Asian Brush-painting** influence with a **cute, slightly exaggerated modern cartoon character**.",
+            "aesthetics": "Emotional and inspiring atmosphere. **Soft textured background** and **moody lighting**. Focus on expressive eyes (even if closed) and dynamic rain streaks.",
+            "color_palette": "Cool, desaturated **watercolor tones** (dominant gray and soft blue) for the rain, focusing on soft blending and texture.",
+            "composition_note": "Emphasize the contrast between the small, crying protagonist and the large, majestic shadow."
+        },
+        "characters": {
+            "protagonist": "[MAIN SUBJECT: Baby Mouse] - **Cute, chubby, slightly exaggerated cartoon version**, struggling forward with its eyes closed, rain flying across its face.",
+            "symbolic_shadow": "[SYMBOLIC SHADOW: Majestic Mouse] - Large, dramatic **shadow silhouette** (must be a silhouette, not a projection) against the sky, symbolizing inner strength."
+        },
+        "audio_style": {
+            "music": "Soft, tension-building cinematic score, non-vocal, with an emotional undertone.",
+            "sound_effects": "Loud, clear sound of heavy rain. Subtle, hurried movements of the tiny, struggling mouse.",
+            "voiceover_note": "No voiceover."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_01_cute_mouse_struggling",
+            "duration_seconds": 6,
+            "voiceover": "No voiceover.",
+            "scene_description": "The **cute, chubby** [MAIN SUBJECT: Baby Mouse] runs across a soft-textured ground in heavy rain. The background is the **gray rainy sky**.",
+            "data_visualization": "Use dynamic brushstrokes and **watercolor texture** for the rain and background. The focus is on the mouse's **exaggerated struggle** and tearful expression.",
+            "camera": "Start with a close-up on the mouse's face, then slowly pull back to a medium shot that tracks the mouse's forward movement."
+        }
+    ]
+}

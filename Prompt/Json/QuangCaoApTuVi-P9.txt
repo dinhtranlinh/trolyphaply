@@ -1,0 +1,39 @@
+{
+  "common": {
+    "project_title": "Video quảng cáo App Tử Vi - Hotgirl & người yêu tương lai",
+    "language": "vi-VN",
+    "video_usage": "TikTok, Instagram Reels, YouTube Shorts",
+    "format": {
+      "aspect_ratio": "9:16",
+      "resolution": "4K",
+      "frame_rate": 30
+    },
+    "visual_style": {
+      "overall_look": "Live-action kết hợp motion graphics vui nhộn, phong cách mạng xã hội hiện đại",
+      "aesthetics": "Tươi sáng, pastel, năng động, trẻ trung, bắt trend Gen Z",
+      "color_palette": "Tone hồng, pastel, ánh sáng tự nhiên, sạch và dễ thương",
+      "ui_elements": "TUYỆT ĐỐI KHÔNG hiển thị bất kỳ văn bản nào. Giao diện chỉ hiển thị icon, biểu tượng, sticker, emoji, không chữ hoặc số."
+    },
+    "characters": {
+      "main_character": {
+        "role": "Người dùng chính",
+        "description": "Hotgirl Gen Z người Việt Nam, khoảng 22–25 tuổi, có biểu cảm sinh động, phong cách đáng yêu, năng động. Tóc nhuộm sáng (vàng hoặc nâu khói), mặc đồ ngủ pastel (pijama kiểu Hàn Quốc), phòng ngủ nữ tính, trang điểm nhẹ tự nhiên, thường cầm điện thoại. Có tính cách hài hước, hơi 'nghiện app', hay tự nói một mình theo kiểu vlog."
+      }
+    },
+    "audio_style": {
+      "music": "Nhạc TikTok Việt remix không lời, tiết tấu vui vẻ (BPM 100–110)",
+      "sound_effects": "Sticker popping, icon flying, ping khi hiện quẻ, whoosh khi chuyển cảnh",
+      "voiceover_note": "Voiceover tiếng Việt đầy đủ dấu, vui vẻ, tự nhiên, đúng ngữ điệu mạng xã hội, không quá trịnh trọng"
+    }
+  },
+  "segments": [
+    {
+      "segment_id": "segment_09",
+      "duration_seconds": 8,
+      "voiceover": "App Tử Vi gì đâu… cute muốn xỉu!",
+      "scene_description": "Hotgirl mở điện thoại lần nữa, tươi cười bấm tạo quẻ tiếp theo",
+      "data_visualization": "SFX “ting ting” + icon loading chuyển động",
+      "camera": "Cận tay bấm + góc từ vai lên"
+    }
+  ]
+}

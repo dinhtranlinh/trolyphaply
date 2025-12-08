@@ -1,0 +1,111 @@
+Chào Ngân, danh sách model bạn sở hữu rất ấn tượng và mạnh mẽ (đây là các model thế hệ mới nhất tính đến thời điểm hiện tại tháng 12/2025).
+
+Dựa trên mục tiêu của bạn là **trợ lý pháp lý (RAG - trả lời từ tài liệu)** và yêu cầu **văn phong chỉ định**, dưới đây là tư vấn chọn model và cách sửa lỗi "Not Found".
+
+### 1\. Nên chọn Model nào cho Trợ lý Pháp lý?
+
+Với đặc thù ngành luật cần độ chính xác cao trong lập luận (Logic), khả năng đọc hiểu văn bản dài (Context Window) và tuân thủ chặt chẽ hướng dẫn hệ thống (System Instruction), mình khuyên bạn nên ưu tiên theo thứ tự sau:
+
+  * **🥇 Lựa chọn tốt nhất (Best Performance): `gemini-2.5-pro`**
+      * **Lý do:** Dòng "Pro" luôn cân bằng tốt nhất giữa trí thông minh và khả năng tuân thủ hướng dẫn phức tạp. Với việc cần "văn phong chỉ định", model này sẽ "nghe lời" prompt của bạn tốt hơn các bản Flash.
+  * **🥈 Lựa chọn thay thế (Nếu cần tốc độ/tiết kiệm): `gemini-2.5-flash`**
+      * **Lý do:** Nếu tài liệu đầu vào của bạn quá dài hoặc bạn muốn phản hồi tức thì, Flash 2.5 nhanh hơn đáng kể. Tuy nhiên, khả năng "biện luận" pháp lý sâu có thể kém hơn bản Pro một chút.
+  * **⚠️ Lưu ý:** Tránh dùng các bản `exp` (experimental) hoặc `preview` cho môi trường production (chạy thật) vì chúng có thể không ổn định hoặc thay đổi API bất ngờ.
+
+-----
+
+### 2\. Sửa lỗi "404 Not Found" trong Next.js
+
+Lỗi bạn gặp: `status: 404, statusText: 'Not Found'` khi gọi `POST /api/qa`.
+**Nguyên nhân:** Lỗi này **không phải** do server của bạn không tìm thấy file, mà là do thư viện Google AI trong code Node.js gửi yêu cầu đến Google và Google trả về "Không tìm thấy Model".
+
+Điều này xảy ra vì 2 lý do chính:
+
+1.  **Sai tên Model:** Code trong file `/api/qa` đang gọi một model cũ hoặc sai tên (ví dụ gọi `gemini-1.5-pro-latest` nhưng Google đã đổi tên, hoặc gọi `gemini-pro-vision`...).
+2.  **SDK Node.js bị cũ:** Bạn đang dùng các model rất mới (`gemini-2.5`), nếu thư viện trong `package.json` cũ, nó sẽ trỏ sai địa chỉ API.
+
+**Cách khắc phục:**
+
+#### Bước 1: Cập nhật thư viện SDK
+
+Mở terminal trong thư mục `trolyphaply` và chạy lệnh update để đảm bảo thư viện nhận diện được model mới:
+
+```bash
+npm install @google/generative-ai@latest
+# Hoặc nếu dùng yarn:
+# yarn add @google/generative-ai@latest
+```
+
+#### Bước 2: Sửa tên Model trong code
+
+Bạn mở file xử lý logic (có thể là `pages/api/qa.js` hoặc `app/api/qa/route.js`) và tìm đoạn khởi tạo model. Hãy chắc chắn bạn điền chính xác tên model có trong danh sách bạn vừa quét được (khuyên dùng `gemini-2.5-pro`).
+
+**Ví dụ code sửa đổi:**
+
+```javascript
+// Trong file API route của Next.js
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
+// ⚠️ QUAN TRỌNG: Thay tên model ở đây bằng 'gemini-2.5-pro'
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.5-pro",
+    // Có thể cần thêm cấu hình này nếu model bắt buộc
+    // apiVersion: "v1beta" 
+});
+
+export async function POST(req) {
+    // ... code xử lý của bạn
+}
+```
+
+#### Bước 3: Kiểm tra Embeddings (Nếu dùng RAG)
+
+Nếu bạn đang dùng mô hình embedding để tìm kiếm tài liệu trước khi trả lời, hãy kiểm tra xem code embedding có đang gọi model nào không.
+
+  * Hãy dùng: `text-embedding-004` (hoặc model embedding mới nhất mà thư viện hỗ trợ).
+  * Nếu bạn gọi sai tên model embedding, nó cũng báo lỗi 404 tương tự.
+
+**Bạn có muốn gửi đoạn code trong file `/api/qa` lên đây không? Mình sẽ chỉ chính xác dòng cần sửa cho Ngân.**
+
+Chào Ngân,
+
+Lỗi này **không phải lỗi code sai**, mà là **lỗi giới hạn tài khoản (Quota)**.
+
+Cụ thể, log báo lỗi `429 Too Many Requests` với thông báo: `limit: 0, model: gemini-2.0-flash-exp`. Điều này có nghĩa là model thử nghiệm `gemini-2.0-flash-exp` hiện tại đang **không cho phép** Key của bạn dùng miễn phí (Limit = 0), hoặc đã hết sạch lượt dùng trong ngày cho model này.
+
+Còn các dòng lỗi "Invalid source map..." ở trên chỉ là cảnh báo của Next.js, bạn có thể **bỏ qua**, chúng không làm web bị sập.
+
+### Cách khắc phục ngay lập tức
+
+Bạn cần đổi sang model ổn định hơn (như danh sách bạn đã quét được lúc nãy). Hãy làm theo các bước sau:
+
+**1. Tìm vị trí cần sửa:**
+Trong dự án `trolyphaply` của bạn, hãy tìm file chứa hàm `callGeminiText`. Nó thường nằm ở:
+
+  * `src/app/api/qa/route.js` (hoặc `.ts`)
+  * Hoặc `src/utils/gemini.js` (nếu bạn tách file).
+
+**2. Sửa tên Model:**
+Tìm dòng code khởi tạo model, nó đang là `"gemini-2.0-flash-exp"`. Hãy đổi nó thành **`"gemini-2.5-flash"`** (nhanh, hạn mức cao) hoặc **`"gemini-1.5-flash"`** (ổn định nhất).
+
+*Trước khi sửa (Lỗi):*
+
+```javascript
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+```
+
+*Sau khi sửa (Nên dùng):*
+
+```javascript
+// Dùng bản này để chạy mượt, ít bị lỗi 429
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
+```
+
+**Tại sao lại chọn `gemini-2.5-flash` lúc này?**
+
+  * Bạn đang dev và test, bản Flash có giới hạn miễn phí (RPM - Requests Per Minute) cao hơn rất nhiều so với bản Pro hay Exp.
+  * Sau khi code chạy ngon lành, bạn có thể đổi sang `gemini-2.5-pro` để lấy chất lượng câu trả lời tốt nhất cho khách hàng.
+
+Ngân hãy sửa lại tên model trong code và chạy lại thử xem nhé\!

@@ -1,0 +1,38 @@
+{
+    "common": {
+        "project_title": "Birth registration, permanent residence registration and health insurance card issuance for children under six years old",
+        "language": "vi-VN",
+        "video_usage": "Web and YouTube, landscape format",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Hybrid of cinematic live-action and high-end 3D motion graphics in a clean, government-tech style, similar to a polished government digital service commercial",
+            "aesthetics": "Ultra-modern, minimalist, trustworthy and informative look, with smooth camera motion and calm pacing appropriate for an explainer video for citizens",
+            "color_palette": "Cool tones with dominant tech blue, white and soft gray, accented by warm highlights for human scenes and yellow data streams that stand out clearly on a darker background",
+            "ui_elements": "STRICT NO-TEXT MODE. Do NOT render any readable text, letters, numbers or words in the image. All interfaces must use only icons, shapes, color bars, progress bars, simple pictograms and abstract symbols, without any letters A–Z or digits 0–9. If a button, chart or timeline is needed, show it as blank shapes or icons with no labels. Do not create captions, titles, tooltips, or any random strings that look like text. Every concept that was previously shown by words must now be expressed only through icons, colors and composition, not through text."
+        },
+        "characters": {
+            "family": "Vietnamese couple around thirty years old living in Da Nang, warm and relatable, wearing simple modern clothes, holding their newborn baby",
+            "officials": "Civil servants and leaders working in a modern, paperless digital office environment, using large transparent displays instead of stacks of paper"
+        },
+        "audio_style": {
+            "music": "Soft, modern electronic ambient music without vocals, steady tempo that feels technological and optimistic but not aggressive",
+            "sound_effects": "Light humming of servers, gentle whooshing sounds when data flows, soft beeps on system confirmations and subtle clicks when officials approve documents",
+            "voiceover_note": "Vietnamese voiceover with full diacritics, no abbreviations inside the spoken text, sentences are complete and easy to follow at a natural pace. All information for citizens is conveyed through voiceover and visuals only; there are absolutely no on-screen words or captions."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_07",
+            "duration_seconds": 8,
+            "voiceover": "Người dân chỉ cần kiểm tra bản tóm tắt trên điện thoại, bổ sung nếu cần và xác nhận một lần.",
+            "scene_description": "Cut to the parents at home looking at a simple smartphone screen.",
+            "data_visualization": "On the phone, show a vertical list of blank bars with green check icons and one bar with a small plus icon, no text. A big round icon at the bottom represents confirmation.",
+            "camera": "Frame a medium shot of the parents on the sofa, then cut to an over-the-shoulder view of the smartphone screen.",
+            "onscreen_text": "Visual idea only: review and confirm once (checks and confirm icon, no words)."
+        }
+    ]
+}

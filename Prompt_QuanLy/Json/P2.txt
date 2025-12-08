@@ -1,0 +1,50 @@
+{
+  "common": {
+    "project_title": "Birth registration, permanent residence registration and health insurance card issuance for children under six years old",
+    "language": "vi-VN",
+    "video_usage": "Web and YouTube, landscape format",
+    "format": {
+      "aspect_ratio": "16:9",
+      "resolution": "4K",
+      "frame_rate": 25
+    },
+    "visual_style": {
+      "overall_look": "Hybrid of cinematic live-action and high-tech motion graphics, clean and modern, similar to a polished government digital service commercial",
+      "aesthetics": "Ultra-modern, minimalist, trustworthy and institutional, with subtle depth of field, smooth transitions and calm pacing appropriate for an explainer video for citizens",
+      "color_palette": "Cool tones with dominant tech blue, white and metallic gray, accented by neon green and warm yellow data streams that stand out clearly on a darker background",
+      "ui_elements": "Floating three-dimensional user interfaces, clear icons of government agencies, database symbols, holographic labels, simple infographics and step-by-step captions. All on-screen text, labels, buttons and captions must be in clean English only, with no Vietnamese characters or accents. Use short English words such as 'Confirm', 'Submit', 'Approved', 'Processing', 'Birth record', 'Residence', 'Health insurance'. The font must be a simple, modern sans-serif typeface, no handwritten or distorted fonts."
+    },
+    "characters": {
+      "family": "Vietnamese couple around thirty years old living in Da Nang, warm and relatable, wearing simple modern clothes, holding their newborn baby",
+      "officials": "Vietnamese civil servants from justice, police and social insurance offices, wearing shirts or light suits with ID badges, working in bright, orderly government offices",
+      "voiceover_voice": "Northern Vietnamese narrator voice, clear and warm, speaking at a natural pace suitable for about fifteen seconds per segment",
+      "people_nationality": "All people in the video are Vietnamese, with typical East Asian facial features and natural expressions"
+    },
+    "data_visualization": {
+      "core_metaphor": "Data is visualized as bright neon light streaks, glowing glass cubes, tiny shimmering energy orbs and a flowing digital river that connects systems",
+      "movement": "Data moves at very high speed, flows inside transparent fiber-optic tubes, is pulled into a central processing core, splits into multiple smaller streams and then converges back together, changing color when processed and finally dropping into a glowing data lake for storage",
+      "environment": "A futuristic data center with tall server racks and thousands of blinking LED lights, combined with abstract three-dimensional matrix space and a digital city at night where data moves like light vehicles on superhighways"
+    },
+    "cinematography": {
+      "camera_motion": "Many smooth tracking shots that follow the data streams and the characters, gentle fly-throughs inside digital pipelines and servers, with slow, stable pauses whenever text needs to be read clearly",
+      "angles": "Wide angles to show entire rooms and digital cities, medium shots on characters for emotion, top-down shots for data flow diagrams, and extreme close-ups on data packets and interface elements",
+      "effects": "Subtle motion blur on fast-moving data, strong bloom around glowing data, gentle lens flares when the camera crosses bright light sources, and soft depth of field to keep focus on important elements"
+    },
+    "audio_style": {
+      "music": "Soft, modern electronic ambient music without vocals, steady tempo that feels technological and optimistic but not aggressive",
+      "sound_effects": "Light humming of servers, gentle whooshing sounds when data flows, soft beeps on system confirmations and subtle clicks when officials approve documents",
+      "voiceover_note": "Vietnamese voiceover with full diacritics, no abbreviations inside the spoken text, sentences are complete and easy to follow at a natural pace. The voiceover is Vietnamese, but every written word visible in the video image must be in English."
+    }
+  },
+  "segments": [
+    {
+      "segment_id": "segment_02",
+      "duration_seconds": 15,
+      "voiceover": "Khi bé chào đời, hệ thống tự động phát hiện nhu cầu làm khai sinh, đăng ký thường trú và thẻ bảo hiểm y tế cho trẻ. Hành chính chủ động nhận diện sự kiện này để chuẩn bị thủ tục cho gia đình ngay từ đầu.",
+      "scene_description": "Cut to a bright, modern delivery room in a Vietnamese hospital in Da Nang. A Vietnamese doctor in clean white uniform gently hands the newborn baby to the mother lying on the bed, while a nurse smiles supportively. The camera then glides to a nearby desk where a medical staff member is entering information on a computer. On the screen we see a clear English-language digital birth record form. When the staff member clicks a button labeled 'Submit event', the form emits a soft glow and a notification symbol appears above it, showing that the proactive system has detected the need for related administrative procedures.",
+      "data_visualization": "The digital birth record icon sends out three small neon streams labeled in English as 'Birth certificate', 'Residence' and 'Health insurance'. These streams travel toward the central 'Proactive e-Administration System' core, illustrating that the system is automatically identifying which procedures are needed based on a single real-world event.",
+      "camera": "Use a gentle tracking shot from the mother and baby to the side desk and monitor. As the medical staff member submits the event, move into a close-up on the screen, then perform a short fly-out that follows the three neon streams as they leave the birth record and head toward the central core.",
+      "onscreen_text": "The system detects all related procedures from one life event."
+    }
+  ]
+}

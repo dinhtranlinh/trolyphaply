@@ -1,0 +1,175 @@
+{
+  "legalLibraryItems": [
+    {
+      "id": "doc_001",
+      "title": "Luật Dân sự 2015 (sửa đổi, bổ sung 2023)",
+      "slug": "luat-dan-su-2015",
+      "type": "law",
+      "documentNumber": "105/2015/QH13",
+      "issuedBy": "Quốc hội",
+      "issuedDate": "2015-11-27",
+      "effectiveDate": "2017-01-01",
+      "category": "Dân sự",
+      "tags": ["dân sự", "quyền sở hữu", "hợp đồng", "di sản"],
+      "summary": "Luật Dân sự 2015 quy định về các quyền và nghĩa vụ dân sự của công dân, pháp nhân, bao gồm quyền sở hữu, quyền lập hợp đồng, quyền thừa kế.",
+      "content": "# LUẬT DÂN SỰ 2015\n\n## CHƯƠNG I: NHỮNG QUY ĐỊNH CHUNG\n\n### Điều 1: Phạm vi điều chỉnh\nLuật này quy định về các quyền và nghĩa vụ dân sự của công dân, pháp nhân và Nhà nước...\n\n### Điều 2: Bình đẳng, tự do hợp tác trong quan hệ dân sự\nCác chủ thể trong quan hệ dân sự được bình đẳng, tự do lập hợp đồng...\n\n## CHƯƠNG II: CÁC QUYỀN DÂN SỰ CƠ BẢN\n\n### Điều 8: Quyền sở hữu\nMỗi công dân, pháp nhân có quyền sở hữu tài sản do lao động mình tạo ra hoặc nhận được hợp pháp...",
+      "chapters": [
+        "CHƯƠNG I: NHỮNG QUY ĐỊNH CHUNG",
+        "CHƯƠNG II: CÁC QUYỀN DÂN SỰ CƠ BẢN",
+        "CHƯƠNG III: HỢP ĐỒng",
+        "CHƯƠNG IV: THỪA KẾ",
+        "CHƯƠNG V: TRÁCH NHIỆM DÂN SỰ"
+      ],
+      "source_urls": ["https://thuvienphapluat.vn/", "https://dichvucong.gov.vn/"],
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    },
+    {
+      "id": "doc_002",
+      "title": "Luật Đất đai 2024",
+      "slug": "luat-dat-dai-2024",
+      "type": "law",
+      "documentNumber": "1/2024/QH15",
+      "issuedBy": "Quốc hội",
+      "issuedDate": "2024-03-15",
+      "effectiveDate": "2025-01-01",
+      "category": "Đất đai",
+      "tags": ["đất đai", "quyền sử dụng đất", "chuyển nhượng", "thuê đất"],
+      "summary": "Luật Đất đai 2024 thay thế Luật Đất đai 2013, quy định các hình thức sử dụng đất, quyền và nghĩa vụ của người sử dụng đất, chuyển nhượng và thuê đất.",
+      "content": "# LUẬT ĐẤT ĐAI 2024\n\n## CHƯƠNG I: NHỮNG QUY ĐỊNH CHUNG\n\n### Điều 1: Phạm vi điều chỉnh\nLuật này quy định về quản lý, sử dụng đất; quyền và nghĩa vụ của người sử dụng đất...\n\n## CHƯƠNG II: HÌNH THỨC SỬ DỤNG ĐẤT\n\n### Điều 5: Các hình thức sử dụng đất\n1. Đất để ở (dân cư sinh sống lâu dài): 50 năm\n2. Đất nông nghiệp: 50 năm\n3. Đất lâm nghiệp: 60 năm\n4. Đất nuôi trồng thủy sản: 15 năm\n5. Đất công nghiệp, thương mại: Tuỳ theo quyết định của nhà nước",
+      "chapters": [
+        "CHƯƠNG I: NHỮNG QUY ĐỊNH CHUNG",
+        "CHƯƠNG II: HÌNH THỨC SỬ DỤNG ĐẤT",
+        "CHƯƠNG III: QUYỀN VÀ NGHĨA VỤ CỦA NGƯỜI SỬ DỤNG ĐẤT",
+        "CHƯƠNG IV: CHUYỂN NHƯỢNG, THUÊ, CHO THUÊ ĐẤT",
+        "CHƯƠNG V: GIẢI QUYẾT TRANH CHẤP VỀ ĐẤT"
+      ],
+      "source_urls": ["https://thuvienphapluat.vn/", "https://dichvucong.gov.vn/"],
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    },
+    {
+      "id": "doc_003",
+      "title": "Bộ luật Lao động 2019",
+      "slug": "bo-luat-lao-dong-2019",
+      "type": "law",
+      "documentNumber": "45/2019/QH14",
+      "issuedBy": "Quốc hội",
+      "issuedDate": "2019-11-20",
+      "effectiveDate": "2021-01-01",
+      "category": "Lao động",
+      "tags": ["lao động", "hợp đồng lao động", "bảo hiểm xã hội", "phúc lợi"],
+      "summary": "Bộ luật Lao động 2019 quy định các hình thức làm việc, hợp đồng lao động, quyền và nghĩa vụ của lao động viên và người sử dụng lao động, bảo hiểm xã hội.",
+      "content": "# BỘ LUẬT LAO ĐỘNG 2019\n\n## CHƯƠNG I: NHỮNG QUY ĐỊNH CHUNG\n\n### Điều 1: Phạm vi điều chỉnh\nBộ Luật này quy định về lao động, hợp đồng lao động, quyền và nghĩa vụ của lao động viên và người sử dụng lao động...\n\n## CHƯƠNG II: HỢP ĐỒNg LAO ĐỘNG\n\n### Điều 12: Loại hợp đồng lao động\n1. Hợp đồng lao động không xác định thời hạn\n2. Hợp đồng lao động xác định thời hạn\n3. Hợp đồng lao động theo mùa vụ hoặc theo công việc nhất định",
+      "chapters": [
+        "CHƯƠNG I: NHỮNG QUY ĐỊNH CHUNG",
+        "CHƯƠNG II: HỢP ĐỒNg LAO ĐỘNG",
+        "CHƯƠNG III: TIỀN LƯƠNG",
+        "CHƯƠNG IV: THỜI GIỜ LÀM VIỆC",
+        "CHƯƠNG V: BẢO HIỂM XÃ HỘI",
+        "CHƯƠNG VI: AN TOÀN LAO ĐỘNG"
+      ],
+      "source_urls": ["https://thuvienphapluat.vn/", "https://dichvucong.gov.vn/"],
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    }
+  ],
+  "procedures": [
+    {
+      "id": "proc_001",
+      "title": "Thủ tục đăng ký kết hôn",
+      "slug": "thu-tuc-dang-ky-ket-hon",
+      "category": "Hôn nhân - Gia đình",
+      "authority": "Phòng Đăng ký hôn nhân - Ly hôn (Văn phòng đăng ký công chứng)",
+      "level": "commune",
+      "description": "Hướng dẫn thủ tục đăng ký kết hôn theo quy định pháp luật",
+      "estimatedTime": "7-10 ngày làm việc",
+      "fees": "Miễn phí (tuỳ theo địa phương)",
+      "tags": ["hôn nhân", "kết hôn", "gia đình", "đăng ký"],
+      "steps": [
+        {
+          "order": 1,
+          "title": "Chuẩn bị hồ sơ",
+          "description": "Chuẩn bị các giấy tờ cần thiết",
+          "documents": [
+            "Giấy tờ tùy thân (CMND/Hộ chiếu)",
+            "Giấy xác nhận tình trạng hôn nhân",
+            "Hóa đơn đỏ (nếu có)",
+            "Giấy khám sức khỏe (nếu cần)"
+          ]
+        },
+        {
+          "order": 2,
+          "title": "Nộp hồ sơ",
+          "description": "Nộp hồ sơ tại Phòng Đăng ký hôn nhân - Ly hôn",
+          "notes": "Cả hai bên phải có mặt hoặc được uỷ quyền"
+        },
+        {
+          "order": 3,
+          "title": "Chờ xử lý",
+          "description": "Chờ cơ quan xử lý hồ sơ (7-10 ngày)",
+          "notes": ""
+        },
+        {
+          "order": 4,
+          "title": "Cấp giấy chứng nhận",
+          "description": "Nhận giấy chứng nhận kết hôn",
+          "notes": "Giấy chứng nhận có giá trị pháp lý trên toàn quốc"
+        }
+      ],
+      "links": [
+        "https://dichvucong.gov.vn/"
+      ],
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    },
+    {
+      "id": "proc_002",
+      "title": "Thủ tục đăng ký kinh doanh",
+      "slug": "thu-tuc-dang-ky-kinh-doanh",
+      "category": "Kinh doanh",
+      "authority": "Phòng Đăng ký Kinh doanh (Sở Kế hoạch và Đầu tư)",
+      "level": "district",
+      "description": "Hướng dẫn thủ tục đăng ký kinh doanh, cấp Giấy chứng nhận đăng ký kinh doanh",
+      "estimatedTime": "5-7 ngày làm việc",
+      "fees": "Miễn phí (từ 2024)",
+      "tags": ["kinh doanh", "đăng ký", "doanh nghiệp", "DN"],
+      "steps": [
+        {
+          "order": 1,
+          "title": "Soạn hồ sơ",
+          "description": "Soạn các giấy tờ cần thiết",
+          "documents": [
+            "Đơn đăng ký kinh doanh (mẫu)",
+            "Giấy tờ tùy thân (chủ DN)",
+            "Giấy xác nhận địa chỉ kinh doanh",
+            "Hợp đồng thuê mặt bằng (nếu có)"
+          ]
+        },
+        {
+          "order": 2,
+          "title": "Nộp hồ sơ online",
+          "description": "Nộp hồ sơ trực tuyến tại Cổng dịch vụ công",
+          "notes": "https://dichvucong.gov.vn/"
+        },
+        {
+          "order": 3,
+          "title": "Kiểm tra hồ sơ",
+          "description": "Cơ quan Đăng ký kiểm tra, xử lý hồ sơ (5-7 ngày)",
+          "notes": ""
+        },
+        {
+          "order": 4,
+          "title": "Cấp Giấy chứng nhận",
+          "description": "Nhận Giấy chứng nhận đăng ký kinh doanh",
+          "notes": "Giấy chứng nhận có giá trị pháp lý, có thể in online"
+        }
+      ],
+      "links": [
+        "https://dichvucong.gov.vn/"
+      ],
+      "created_at": "2025-12-06T00:00:00Z",
+      "updated_at": "2025-12-06T00:00:00Z"
+    }
+  ]
+}

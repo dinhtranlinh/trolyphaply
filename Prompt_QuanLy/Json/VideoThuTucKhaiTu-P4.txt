@@ -1,0 +1,39 @@
+{
+    "common": {
+        "project_title": "Proactive death registration service (procedure 1.000656)",
+        "language": "vi-VN",
+        "video_usage": "Web and YouTube, landscape format",
+        "format": {
+            "aspect_ratio": "16:9",
+            "resolution": "4K",
+            "frame_rate": 25
+        },
+        "visual_style": {
+            "overall_look": "Hybrid of simple live-action shots and clean 3D motion graphics in a calm, government-tech style. The visuals should feel respectful, modern and minimal, without flashy effects.",
+            "aesthetics": "Ultra-minimal, trustworthy and quiet, with smooth camera motion and gentle pacing that matches a sensitive administrative procedure related to death registration.",
+            "color_palette": "Soft cool tones with light blue, white and grey as the main colors, with limited accent colors to highlight data flows and system icons. Avoid aggressive colors and strong contrasts.",
+            "ui_elements": "STRICT NO-TEXT MODE. Do NOT render any readable text, letters or numbers in the image. All interfaces must use only icons, shapes, color blocks, progress bars, simple pictograms and abstract symbols, without any letters A–Z or digits 0–9. If a button, chart or timeline is needed, show it as blank shapes or icons with no labels. Do not create captions, titles, tooltips, or any random strings that look like text. Every concept must be expressed only through icons, colors and composition, not through words."
+        },
+        "characters": {
+            "family": "A Vietnamese family member in their 40s or 50s, dressed simply and respectfully, representing the relative of the deceased person.",
+            "officials": "Civil servants working in a modern, paperless digital office environment, using large transparent displays instead of stacks of paper.",
+            "medical_staff": "Hospital medical staff in standard uniforms, seen briefly when entering data into the hospital information system."
+        },
+        "audio_style": {
+            "music": "Soft, subtle ambient music without vocals, with a slow, steady tempo that feels respectful and calm, not dramatic.",
+            "sound_effects": "Very light interface sounds such as soft whooshes when data flows and gentle confirmation chimes. Avoid loud or playful effects.",
+            "voiceover_note": "Vietnamese voiceover with clear diction and full diacritics, using short, simple sentences suitable for about 8 seconds per segment. All information for citizens is conveyed via the voiceover and visuals; there is absolutely no on-screen text."
+        }
+    },
+    "segments": [
+        {
+            "segment_id": "segment_04_crosscheck_civil_status_database",
+            "duration_seconds": 8,
+            "voiceover": "Đồng thời, hệ thống tra cứu Cơ sở dữ liệu hộ tịch điện tử do Bộ Tư pháp quản lý để đối chiếu và bổ sung thông tin hộ tịch của người chết.",
+            "scene_description": "A second data block appears on the other side of the draft file, representing the electronic civil status database managed by the Ministry of Justice.",
+            "data_visualization": "This civil status block contains icons such as a registry book, a seal symbol and a small set of family icons representing civil status records. Light flows from the draft death file to this block and back. As data returns to the draft file, additional icons light up on the file, and more green check symbols appear along its edges, showing that civil status information has been verified and enriched. No labels or numbers are shown.",
+            "camera": "Frame the draft file in the middle with the population database block on one side and the civil status block on the other. Use a slow, symmetrical zoom-in as data flows in both directions and the draft file becomes more complete and brighter.",
+            "onscreen_text": "No text. Civil status verification is represented by a registry book icon, seal icon and returning data flows with checkmarks."
+        }
+    ]
+}

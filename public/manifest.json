@@ -1,0 +1,57 @@
+{
+  "name": "Trợ Lý Pháp Lý",
+  "short_name": "TroLyPhapLy",
+  "description": "Nền tảng hỗ trợ pháp lý thông minh với AI - Tra cứu văn bản, thủ tục hành chính, và các ứng dụng AI vui nhộn",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0B3B70",
+  "background_color": "#FFFFFF",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["legal", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Hỏi đáp pháp lý",
+      "short_name": "Hỏi đáp",
+      "description": "Đặt câu hỏi về luật pháp và thủ tục hành chính",
+      "url": "/",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Thư viện pháp luật",
+      "short_name": "Pháp luật",
+      "description": "Tra cứu văn bản pháp luật và thủ tục",
+      "url": "/law",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Prompts Hub",
+      "short_name": "Prompts",
+      "description": "Thư viện prompts AI hữu ích",
+      "url": "/prompts",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ứng dụng AI",
+      "short_name": "Apps",
+      "description": "Mini apps AI vui nhộn",
+      "url": "/apps",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": []
+}

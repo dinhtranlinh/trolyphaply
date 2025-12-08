@@ -1,0 +1,44 @@
+Authentication
+Supabase works through a mixture of JWT and Key auth.
+
+If no Authorization header is included, the API will assume that you are making a request with an anonymous user.
+
+If an Authorization header is included, the API will "switch" to the role of the user making the request. See the User Management section for more details.
+
+We recommend setting your keys as Environment Variables.
+
+Client API Keys
+Client keys allow "anonymous access" to your database, until the user has logged in. After logging in the keys will switch to the user's own login token.
+
+In this documentation, we will refer to the key using the name SUPABASE_KEY.
+
+We have provided you a Client Key to get started. You will soon be able to add as many keys as you like. You can find the anon key in the API Settings page.
+
+CLIENT API KEY
+const SUPABASE_KEY = 'SUPABASE_CLIENT_API_KEY'
+Example usage
+const SUPABASE_URL = "https://icqivkassoxfaukqbzyt.supabase.co"
+const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);
+Service Keys
+Service keys have FULL access to your data, bypassing any security policies. Be VERY careful where you expose these keys. They should only be used on a server and never on a client or browser.
+
+In this documentation, we will refer to the key using the name SERVICE_KEY.
+
+We have provided you with a Service Key to get started. Soon you will be able to add as many keys as you like. You can find the service_role in the API Settings page.
+
+SERVICE KEY
+const SERVICE_KEY = 'SUPABASE_SERVICE_KEY'
+Example usage
+const SUPABASE_URL = "https://icqivkassoxfaukqbzyt.supabase.co"
+const supabase = createClient(SUPABASE_URL, process.env.SERVICE_KEY);
+
+Connect to your project
+All projects have a RESTful endpoint that you can use with your project's API key to query and manage your database. These can be obtained from the API settings.
+
+You can initialize a new Supabase client using the createClient() method. The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+Initializing
+import { createClient } from '@supabase/supabase-js'
+const supabaseUrl = 'https://icqivkassoxfaukqbzyt.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
