@@ -12,8 +12,8 @@ interface MiniApp {
   name: string;
   description: string;
   category: string;
-  icon?: string;
-  published: boolean;
+  status: string;
+  type: string;
 }
 
 /**
@@ -143,10 +143,9 @@ export default function AppsPage() {
                   slug={app.slug}
                   title={app.name}
                   description={app.description}
-                  icon={app.icon}
                   category={app.category}
                   tags={[]}
-                  isPublished={app.published}
+                  isPublished={app.status === 'active'}
                   onClick={() => handleAppClick(app.slug)}
                 />
               ))}

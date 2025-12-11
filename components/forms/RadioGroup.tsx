@@ -51,9 +51,9 @@ export default function RadioGroup({
           orientation === 'horizontal' ? 'flex flex-wrap gap-4' : 'space-y-3'
         }`}
       >
-        {options.map((option) => (
+        {options.map((option, index) => (
           <label
-            key={option.value}
+            key={`${name}-${option.value}-${index}`}
             className={`flex items-start gap-3 cursor-pointer ${
               disabled ? 'opacity-50 cursor-not-allowed' : ''
             }`}

@@ -29,6 +29,19 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient();
 
+    // Fetch active Q&A prompt from database
+    const { data: activePrompt } = await supabase
+      .from('qa_prompts')
+      .select(`
+        *,
+        writing_styles:qa_prompt_writing_styles(
+          priority,
+          style:legal_writing_styles(*)
+        )
+      `)
+      .eq('is_active', true)
+      .single();
+
     // Fetch style guide from database
     let styleGuide: any = null;
     let examples: any[] = [];
@@ -78,14 +91,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Build system prompt with style guide
-    let systemPrompt = `Bạn là một trợ lý pháp lý AI chuyên nghiệp của Việt Nam. Nhiệm vụ của bạn là:
-
-1. Trả lời các câu hỏi về pháp luật và thủ tục hành chính Việt Nam
-2. Cung cấp thông tin chính xác, dễ hiểu, có cấu trúc rõ ràng
-3. Trích dẫn điều luật, văn bản pháp luật khi có thể
-4. Lưu ý người dùng tham khảo ý kiến chuyên gia cho các vấn đề phức tạp
-5. Sử dụng ngôn ngữ thân thiện, dễ hiểu với người dân`;
+    // Build system prompt - use active prompt from DB or fallback to hard-coded
+    let systemPrompt = '';
+    
+    if (activePrompt && activePrompt.prompt_text) {
+      // Use prompt from database
+      systemPrompt = activePrompt.prompt_text;
+      
+      // Append writing styles if configured
+      if (activePrompt.writing_styles && activePrompt.writing_styles.length > 0) {
+        systemPrompt += `\n\nCÁC VĂN PHONG TRẢ LỜI (ưu tiên theo thứ tự):\n`;
+        
+        activePrompt.writing_styles
+          .sort((a: any, b: any) => a.priority - b.priority)
+          .forEach((ws: any, index: number) => {
+            const style = ws.style;
+            systemPrompt += `\n${index + 1}. ${style.name}\n   ${style.description}\n   Ví dụ: ${style.example_content}\n`;
+          });
+      }
+    } else {
+      // Fallback to hard-coded prompt
+      systemPrompt = `Bạn là một trợ lý pháp lý AI chuyên nghiệp của Việt Nam. Nhiệm vụ của bạn là:\n\n1. Trả lời các câu hỏi về pháp luật và thủ tục hành chính Việt Nam\n2. Cung cấp thông tin chính xác, dễ hiểu, có cấu trúc rõ ràng\n3. Trích dẫn điều luật, văn bản pháp luật khi có thể\n4. Lưu ý người dùng tham khảo ý kiến chuyên gia cho các vấn đề phức tạp\n5. Sử dụng ngôn ngữ thân thiện, dễ hiểu với người dân`;
+    }
 
     // Add style guide instructions if available
     if (styleGuide) {
@@ -95,7 +122,7 @@ VĂN PHONG TRẢ LỜI: ${styleGuide.name}
 ${styleGuide.description}
 
 ĐẶC ĐIỂM VĂN PHONG:
-${Array.isArray(styleGuide.characteristics) ? styleGuide.characteristics.map((c, i) => `${i + 1}. ${c}`).join('\n') : styleGuide.characteristics}
+${Array.isArray(styleGuide.characteristics) ? styleGuide.characteristics.map((c: string, i: number) => `${i + 1}. ${c}`).join('\n') : styleGuide.characteristics}
 
 GIỌNG ĐIỆU: ${Array.isArray(styleGuide.tone) ? styleGuide.tone.join(', ') : styleGuide.tone}`;
 

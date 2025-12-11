@@ -4,10 +4,8 @@ from google.api_core import exceptions
 # --- CẤU HÌNH ---
 # Dán danh sách các API Key của bạn vào đây
 API_KEYS = [
-    "AIzaSyB5nGWaghYxZH8FM52U5AV5wkJhIJMp2WI",
-    "AIzaSyAchSyhxOL49mHUxaZQgsfF12e2sODknC4",
-    "AIzaSyCJrczJAKIc-KZLiW_YapvPmmmmmBV8lzc",
-    "AIzaSyDSEB9E06Mg2k1al_gPySA_ro7mdP9ccBE",
+    "AIzaSyAr_MQHpxUibo0_aq4gSrym3UrBVGYcyqM",
+    "AIzaSyBMmPR4hpsFc3nHkNHmq6GY1oL4pL3jADI",
 ]
 # ----------------
 

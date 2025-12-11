@@ -1,382 +1,382 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import AppShell from '@/components/layout/AppShell';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import TextInput from '@/components/forms/TextInput';
-import TextArea from '@/components/forms/TextArea';
-import Select from '@/components/forms/Select';
-import RadioGroup from '@/components/forms/RadioGroup';
-import CheckboxGroup from '@/components/forms/CheckboxGroup';
-import Toast from '@/components/ui/Toast';
 
-interface FieldSchema {
-  id: string;
+interface Field {
+  name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'radio' | 'checkbox';
-  placeholder?: string;
-  options?: string[];
+  type: 'text' | 'textarea' | 'select' | 'number' | 'date' | 'radio';
   required?: boolean;
-  defaultValue?: any;
+  maxLength?: number;
+  minLength?: number;
+  min?: number;
+  max?: number;
+  options?: any[];
+  placeholder?: string;
+  description?: string;
+}
+
+interface InputSchema {
+  fields: Field[];
 }
 
 interface App {
+  id: string;
   slug: string;
   name: string;
   description: string;
-  category: string;
-  icon?: string;
-  input_schema: {
-    fields: FieldSchema[];
-  };
-  published: boolean;
+  input_schema: InputSchema;
+  status: string;
 }
 
-interface ExecutionResult {
-  id: string | null;
-  text: string;
-  imageUrl: string | null;
-}
-
-/**
- * Single Mini-App Page
- * Dynamic form + AI generation + result display
- */
-export default function MiniAppPage() {
+export default function AppRunnerPage() {
   const params = useParams();
   const router = useRouter();
-  const slug = params?.slug as string;
+  const slug = params.slug as string;
 
   const [app, setApp] = useState<App | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<Record<string, any>>({});
-  const [executing, setExecuting] = useState(false);
-  const [result, setResult] = useState<ExecutionResult | null>(null);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
-    if (slug) {
-      fetchApp();
-    }
+    loadApp();
   }, [slug]);
 
-  const fetchApp = async () => {
-    setLoading(true);
-    setError('');
-
+  const loadApp = async () => {
     try {
       const response = await fetch(`/api/apps/${slug}`);
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.error || 'Không thể tải ứng dụng');
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('App không tồn tại');
+        } else if (response.status === 403) {
+          setError('App này hiện không khả dụng');
+        } else {
+          setError('Không thể tải app');
+        }
+        setLoading(false);
         return;
       }
 
-      setApp(data.app);
-
-      // Initialize form data with default values
-      const initialData: Record<string, any> = {};
-      if (data.app.input_schema?.fields) {
-        data.app.input_schema.fields.forEach((field: FieldSchema) => {
-          initialData[field.id] = field.defaultValue || '';
-        });
+      const data = await response.json();
+      
+      if (!data.success) {
+        setError(data.error || 'Không thể tải app');
+        setLoading(false);
+        return;
       }
+
+      const appData = data.app;
+
+      // Parse input_schema if it's a string
+      if (typeof appData.input_schema === 'string') {
+        try {
+          appData.input_schema = JSON.parse(appData.input_schema);
+        } catch (e) {
+          console.error('Failed to parse input_schema:', e);
+          appData.input_schema = { fields: [] };
+        }
+      }
+
+      // Handle both array format and object format
+      let fields = [];
+      if (Array.isArray(appData.input_schema)) {
+        fields = appData.input_schema;
+      } else if (appData.input_schema?.fields && Array.isArray(appData.input_schema.fields)) {
+        fields = appData.input_schema.fields;
+      } else {
+        console.error('Invalid input_schema structure:', appData.input_schema);
+      }
+
+      // Normalize to standard format
+      appData.input_schema = { fields };
+
+      setApp(appData);
+      
+      // Initialize form data with empty values
+      const initialData: Record<string, any> = {};
+      fields.forEach((field: Field) => {
+        initialData[field.name] = '';
+      });
       setFormData(initialData);
+      setLoading(false);
     } catch (err) {
-      console.error('Fetch error:', err);
-      setError('Không thể tải ứng dụng. Vui lòng thử lại.');
-    } finally {
+      console.error('Load app error:', err);
+      setError('Có lỗi xảy ra');
       setLoading(false);
     }
   };
 
-  const handleFieldChange = (fieldId: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [fieldId]: value }));
-  };
-
-  const handleGenerate = async () => {
-    if (!app) return;
-
-    // Validate required fields
-    const schema = app.input_schema;
-    if (schema?.fields) {
-      for (const field of schema.fields) {
-        if (field.required && !formData[field.id]) {
-          showToastMessage(`Vui lòng nhập ${field.label}`, 'error');
-          return;
-        }
-      }
-    }
-
-    setExecuting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
+    setSubmitting(true);
 
     try {
       const response = await fetch(`/api/run/${slug}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: formData }),
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.error || 'Không thể tạo kết quả');
-        showToastMessage(data.error || 'Có lỗi xảy ra', 'error');
-        return;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Có lỗi xảy ra khi xử lý');
       }
 
-      setResult(data.result);
-      showToastMessage('Tạo thành công!', 'success');
-    } catch (err) {
-      console.error('Execute error:', err);
-      setError('Không thể tạo kết quả. Vui lòng thử lại.');
-      showToastMessage('Không thể tạo kết quả', 'error');
-    } finally {
-      setExecuting(false);
+      const result = await response.json();
+      
+      // Redirect to result page if resultId exists
+      if (result.resultId) {
+        router.push(`/r/${result.resultId}`);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      setSubmitting(false);
     }
   };
 
-  const handleCopy = async () => {
-    if (!result?.text) return;
-
-    try {
-      await navigator.clipboard.writeText(result.text);
-      showToastMessage('Đã copy!', 'success');
-    } catch (err) {
-      console.error('Copy error:', err);
-      showToastMessage('Không thể copy', 'error');
-    }
+  const handleFieldChange = (fieldName: string, value: any) => {
+    setFormData({ ...formData, [fieldName]: value });
   };
 
-  const handleShare = () => {
-    if (!result?.text) return;
+  const renderField = (field: Field) => {
+    const value = formData[field.name] || '';
 
-    // Open Facebook share dialog
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(
-      result.text
-    )}`;
-    window.open(shareUrl, '_blank', 'width=600,height=400');
-  };
-
-  const handleRegenerate = () => {
-    setResult(null);
-    handleGenerate();
-  };
-
-  const showToastMessage = (message: string, type: 'success' | 'error') => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
-
-  const renderField = (field: FieldSchema) => {
-    const value = formData[field.id] || '';
+    // Mobile-optimized input styling
+    const commonProps = {
+      id: field.name,
+      name: field.name,
+      required: field.required,
+      placeholder: field.placeholder,
+      value,
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        handleFieldChange(field.name, e.target.value);
+      },
+      className: 'w-full px-4 py-3.5 text-base border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all',
+      style: { fontSize: '16px' }, // Prevent iOS zoom
+    };
 
     switch (field.type) {
-      case 'text':
-        return (
-          <TextInput
-            key={field.id}
-            label={field.label}
-            value={value}
-            onChange={(val) => handleFieldChange(field.id, val)}
-            placeholder={field.placeholder}
-            required={field.required}
-          />
-        );
-
       case 'textarea':
         return (
-          <TextArea
-            key={field.id}
-            label={field.label}
-            value={value}
-            onChange={(val) => handleFieldChange(field.id, val)}
-            placeholder={field.placeholder}
-            required={field.required}
+          <textarea
+            {...commonProps}
             rows={4}
+            maxLength={field.maxLength}
+            minLength={field.minLength}
           />
         );
 
       case 'select':
         return (
-          <Select
-            key={field.id}
-            label={field.label}
-            value={value}
-            onChange={(val) => handleFieldChange(field.id, val)}
-            options={
-              field.options?.map((opt) => ({ value: opt, label: opt })) || []
-            }
-            required={field.required}
-          />
+          <select {...commonProps}>
+            <option value="">-- Chọn --</option>
+            {field.options?.map((option, idx) => {
+              // Handle both string and object format
+              const optionValue = typeof option === 'object' ? option.value : option;
+              const optionLabel = typeof option === 'object' ? option.label : option;
+              return (
+                <option key={`${field.name}-${optionValue}-${idx}`} value={optionValue}>
+                  {optionLabel}
+                </option>
+              );
+            })}
+          </select>
         );
 
       case 'radio':
         return (
-          <RadioGroup
-            key={field.id}
-            name={field.id}
-            label={field.label}
-            options={
-              field.options?.map((opt) => ({ value: opt, label: opt })) || []
-            }
-            value={value}
-            onChange={(val) => handleFieldChange(field.id, val)}
-            required={field.required}
-          />
+          <div className="space-y-3">
+            {field.options?.map((option, idx) => {
+              const optionValue = typeof option === 'object' ? option.value : option;
+              const optionLabel = typeof option === 'object' ? option.label : option;
+              return (
+                <label
+                  key={`${field.name}-${optionValue}-${idx}`}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name={field.name}
+                    value={optionValue}
+                    checked={value === optionValue}
+                    onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                    required={field.required}
+                    className="w-4 h-4 text-indigo-600 focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <span className="text-base">{optionLabel}</span>
+                </label>
+              );
+            })}
+          </div>
         );
 
-      case 'checkbox':
+      case 'date':
         return (
-          <CheckboxGroup
-            key={field.id}
-            label={field.label}
-            options={
-              field.options?.map((opt) => ({ value: opt, label: opt })) || []
-            }
-            values={value || []}
-            onChange={(val) => handleFieldChange(field.id, val)}
+          <input
+            {...commonProps}
+            type="date"
           />
         );
 
+      case 'number':
+        return (
+          <input
+            {...commonProps}
+            type="number"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            min={field.min}
+            max={field.max}
+          />
+        );
+
+      case 'text':
       default:
-        return null;
+        return (
+          <input
+            {...commonProps}
+            type="text"
+            maxLength={field.maxLength}
+            minLength={field.minLength}
+          />
+        );
     }
   };
 
   if (loading) {
     return (
-      <AppShell showHeader={true} headerTitle="Ứng dụng AI" showBackButton={true}>
-        <div className="flex items-center justify-center h-64">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-solid border-primary border-r-transparent" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-50 to-white">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 mb-4"></div>
+          <p className="text-gray-600 font-medium">Đang tải...</p>
         </div>
-      </AppShell>
+      </div>
     );
   }
 
-  if (error || !app) {
+  if (error && !app) {
     return (
-      <AppShell showHeader={true} headerTitle="Ứng dụng AI" showBackButton={true}>
-        <div className="px-4 py-8 text-center">
-          <p className="text-error mb-4">{error || 'Không tìm thấy ứng dụng'}</p>
-          <Button variant="secondary" onClick={() => router.back()}>
-            Quay lại
-          </Button>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
+          <div className="text-6xl mb-4">😕</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Oops!</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => router.push('/apps')}
+            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Quay về danh sách
+          </button>
         </div>
-      </AppShell>
+      </div>
     );
   }
+
+  if (!app) return null;
 
   return (
-    <AppShell
-      showHeader={true}
-      headerTitle={app.name}
-      showBackButton={true}
-      showBottomNav={true}
-    >
-      <div className="space-y-4 p-4 pb-6">
-        {/* App Header */}
-        <div className="text-center">
-          <div
-            className="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl"
-            style={{ background: 'var(--color-primary-soft)' }}
-          >
-            {app.icon || '✨'}
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-gray-50">
+      {/* Sticky Header - Mobile Optimized */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Go back"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900 line-clamp-1">{app.name}</h1>
+            </div>
           </div>
-          <h1 className="page-title mb-2">{app.name}</h1>
-          <p className="text-sm text-muted">{app.description}</p>
+          <div className="text-2xl">✨</div>
         </div>
-
-        {/* Dynamic Form */}
-        {app.input_schema?.fields && app.input_schema.fields.length > 0 && (
-          <Card>
-            <h3 className="font-semibold text-sm mb-4">Thông tin</h3>
-            <div className="space-y-4">
-              {app.input_schema.fields.map((field) => renderField(field))}
-            </div>
-          </Card>
-        )}
-
-        {/* Generate Button */}
-        {!result && (
-          <Button
-            variant="accent"
-            fullWidth
-            size="lg"
-            onClick={handleGenerate}
-            loading={executing}
-            disabled={executing}
-          >
-            {executing ? 'Đang tạo...' : 'Tạo ngay ✨'}
-          </Button>
-        )}
-
-        {/* Result Display */}
-        {result && (
-          <>
-            <Card>
-              <div className="flex items-center gap-2 mb-3">
-                <svg
-                  className="w-5 h-5 text-accent"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <h3 className="font-semibold text-sm">Kết quả</h3>
-              </div>
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                {result.text}
-              </div>
-              {result.imageUrl && (
-                <img
-                  src={result.imageUrl}
-                  alt="Result"
-                  className="mt-4 rounded-lg w-full"
-                />
-              )}
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <Button variant="primary" fullWidth onClick={handleCopy}>
-                📋 Copy
-              </Button>
-              <Button variant="secondary" fullWidth onClick={handleShare}>
-                📤 Chia sẻ FB
-              </Button>
-            </div>
-
-            <Button variant="accent" fullWidth onClick={handleRegenerate}>
-              🔄 Tạo lại
-            </Button>
-          </>
-        )}
       </div>
 
-      {/* Toast */}
-      {showToast && (
-        <Toast
-          type={toastType}
-          message={toastMessage}
-          onClose={() => setShowToast(false)}
-        />
-      )}
-    </AppShell>
+      <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
+        {/* App Description */}
+        {app.description && (
+          <div className="mb-6 text-center">
+            <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
+              {app.description}
+            </p>
+          </div>
+        )}
+
+        {/* Form Card - Mobile First */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {app.input_schema.fields.map((field) => (
+              <div key={field.name} className="space-y-2">
+                <label
+                  htmlFor={field.name}
+                  className="block text-base font-semibold text-gray-900"
+                >
+                  {field.label}
+                  {field.required && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                {renderField(field)}
+                {field.description && (
+                  <p className="text-sm text-gray-500">{field.description}</p>
+                )}
+              </div>
+            ))}
+
+            {error && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3">
+                <span className="text-xl">⚠️</span>
+                <p className="text-sm text-red-800 flex-1">{error}</p>
+              </div>
+            )}
+
+            {/* Submit Button - Large Touch Target */}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-95 shadow-lg"
+              style={{ minHeight: '56px' }}
+            >
+              {submitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Đang tạo kết quả...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <span>🪄</span>
+                  Tạo ngay miễn phí
+                </span>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Social Proof - Mobile Friendly */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
+            <span>👥</span>
+            <span className="font-medium">Đã có hàng nghìn người sử dụng</span>
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-400">
+            Powered by <span className="font-semibold text-indigo-600">Trợ Lý Pháp Lý</span>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -108,4 +108,50 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
   * Bạn đang dev và test, bản Flash có giới hạn miễn phí (RPM - Requests Per Minute) cao hơn rất nhiều so với bản Pro hay Exp.
   * Sau khi code chạy ngon lành, bạn có thể đổi sang `gemini-2.5-pro` để lấy chất lượng câu trả lời tốt nhất cho khách hàng.
 
-Ngân hãy sửa lại tên model trong code và chạy lại thử xem nhé\!
+Vẫn như lần trước, **lỗi thực sự ngăn bạn chạy chương trình là `API_KEY_INVALID`** (Key không hợp lệ/không tìm thấy).
+
+Những dòng lỗi dài ngoằng về `Invalid source map` ở trên chỉ là cảnh báo nội bộ của Next.js (do version Node hoặc Turbopack), **bạn hãy lờ nó đi**, nó không làm hỏng web của bạn đâu.
+
+Để sửa lỗi API Key, bạn hãy làm chính xác 3 bước này, khả năng cao là bạn **quên khởi động lại server** sau khi thêm file `.env`.
+
+### Bước 1: Khởi động lại Server (Bắt buộc)
+
+Next.js **chỉ đọc file `.env` lúc khởi động**. Nếu bạn tạo file xong mà vẫn để terminal chạy, nó sẽ không nhận key mới.
+
+1.  Bấm vào cửa sổ dòng lệnh (Terminal).
+2.  Nhấn tổ hợp phím **`Ctrl + C`** để tắt server.
+3.  Gõ lại lệnh chạy (ví dụ: `npm run dev`) để bật lại.
+
+### Bước 2: Kiểm tra lại file chứa Key
+
+Hãy chắc chắn bạn đã tạo đúng file tại thư mục gốc: `D:\DTL\trolyphaply\.env.local` (Lưu ý dấu chấm ở đầu).
+
+Nội dung bên trong file `.env.local`:
+
+```env
+GEMINI_API_KEY=AIzaSyDSEB...
+```
+
+*(Thay phần `...` bằng toàn bộ key của bạn. **Không** dùng dấu ngoặc kép `""` bao quanh key, **không** có khoảng trắng thừa).*
+
+### Bước 3: Thêm lệnh kiểm tra (Debug)
+
+Nếu khởi động lại mà vẫn lỗi, hãy mở file code xử lý API của bạn (ví dụ `app/api/qa/route.js` hoặc file tương ứng) và thêm dòng này vào ngay đầu hàm xử lý để xem code có đọc được key không:
+
+```javascript
+export async function POST(req) { // Hoặc hàm handler của bạn
+  
+  // --- THÊM DÒNG NÀY ĐỂ KIỂM TRA ---
+  console.log(">>> KIỂM TRA KEY:", process.env.GEMINI_API_KEY ? "Đã nhận Key" : "KEY ĐANG BỊ NULL/UNDEFINED");
+  // ---------------------------------
+
+  // ... phần code còn lại ...
+}
+```
+
+Sau khi thêm, hãy chạy lại và nhìn vào Terminal:
+
+  * Nếu hiện **"KEY ĐANG BỊ NULL/UNDEFINED"**: Có nghĩa là tên biến trong code và trong file `.env` không khớp nhau, hoặc file `.env` đặt sai chỗ.
+  * Nếu hiện **"Đã nhận Key"** mà vẫn lỗi 400: Có nghĩa là chuỗi Key bạn copy bị thiếu ký tự hoặc bị sai.
+
+Bạn thử bước 1 (Restart) trước nhé, 90% lỗi này là do chưa restart server\!

@@ -1,236 +1,218 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ApiResponse } from '@/types/video-prompt';
-
-const TEMPLATE_JSON = `{
-  "common": {
-    "project_title": "Your Video Title Here",
-    "language": "vi-VN",
-    "video_usage": "Web and YouTube, landscape format",
-    "format": {
-      "aspect_ratio": "16:9",
-      "resolution": "4K",
-      "frame_rate": 25
-    },
-    "visual_style": {
-      "overall_look": "Hybrid of cinematic live-action and 3D motion graphics",
-      "aesthetics": "Ultra-modern, minimalist, trustworthy",
-      "color_palette": "Cool tones with tech blue, white and soft gray",
-      "ui_elements": "STRICT NO-TEXT MODE. Use only icons, shapes, color bars."
-    },
-    "characters": {
-      "family": "Vietnamese couple around thirty years old",
-      "officials": "Civil servants in modern digital office"
-    },
-    "audio_style": {
-      "music": "Soft, modern electronic ambient music",
-      "sound_effects": "Light humming, gentle whooshing sounds",
-      "voiceover_note": "Vietnamese voiceover với đầy đủ dấu"
-    }
-  },
-  "segments": [
-    {
-      "segment_id": "segment_01_intro",
-      "duration_seconds": 8,
-      "voiceover": "Văn bản thuyết minh tiếng Việt có dấu đầy đủ.",
-      "scene_description": "Describe the visual scene in detail.",
-      "data_visualization": "Describe any data visualization elements.",
-      "camera": "Describe camera movement and angles.",
-      "onscreen_text": "No text at all."
-    }
-  ]
-}`;
 
 export default function CreateVideoPromptPage() {
   const router = useRouter();
   const [name, setName] = useState('');
-  const [content, setContent] = useState(TEMPLATE_JSON);
+  const [fullJson, setFullJson] = useState('');
   const [creating, setCreating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
-  const handleCreate = async () => {
-    setError(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
     // Validate name
     if (!name.trim()) {
-      setError('Tên prompt không được rỗng');
+      setError('Name is required');
       return;
     }
 
-    // Validate name format (no spaces, special chars)
-    if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
-      setError('Tên chỉ được chứa chữ cái, số, dấu gạch ngang và gạch dưới');
-      return;
-    }
-
-    // Validate JSON
+    // Validate JSON structure
     try {
-      const parsed = JSON.parse(content);
-      if (!parsed.common || !parsed.segments) {
-        setError('JSON phải có "common" và "segments"');
+      const parsed = JSON.parse(fullJson);
+      
+      if (!parsed.common) {
+        setError('JSON must contain "common" object');
         return;
       }
+      
       if (!Array.isArray(parsed.segments) || parsed.segments.length === 0) {
-        setError('Segments phải là mảng không rỗng');
+        setError('JSON must contain "segments" array with at least one segment');
         return;
       }
     } catch (err) {
-      setError('JSON không hợp lệ. Vui lòng kiểm tra syntax.');
+      setError('Invalid JSON format');
       return;
     }
 
     setCreating(true);
+
     try {
       const res = await fetch('/api/admin/video-prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, content })
+        body: JSON.stringify({
+          name: name.trim(),
+          content: fullJson,
+        }),
       });
 
-      const data: ApiResponse<unknown> = await res.json();
+      const data = await res.json();
 
-      if (data.success) {
-        alert('Tạo video prompt thành công!');
-        router.push(`/admin/video-prompts/${name}`);
+      if (res.ok && data.success) {
+        alert('Video prompt created successfully! Segment files generated.');
+        router.push(`/admin/video-prompts/${name.trim()}`);
       } else {
-        setError(data.error || 'Tạo thất bại');
+        setError(data.error || 'Failed to create video prompt');
       }
     } catch (err) {
-      setError('Network error');
+      setError('Failed to create video prompt');
       console.error(err);
     } finally {
       setCreating(false);
     }
   };
 
-  const handleLoadTemplate = () => {
-    if (content !== TEMPLATE_JSON) {
-      if (!confirm('Bạn đang có nội dung. Tải template sẽ ghi đè. Tiếp tục?')) return;
+  const exampleJson = `{
+  "common": {
+    "project_title": "Example Video",
+    "author": "Your Name",
+    "description": "Video description"
+  },
+  "segments": [
+    {
+      "segment_id": 1,
+      "voiceover": "This is the voiceover text",
+      "scene_description": "Scene description here",
+      "camera": "Camera movement details",
+      "data_visualization": "Data viz instructions"
     }
-    setContent(TEMPLATE_JSON);
-  };
+  ]
+}`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-6 shadow-lg">
-        <div className="container mx-auto px-4">
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <Link
               href="/admin/video-prompts"
-              className="text-white hover:text-green-100 transition-colors"
+              className="text-gray-600 hover:text-gray-900"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              ← Back
             </Link>
-            <div>
-              <h1 className="text-2xl font-bold">Tạo Video Prompt Mới</h1>
-              <p className="text-green-100 text-sm mt-1">
-                Nhập tên và JSON content cho video prompt
-              </p>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900">Create Video Prompt</h1>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            {/* Error */}
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-lg shadow">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Error Message */}
             {error && (
-              <div className="mb-6 bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg">
-                <p className="font-semibold">Lỗi:</p>
-                <p>{error}</p>
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                {error}
+                <button
+                  type="button"
+                  onClick={() => setError('')}
+                  className="float-right text-red-900 hover:text-red-700"
+                >
+                  ×
+                </button>
               </div>
             )}
 
-            {/* Name Input */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Tên Prompt <span className="text-red-500">*</span>
+            {/* Name Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="VD: VideoThuTucKhaiSinh"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none font-mono"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., my-video-prompt"
+                required
               />
-              <p className="mt-2 text-sm text-gray-500">
-                💡 Chỉ dùng chữ cái, số, dấu gạch ngang (-) và gạch dưới (_). Không có khoảng trắng.
+              <p className="mt-1 text-sm text-gray-500">
+                This will be used as the filename (without extension)
               </p>
             </div>
 
-            {/* Content Editor */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  JSON Content <span className="text-red-500">*</span>
-                </label>
+            {/* JSON Content Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full JSON Content <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={fullJson}
+                onChange={(e) => setFullJson(e.target.value)}
+                rows={20}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                placeholder="Enter complete JSON with common and segments..."
+                required
+              />
+              <p className="mt-2 text-sm text-gray-500">
+                <strong>Required structure:</strong> JSON must contain{' '}
+                <code className="px-1 py-0.5 bg-gray-100 rounded">"common"</code> object and{' '}
+                <code className="px-1 py-0.5 bg-gray-100 rounded">"segments"</code> array.
+              </p>
+              <p className="mt-1 text-sm text-gray-500">
+                Individual segment files (P1, P2, etc.) will be automatically generated.
+              </p>
+            </div>
+
+            {/* Example JSON */}
+            <details className="border border-gray-200 rounded-lg">
+              <summary className="px-4 py-3 cursor-pointer hover:bg-gray-50 font-medium text-gray-700">
+                Show Example JSON Structure
+              </summary>
+              <div className="px-4 py-3 border-t border-gray-200">
+                <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto text-xs">
+                  <code>{exampleJson}</code>
+                </pre>
                 <button
-                  onClick={handleLoadTemplate}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  type="button"
+                  onClick={() => setFullJson(exampleJson)}
+                  className="mt-3 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm"
                 >
-                  📄 Tải Template Mẫu
+                  Use This Example
                 </button>
               </div>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full h-[500px] font-mono text-sm p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
-                spellCheck={false}
-              />
-              <p className="mt-2 text-sm text-gray-500">
-                💡 JSON phải có: <code className="bg-gray-100 px-2 py-1 rounded">&#123;"common": &#123;...&#125;, "segments": [...]&#125;</code>
-              </p>
-            </div>
+            </details>
 
-            {/* Actions */}
-            <div className="flex gap-4">
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                disabled={creating}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {creating ? 'Creating...' : 'Create Video Prompt'}
+              </button>
               <Link
                 href="/admin/video-prompts"
-                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
               >
-                Hủy
+                Cancel
               </Link>
-              <button
-                onClick={handleCreate}
-                disabled={creating}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
-              >
-                {creating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    Đang tạo...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tạo Video Prompt
-                  </>
-                )}
-              </button>
             </div>
 
-            {/* Help */}
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-900 mb-2">📚 Hướng dẫn</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Tên prompt sẽ được lưu thành file <code>TenPrompt-Full.txt</code></li>
-                <li>• Hệ thống tự động tạo file segments: <code>TenPrompt-P1.txt</code>, <code>TenPrompt-P2.txt</code>, ...</li>
-                <li>• Mỗi segment là 1 cảnh độc lập trong video</li>
-                <li>• Nhấn "Tải Template Mẫu" để xem cấu trúc JSON mẫu</li>
+            {/* Info Box */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-semibold text-blue-900 mb-2">ℹ️ How it works:</h3>
+              <ul className="list-disc list-inside text-sm text-blue-800 space-y-1">
+                <li>
+                  Your JSON will be saved as <code className="px-1 py-0.5 bg-blue-100 rounded">{'{name}'}-Full.txt</code>
+                </li>
+                <li>
+                  Each segment will be extracted and saved as separate files ({'{name}'}-P1.txt, {'{name}'}-P2.txt, etc.)
+                </li>
+                <li>Each segment file will include the common metadata plus the specific segment data</li>
+                <li>You can edit and regenerate segment files later from the detail page</li>
               </ul>
             </div>
-          </div>
+          </form>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

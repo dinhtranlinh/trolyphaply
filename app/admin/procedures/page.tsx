@@ -1,295 +1,385 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import SearchBar from '@/components/ui/SearchBar';
-import TextInput from '@/components/forms/TextInput';
-import TextArea from '@/components/forms/TextArea';
-import Select from '@/components/forms/Select';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Procedure {
   id: string;
   title: string;
+  category: string;
   authority: string;
   time_est: string;
-  category: string;
-  steps: any[];
-  documents: any[];
   fees: string | null;
+  steps: any;
+  documents: string[];
   notes: string | null;
   tags: string[];
   status: string;
   created_at: string;
-  updated_at: string;
 }
 
-/**
- * Admin Procedures Management Page
- */
-export default function AdminProceduresPage() {
+export default function ProceduresManagementPage() {
+  const router = useRouter();
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [showModal, setShowModal] = useState(false);
-  const [editingProc, setEditingProc] = useState<Procedure | null>(null);
+  const [statusFilter, setStatusFilter] = useState('active');
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [selectedProc, setSelectedProc] = useState<Procedure | null>(null);
+  
+  // Form state
   const [formData, setFormData] = useState({
     title: '',
+    category: 'civil',
     authority: '',
-    timeEst: '',
-    category: 'marriage',
-    steps: '[]',
-    documents: '[]',
+    time_est: '',
     fees: '',
+    steps: '',
+    documents: '',
     notes: '',
     tags: '',
     status: 'active',
   });
-  const [submitting, setSubmitting] = useState(false);
 
+  const [error, setError] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Check authorization
   useEffect(() => {
-    loadProcedures();
-  }, [search, categoryFilter]);
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      router.push('/admin');
+      return;
+    }
+    fetchProcedures();
+  }, [router, search, categoryFilter, statusFilter]);
 
-  const loadProcedures = async () => {
+  const fetchProcedures = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (categoryFilter !== 'all') params.append('category', categoryFilter);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
 
-      const response = await fetch(`/api/admin/procedures?${params}`);
-      const data = await response.json();
-      setProcedures(data.procedures || []);
-    } catch (error) {
-      console.error('Error loading procedures:', error);
+      const res = await fetch(`/api/admin/procedures?${params}`);
+      const data = await res.json();
+      
+      if (res.ok) {
+        setProcedures(data.procedures || []);
+      } else {
+        setError(data.error || 'Failed to fetch procedures');
+      }
+    } catch (err) {
+      setError('Failed to fetch procedures');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreate = () => {
-    setEditingProc(null);
+    setModalMode('create');
     setFormData({
       title: '',
+      category: 'civil',
       authority: '',
-      timeEst: '',
-      category: 'marriage',
-      steps: '[]',
-      documents: '[]',
+      time_est: '',
       fees: '',
+      steps: '',
+      documents: '',
       notes: '',
       tags: '',
       status: 'active',
     });
-    setShowModal(true);
+    setIsModalOpen(true);
   };
 
   const handleEdit = (proc: Procedure) => {
-    setEditingProc(proc);
+    setModalMode('edit');
+    setSelectedProc(proc);
     setFormData({
       title: proc.title,
-      authority: proc.authority,
-      timeEst: proc.time_est,
       category: proc.category,
-      steps: JSON.stringify(proc.steps, null, 2),
-      documents: JSON.stringify(proc.documents, null, 2),
+      authority: proc.authority,
+      time_est: proc.time_est,
       fees: proc.fees || '',
+      steps: JSON.stringify(proc.steps, null, 2),
+      documents: proc.documents.join(', '),
       notes: proc.notes || '',
       tags: proc.tags.join(', '),
       status: proc.status,
     });
-    setShowModal(true);
+    setIsModalOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
+    setError('');
 
     try {
       const payload = {
-        title: formData.title,
-        authority: formData.authority,
-        timeEst: formData.timeEst,
-        category: formData.category,
-        steps: JSON.parse(formData.steps || '[]'),
-        documents: JSON.parse(formData.documents || '[]'),
-        fees: formData.fees || null,
-        notes: formData.notes || null,
+        ...formData,
+        timeEst: formData.time_est,
+        steps: formData.steps ? JSON.parse(formData.steps) : [],
+        documents: formData.documents.split(',').map((d) => d.trim()).filter(Boolean),
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
-        status: formData.status,
       };
 
-      const url = editingProc
-        ? `/api/admin/procedures/${editingProc.id}`
-        : '/api/admin/procedures';
-      const method = editingProc ? 'PUT' : 'POST';
+      const url = modalMode === 'create' 
+        ? '/api/admin/procedures'
+        : `/api/admin/procedures/${selectedProc?.id}`;
+      
+      const method = modalMode === 'create' ? 'POST' : 'PUT';
 
-      const response = await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        setShowModal(false);
-        loadProcedures();
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsModalOpen(false);
+        fetchProcedures();
       } else {
-        const data = await response.json();
-        alert(data.error || 'Failed to save procedure');
+        setError(data.error || 'Failed to save procedure');
       }
-    } catch (error) {
-      console.error('Error saving procedure:', error);
-      alert('Failed to save procedure');
-    } finally {
-      setSubmitting(false);
+    } catch (err) {
+      setError('Failed to save procedure. Check JSON format.');
+      console.error(err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa thủ tục này?')) return;
+    if (deleteConfirm !== id) {
+      setDeleteConfirm(id);
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/admin/procedures/${id}`, {
+      const res = await fetch(`/api/admin/procedures/${id}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        loadProcedures();
+      if (res.ok) {
+        fetchProcedures();
+        setDeleteConfirm(null);
       } else {
-        alert('Failed to delete procedure');
+        const data = await res.json();
+        setError(data.error || 'Failed to delete procedure');
       }
-    } catch (error) {
-      console.error('Error deleting procedure:', error);
+    } catch (err) {
+      setError('Failed to delete procedure');
+      console.error(err);
     }
   };
 
-  const categories = [
-    { value: 'all', label: 'Tất cả' },
-    { value: 'marriage', label: 'Hôn nhân - Gia đình' },
-    { value: 'land', label: 'Đất đai - Nhà đất' },
-    { value: 'business', label: 'Doanh nghiệp' },
-    { value: 'vehicle', label: 'Phương tiện' },
-    { value: 'citizen', label: 'Công dân' },
-    { value: 'other', label: 'Khác' },
-  ];
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted">Đang tải...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const handleExport = () => {
-    window.open('/api/admin/legal-library/export?type=procedures', '_blank');
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    router.push('/admin');
   };
 
-  const handleImport = () => {
-    window.location.href = '/admin/documents/import';
+  const handleExport = async () => {
+    try {
+      const res = await fetch('/api/admin/legal-library/export?type=procedures');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `procedures-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      setError('Failed to export procedures');
+      console.error(err);
+    }
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="page-title mb-1">Quản lý Thủ tục</h1>
-          <p className="text-muted">{procedures.length} thủ tục</p>
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push('/admin/dashboard')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back
+            </button>
+            <h1 className="text-3xl font-bold text-gray-900">Procedures Management</h1>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+            >
+              📥 Export
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleImport}>
-            📥 Import
-          </Button>
-          <Button variant="outline" onClick={handleExport}>
-            📤 Export
-          </Button>
-          <Button variant="primary" onClick={handleCreate}>
-            ➕ Thêm thủ tục
-          </Button>
-        </div>
-      </div>
+      </header>
 
-      {/* Filters */}
-      <Card className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Tìm theo tên thủ tục..."
-          />
-          <Select
-            label="Lĩnh vực"
-            value={categoryFilter}
-            onChange={setCategoryFilter}
-            options={categories}
-          />
-        </div>
-      </Card>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input
+              type="text"
+              placeholder="Search by title..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
 
-      {/* Table */}
-      <Card>
-        {procedures.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-3">📋</div>
-            <p className="text-muted">Chưa có thủ tục nào</p>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Categories</option>
+              <option value="civil">Civil</option>
+              <option value="criminal">Criminal</option>
+              <option value="administrative">Administrative</option>
+              <option value="labor">Labor</option>
+              <option value="tax">Tax</option>
+              <option value="other">Other</option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <button
+            onClick={handleCreate}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            + Create Procedure
+          </button>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* Procedures Table */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : procedures.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="text-gray-400 text-6xl mb-4">📋</div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No procedures found</h3>
+            <p className="text-gray-500 mb-4">Create your first procedure to get started.</p>
+            <button
+              onClick={handleCreate}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Create Procedure
+            </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '2px solid var(--color-border-subtle)' }}>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Tên thủ tục</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Lĩnh vực</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Thời gian</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Trạng thái</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold">Thao tác</th>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Time Est.
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Authority
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {procedures.map((proc, index) => (
-                  <tr
-                    key={proc.id}
-                    style={{
-                      borderBottom:
-                        index < procedures.length - 1 ? '1px solid var(--color-border-subtle)' : 'none',
-                    }}
-                  >
-                    <td className="py-3 px-4">
-                      <div className="font-medium">{proc.title}</div>
-                      <div className="text-sm text-muted">{proc.authority}</div>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {procedures.map((proc) => (
+                  <tr key={proc.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">{proc.title}</div>
                     </td>
-                    <td className="py-3 px-4 text-sm">{proc.category}</td>
-                    <td className="py-3 px-4 text-sm">{proc.time_est}</td>
-                    <td className="py-3 px-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{proc.category}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{proc.time_est}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-500">{proc.authority}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className="px-2 py-1 rounded text-xs"
-                        style={{
-                          background:
-                            proc.status === 'active' ? 'var(--color-success-light)' : 'var(--color-muted)',
-                          color: proc.status === 'active' ? 'var(--color-success)' : 'var(--color-text-muted)',
-                        }}
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          proc.status === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
                       >
                         {proc.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <button
                         onClick={() => handleEdit(proc)}
-                        className="text-primary hover:underline text-sm mr-3"
+                        className="text-indigo-600 hover:text-indigo-900"
                       >
-                        Sửa
+                        Edit
                       </button>
                       <button
                         onClick={() => handleDelete(proc.id)}
-                        className="text-error hover:underline text-sm"
+                        className={`${
+                          deleteConfirm === proc.id
+                            ? 'text-red-900 font-bold'
+                            : 'text-red-600 hover:text-red-900'
+                        }`}
                       >
-                        Xóa
+                        {deleteConfirm === proc.id ? 'Confirm?' : 'Delete'}
                       </button>
+                      {deleteConfirm === proc.id && (
+                        <button
+                          onClick={() => setDeleteConfirm(null)}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -297,114 +387,180 @@ export default function AdminProceduresPage() {
             </table>
           </div>
         )}
-      </Card>
+      </main>
 
       {/* Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.5)' }}
-          onClick={() => setShowModal(false)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="section-title mb-6">{editingProc ? 'Sửa thủ tục' : 'Thêm thủ tục mới'}</h2>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                {modalMode === 'create' ? 'Create Procedure' : 'Edit Procedure'}
+              </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <TextInput
-                label="Tên thủ tục *"
-                value={formData.title}
-                onChange={(val) => setFormData({ ...formData, title: val })}
-                required
-              />
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <TextInput
-                  label="Cơ quan thực hiện *"
-                  value={formData.authority}
-                  onChange={(val) => setFormData({ ...formData, authority: val })}
-                  required
-                />
-                <TextInput
-                  label="Thời gian ước tính *"
-                  value={formData.timeEst}
-                  onChange={(val) => setFormData({ ...formData, timeEst: val })}
-                  placeholder="VD: 3-5 ngày làm việc"
-                  required
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="civil">Civil</option>
+                      <option value="criminal">Criminal</option>
+                      <option value="administrative">Administrative</option>
+                      <option value="labor">Labor</option>
+                      <option value="tax">Tax</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
 
-              <Select
-                label="Lĩnh vực *"
-                value={formData.category}
-                onChange={(val) => setFormData({ ...formData, category: val })}
-                options={categories.filter((c) => c.value !== 'all')}
-              />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Time Estimation <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.time_est}
+                      onChange={(e) => setFormData({ ...formData, time_est: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., 7-10 days"
+                      required
+                    />
+                  </div>
 
-              <TextArea
-                label="Các bước thực hiện (JSON) *"
-                value={formData.steps}
-                onChange={(val) => setFormData({ ...formData, steps: val })}
-                rows={6}
-                helperText='Format: [{&quot;step&quot;: 1, &quot;title&quot;: &quot;...&quot;, &quot;description&quot;: &quot;...&quot;}]'
-                required
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Authority <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.authority}
+                      onChange={(e) => setFormData({ ...formData, authority: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Ministry of Justice"
+                      required
+                    />
+                  </div>
 
-              <TextArea
-                label="Hồ sơ cần thiết (JSON) *"
-                value={formData.documents}
-                onChange={(val) => setFormData({ ...formData, documents: val })}
-                rows={4}
-                helperText='Format: [{&quot;name&quot;: &quot;...&quot;, &quot;copies&quot;: 1}]'
-                required
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Fees
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.fees}
+                      onChange={(e) => setFormData({ ...formData, fees: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., 500,000 VND"
+                    />
+                  </div>
 
-              <TextInput
-                label="Lệ phí"
-                value={formData.fees}
-                onChange={(val) => setFormData({ ...formData, fees: val })}
-                placeholder="VD: 100,000 VNĐ"
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Steps (JSON format) <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      value={formData.steps}
+                      onChange={(e) => setFormData({ ...formData, steps: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                      rows={8}
+                      placeholder='[{"step": 1, "title": "Prepare documents", "description": "Gather all required documents"}]'
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Array of objects with step, title, description
+                    </p>
+                  </div>
 
-              <TextArea
-                label="Ghi chú"
-                value={formData.notes}
-                onChange={(val) => setFormData({ ...formData, notes: val })}
-                rows={3}
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Required Documents (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.documents}
+                      onChange={(e) => setFormData({ ...formData, documents: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="ID card, Birth certificate, Marriage certificate"
+                    />
+                  </div>
 
-              <TextInput
-                label="Tags (phân cách bằng dấu phẩy)"
-                value={formData.tags}
-                onChange={(val) => setFormData({ ...formData, tags: val })}
-                placeholder="kết hôn, đăng ký, hồ sơ"
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Notes
+                    </label>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Additional notes or important information"
+                    />
+                  </div>
 
-              <Select
-                label="Trạng thái"
-                value={formData.status}
-                onChange={(val) => setFormData({ ...formData, status: val })}
-                options={[
-                  { value: 'active', label: 'Hoạt động' },
-                  { value: 'archived', label: 'Lưu trữ' },
-                ]}
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tags (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.tags}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="marriage, registration, civil"
+                    />
+                  </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  fullWidth
-                >
-                  Hủy
-                </Button>
-                <Button variant="primary" type="submit" loading={submitting} fullWidth>
-                  {editingProc ? 'Cập nhật' : 'Tạo mới'}
-                </Button>
-              </div>
-            </form>
-          </Card>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="active">Active</option>
+                      <option value="archived">Archived</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  >
+                    {modalMode === 'create' ? 'Create' : 'Update'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

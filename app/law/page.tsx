@@ -17,6 +17,7 @@ interface Document {
   doc_number: string;
   category: string;
   type: string;
+  authority: string;
   tags: string[];
   issue_date?: string;
   effective_date?: string;
@@ -31,6 +32,9 @@ interface Procedure {
   authority?: string;
   tags: string[];
   notes?: string;
+  steps?: any;
+  documents?: any;
+  fees?: string;
 }
 
 type TabType = 'all' | 'documents' | 'procedures';
@@ -216,11 +220,11 @@ function LegalLibraryContent() {
                       <LegalDocCard
                         key={doc.id}
                         title={doc.title}
-                        code={doc.code}
+                        code={doc.doc_number}
                         category={doc.category}
-                        documentType={doc.document_type}
+                        documentType={doc.type}
                         tags={doc.tags}
-                        issuedDate={doc.issued_date}
+                        issuedDate={doc.issue_date}
                         effectiveDate={doc.effective_date}
                         onClick={() => (window.location.href = `/law/doc/${doc.id}`)}
                       />
@@ -239,8 +243,8 @@ function LegalLibraryContent() {
                         key={proc.id}
                         title={proc.title}
                         category={proc.category}
-                        difficulty={proc.difficulty}
-                        estimatedTime={proc.estimated_time}
+                        difficulty="medium"
+                        estimatedTime={proc.time_est}
                         authority={proc.authority}
                         tags={proc.tags}
                         onClick={() => (window.location.href = `/law/procedure/${proc.id}`)}

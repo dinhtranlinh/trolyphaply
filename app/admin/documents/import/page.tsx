@@ -1,263 +1,426 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Upload, FileJson, AlertCircle, CheckCircle } from 'lucide-react'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-interface ImportResult {
-  success: boolean
-  message: string
-  results?: {
-    documents: { imported: number; skipped: number; errors: string[] }
-    procedures: { imported: number; skipped: number; errors: string[] }
-  }
-  errors?: {
-    documents: string[]
-    procedures: string[]
-  }
+interface ImportDocument {
+  title: string;
+  slug: string;
+  type: string;
+  documentNumber?: string;
+  issuedBy: string;
+  issuedDate: string;
+  effectiveDate: string;
+  category: string;
+  tags: string[];
+  summary?: string;
+  content: string;
+  chapters?: string[];
+  source_urls?: string[];
+}
+
+interface ImportProcedure {
+  title: string;
+  slug: string;
+  category: string;
+  authority: string;
+  level?: string;
+  description?: string;
+  estimatedTime: string;
+  fees?: string;
+  tags: string[];
+  steps: any[];
+}
+
+interface ImportData {
+  legalLibraryItems?: ImportDocument[];
+  procedures?: ImportProcedure[];
+}
+
+interface ImportResults {
+  documents: { imported: number; skipped: number; errors: string[] };
+  procedures: { imported: number; skipped: number; errors: string[] };
 }
 
 export default function ImportLegalLibraryPage() {
-  const router = useRouter()
-  const [file, setFile] = useState<File | null>(null)
-  const [importing, setImporting] = useState(false)
-  const [result, setResult] = useState<ImportResult | null>(null)
-  const [preview, setPreview] = useState<any>(null)
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [previewData, setPreviewData] = useState<ImportData | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [results, setResults] = useState<ImportResults | null>(null);
+  const [error, setError] = useState('');
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (!selectedFile) return
+  React.useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      router.push('/admin');
+      return;
+    }
+    setAuthorized(true);
+  }, [router]);
 
-    if (!selectedFile.name.endsWith('.json')) {
-      alert('Vui lòng chọn file JSON')
-      return
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    if (selectedFile.type !== 'application/json') {
+      setError('Please upload a JSON file');
+      return;
     }
 
-    setFile(selectedFile)
-    setResult(null)
+    setFile(selectedFile);
+    setError('');
+    setResults(null);
 
-    // Preview file content
-    try {
-      const text = await selectedFile.text()
-      const json = JSON.parse(text)
-      setPreview({
-        documents: json.legalLibraryItems?.length || 0,
-        procedures: json.procedures?.length || 0
-      })
-    } catch (err) {
-      alert('File JSON không hợp lệ')
-      setFile(null)
-      setPreview(null)
-    }
-  }
+    // Read and parse file for preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const data: ImportData = JSON.parse(content);
+        setPreviewData(data);
+      } catch (err) {
+        setError('Invalid JSON format');
+        setPreviewData(null);
+      }
+    };
+    reader.readAsText(selectedFile);
+  };
 
   const handleImport = async () => {
-    if (!file) return
+    if (!previewData) return;
+
+    setError('');
+    setImporting(true);
 
     try {
-      setImporting(true)
-      const text = await file.text()
-      const json = JSON.parse(text)
-
       const res = await fetch('/api/admin/legal-library/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(json)
-      })
+        body: JSON.stringify(previewData),
+      });
 
-      const data = await res.json()
-      setResult(data)
+      const data = await res.json();
 
-      if (data.success) {
-        // Auto redirect after 3 seconds if successful
-        setTimeout(() => {
-          router.push('/admin/documents')
-        }, 3000)
+      if (res.ok && data.success) {
+        setResults(data.results);
+        setFile(null);
+        setPreviewData(null);
+      } else {
+        setError(data.error || 'Import failed');
       }
-    } catch (err: any) {
-      setResult({
-        success: false,
-        message: err.message || 'Import failed'
-      })
+    } catch (err) {
+      setError('Failed to import data');
+      console.error(err);
     } finally {
-      setImporting(false)
+      setImporting(false);
     }
+  };
+
+  const handleReset = () => {
+    setFile(null);
+    setPreviewData(null);
+    setResults(null);
+    setError('');
+  };
+
+  if (!authorized) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <Button
-        variant="ghost"
-        onClick={() => router.push('/admin/documents')}
-        className="mb-4"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Quay lại
-      </Button>
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/dashboard"
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back to Dashboard
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Import Legal Library
+            </h1>
+          </div>
+        </div>
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Import Legal Library</CardTitle>
-          <CardDescription>
-            Import văn bản pháp luật và thủ tục từ file JSON
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* File Upload */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Chọn file JSON
-            </label>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+            {error}
+            <button
+              onClick={() => setError('')}
+              className="float-right text-red-900 hover:text-red-700"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* Upload Section */}
+        {!results && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Upload JSON File
+            </h2>
             <div className="flex items-center gap-4">
-              <label className="flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#0B3B70] transition-colors">
-                <Upload className="mr-2 h-5 w-5 text-gray-500" />
-                <span className="text-sm text-gray-600">
-                  {file ? file.name : 'Chọn file...'}
-                </span>
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-              </label>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100"
+              />
+              {previewData && (
+                <button
+                  onClick={handleReset}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Upload a JSON file containing legal documents and procedures data
+            </p>
+          </div>
+        )}
+
+        {/* Preview Section */}
+        {previewData && !results && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Preview Import Data
+            </h2>
+
+            {/* Documents Preview */}
+            {previewData.legalLibraryItems && previewData.legalLibraryItems.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium text-gray-800 mb-3">
+                  📜 Legal Documents ({previewData.legalLibraryItems.length})
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Title
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Category
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Issued By
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {previewData.legalLibraryItems.slice(0, 10).map((doc, idx) => (
+                        <tr key={idx}>
+                          <td className="px-6 py-4 text-sm text-gray-900">{doc.title}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{doc.type}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{doc.category}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{doc.issuedBy}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {previewData.legalLibraryItems.length > 10 && (
+                    <p className="text-sm text-gray-500 mt-2 px-6">
+                      ... and {previewData.legalLibraryItems.length - 10} more documents
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Procedures Preview */}
+            {previewData.procedures && previewData.procedures.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium text-gray-800 mb-3">
+                  📋 Procedures ({previewData.procedures.length})
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Title
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Category
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Authority
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Time Est.
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {previewData.procedures.slice(0, 10).map((proc, idx) => (
+                        <tr key={idx}>
+                          <td className="px-6 py-4 text-sm text-gray-900">{proc.title}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{proc.category}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{proc.authority}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{proc.estimatedTime}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {previewData.procedures.length > 10 && (
+                    <p className="text-sm text-gray-500 mt-2 px-6">
+                      ... and {previewData.procedures.length - 10} more procedures
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Import Button */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleImport}
+                disabled={importing}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {importing ? 'Importing...' : 'Import Data'}
+              </button>
+              <button
+                onClick={handleReset}
+                disabled={importing}
+                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
             </div>
           </div>
+        )}
 
-          {/* Preview */}
-          {preview && (
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="pt-4">
-                <div className="flex items-start gap-3">
-                  <FileJson className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-blue-900 mb-2">
-                      Nội dung file:
-                    </p>
-                    <ul className="text-sm text-blue-800 space-y-1">
-                      {preview.documents > 0 && (
-                        <li>📄 {preview.documents} văn bản pháp luật</li>
-                      )}
-                      {preview.procedures > 0 && (
-                        <li>📋 {preview.procedures} thủ tục hành chính</li>
-                      )}
-                    </ul>
+        {/* Results Section */}
+        {results && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Import Results
+            </h2>
+
+            {/* Documents Results */}
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                📜 Legal Documents
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-green-700">
+                    {results.documents.imported}
                   </div>
+                  <div className="text-sm text-green-600">Imported</div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Import Button */}
-          {file && !result && (
-            <Button
-              onClick={handleImport}
-              disabled={importing}
-              className="w-full"
-              size="lg"
-            >
-              {importing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Đang import...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Bắt đầu Import
-                </>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-yellow-700">
+                    {results.documents.skipped}
+                  </div>
+                  <div className="text-sm text-yellow-600">Skipped (Already Exists)</div>
+                </div>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-red-700">
+                    {results.documents.errors.length}
+                  </div>
+                  <div className="text-sm text-red-600">Errors</div>
+                </div>
+              </div>
+              {results.documents.errors.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <h4 className="font-medium text-red-900 mb-2">Error Details:</h4>
+                  <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                    {results.documents.errors.map((err, idx) => (
+                      <li key={idx}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
-            </Button>
-          )}
+            </div>
 
-          {/* Results */}
-          {result && (
-            <Card className={result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}>
-              <CardContent className="pt-4">
-                <div className="flex items-start gap-3">
-                  {result.success ? (
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-                  )}
-                  <div className="flex-1">
-                    <p className={`text-sm font-medium mb-2 ${result.success ? 'text-green-900' : 'text-red-900'}`}>
-                      {result.message}
-                    </p>
-
-                    {result.results && (
-                      <div className="space-y-2 text-sm">
-                        {result.results.documents && (
-                          <div>
-                            <p className="font-medium">Văn bản:</p>
-                            <ul className="list-disc list-inside ml-2">
-                              <li>✅ Imported: {result.results.documents.imported}</li>
-                              <li>⏭️ Skipped: {result.results.documents.skipped}</li>
-                              {result.results.documents.errors.length > 0 && (
-                                <li className="text-red-700">❌ Errors: {result.results.documents.errors.length}</li>
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                        {result.results.procedures && (
-                          <div>
-                            <p className="font-medium">Thủ tục:</p>
-                            <ul className="list-disc list-inside ml-2">
-                              <li>✅ Imported: {result.results.procedures.imported}</li>
-                              <li>⏭️ Skipped: {result.results.procedures.skipped}</li>
-                              {result.results.procedures.errors.length > 0 && (
-                                <li className="text-red-700">❌ Errors: {result.results.procedures.errors.length}</li>
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Error Details */}
-                    {result.errors && (
-                      <details className="mt-3">
-                        <summary className="cursor-pointer text-sm font-medium text-red-800">
-                          Chi tiết lỗi ({(result.errors.documents?.length || 0) + (result.errors.procedures?.length || 0)})
-                        </summary>
-                        <div className="mt-2 space-y-2 text-xs">
-                          {result.errors.documents?.map((err, idx) => (
-                            <div key={idx} className="text-red-700">• {err}</div>
-                          ))}
-                          {result.errors.procedures?.map((err, idx) => (
-                            <div key={idx} className="text-red-700">• {err}</div>
-                          ))}
-                        </div>
-                      </details>
-                    )}
-
-                    {result.success && (
-                      <p className="text-xs text-green-700 mt-3">
-                        Đang chuyển về trang quản lý...
-                      </p>
-                    )}
+            {/* Procedures Results */}
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                📋 Procedures
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-green-700">
+                    {results.procedures.imported}
                   </div>
+                  <div className="text-sm text-green-600">Imported</div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-yellow-700">
+                    {results.procedures.skipped}
+                  </div>
+                  <div className="text-sm text-yellow-600">Skipped (Already Exists)</div>
+                </div>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-red-700">
+                    {results.procedures.errors.length}
+                  </div>
+                  <div className="text-sm text-red-600">Errors</div>
+                </div>
+              </div>
+              {results.procedures.errors.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <h4 className="font-medium text-red-900 mb-2">Error Details:</h4>
+                  <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                    {results.procedures.errors.map((err, idx) => (
+                      <li key={idx}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
 
-          {/* Instructions */}
-          <Card className="bg-gray-50">
-            <CardContent className="pt-4">
-              <p className="text-sm font-medium mb-2">📖 Hướng dẫn:</p>
-              <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
-                <li>File JSON phải có cấu trúc: <code className="text-xs bg-gray-200 px-1 rounded">{`{ "legalLibraryItems": [...], "procedures": [...] }`}</code></li>
-                <li>Các văn bản/thủ tục đã tồn tại (trùng title) sẽ bị bỏ qua</li>
-                <li>File mẫu: <code className="text-xs bg-gray-200 px-1 rounded">data/legal-library.json</code></li>
-                <li>Hỗ trợ import cả documents và procedures cùng lúc</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </CardContent>
-      </Card>
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Link
+                href="/admin/documents"
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                View Documents
+              </Link>
+              <Link
+                href="/admin/procedures"
+                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+              >
+                View Procedures
+              </Link>
+              <button
+                onClick={handleReset}
+                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+              >
+                Import More
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
-  )
+  );
 }

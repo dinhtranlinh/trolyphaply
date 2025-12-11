@@ -2,8 +2,8 @@
 
 > **Project**: TroLyPhapLy (Trợ Lý Pháp Lý - Nâng cấp)  
 > **Location**: `D:\DTL\trolyphaply\`  
-> **Date**: December 6, 2025  
-> **Status**: ✅ SESSIONS 0-7 HOÀN THÀNH - Bắt đầu NEW SESSIONS (Q&A + Quản trị)
+> **Date**: December 8, 2025  
+> **Status**: ✅ SESSIONS 5-9 HOÀN THÀNH (100% Admin Dashboard Complete!) 🎉
 
 ---
 
@@ -281,6 +281,394 @@ D:\DTL\trolyphaply\
   - [ ] Hướng dẫn prompt versioning
 
 **Estimation**: 2-3 giờ
+
+---
+
+## 🔧 HOÀN THIỆN ADMIN DASHBOARD (SESSION 5-9)
+
+> **Tài khoản đăng nhập**: admin@trolyphaply.vn / LamKhanh1823$$$  
+> **Status**: ⏳ IN PROGRESS - Backend API ✅ READY, Frontend Pages ❌ INCOMPLETE
+
+### 📊 Tổng quan Hoàn thiện Admin
+
+**Backend Status**: ✅ 100% - Tất cả API routes đã sẵn sàng
+
+- ✅ 22 API routes hoàn thành (auth, documents, procedures, prompts, apps, style-guides, video-prompts, legal-library)
+- ✅ Supabase integration
+- ✅ Validation & error handling
+
+**Frontend Status**: ✅ 100% - ALL ADMIN PAGES COMPLETED!
+
+- ✅ Admin Login & Dashboard with Sidebar Navigation
+- ✅ Documents Management Page (with Export)
+- ✅ Procedures Management Page (with Export)
+- ✅ Prompts Management Page
+- ✅ Apps Management Page
+- ✅ Style Guides Management Pages (list, create, detail, edit)
+- ✅ Video Prompts Manager Pages (list, detail, create)
+- ✅ Legal Library Import/Export Page **[SESSION 9 COMPLETED]**
+
+**Estimation**: ✅ COMPLETED - All admin features implemented!
+
+---
+
+### ✅ SESSION 5: Documents & Procedures CRUD Pages - Phase 1 COMPLETED
+
+**Duration**: 45 min (completed in ~25 minutes)
+**Complexity**: ⭐⭐⭐ Medium
+
+**Mục tiêu**: Tạo trang quản lý Documents và Procedures với CRUD UI hoàn chỉnh
+
+**Tasks**:
+
+1. **Documents Management Page** (`app/admin/documents/page.tsx`) ✅ COMPLETED
+
+   - ✅ Table list với columns: Tên văn bản, Số VB, Loại, Lĩnh vực, Trạng thái, Thao tác
+   - ✅ SearchBar input (tìm theo title/doc_number)
+   - ✅ Filter by category dropdown
+   - ✅ Filter by type dropdown
+   - ✅ Filter by status (Active/Archived)
+   - ✅ Create button → Open modal
+   - ✅ Create/Edit modal form:
+     - ✅ TextInput: title (required)
+     - ✅ TextInput: doc_number
+     - ✅ Select: type (Law, Decree, Circular, Decision)
+     - ✅ Select: category (Civil, Criminal, Administrative, Labor, Tax, Other)
+     - ✅ DateInput: issue_date
+     - ✅ DateInput: effective_date
+     - ✅ TextInput: authority
+     - ✅ TextArea: summary
+     - ✅ TextArea: content (JSON format hint)
+     - ✅ TextInput: tags (comma-separated)
+     - ✅ Select: status (Active/Archived)
+   - ✅ Edit button per row → Pre-fill modal
+   - ✅ Delete button per row → Confirmation dialog
+   - ✅ Loading states & error handling
+   - ✅ Empty state UI
+
+2. **Procedures Management Page** (`app/admin/procedures/page.tsx`) ✅ COMPLETED
+
+   - ✅ Table list với columns: Tên thủ tục, Lĩnh vực, Thời gian, Trạng thái, Thao tác
+   - ✅ SearchBar input (tìm theo title)
+   - ✅ Filter by category dropdown
+   - ✅ Filter by status (Active/Archived)
+   - ✅ Create button → Open modal
+   - ✅ Create/Edit modal form:
+     - ✅ TextInput: title (required)
+     - ✅ Select: category (Marriage, Land, Business, Vehicle, Citizen, Other)
+     - ✅ TextInput: authority
+     - ✅ TextInput: time_est (thời gian ước lượng)
+     - ✅ TextInput: fees (phí dịch vụ)
+     - ✅ TextArea: steps (JSON array hint)
+     - ✅ TextArea: documents (JSON array hint)
+     - ✅ TextArea: notes
+     - ✅ TextInput: tags (comma-separated)
+     - ✅ Select: status (Active/Archived)
+   - ✅ Edit button per row → Pre-fill modal
+   - ✅ Delete button per row → Confirmation dialog
+   - ✅ Loading states & error handling
+   - ✅ Empty state UI
+
+3. **Integration with existing API routes** ✅ COMPLETED
+   - ✅ Use `/api/admin/documents` (GET, POST)
+   - ✅ Use `/api/admin/documents/[id]` (GET, PUT, DELETE)
+   - ✅ Use `/api/admin/procedures` (GET, POST)
+   - ✅ Use `/api/admin/procedures/[id]` (GET, PUT, DELETE)
+
+**Files Created**:
+
+- ✅ `app/admin/documents/page.tsx` (448 lines)
+- ✅ `app/admin/procedures/page.tsx` (432 lines)
+
+**Files to Update**:
+
+- `app/admin/layout.tsx` (add sidebar links if missing)
+
+---
+
+### ✅ SESSION 6: Prompts & Apps Management Pages - Phase 2 COMPLETED
+
+**Duration**: 1 giờ (completed in ~35 minutes)
+**Complexity**: ⭐⭐⭐⭐ High
+
+**Mục tiêu**: Tạo trang quản lý Prompts, Apps với CRUD UI + advanced features
+
+**Tasks**:
+
+1. **Prompts Management Page** (`app/admin/prompts/page.tsx`) ✅ COMPLETED
+
+   - ✅ Table list với columns: Tên, Danh mục, Public, Tags, Thao tác
+   - ✅ SearchBar input (tìm theo title)
+   - ✅ Filter by category dropdown (7 categories)
+   - ✅ Create button → Open modal
+   - ✅ Create/Edit modal form:
+     - ✅ TextInput: title (maxLength 200, char counter)
+     - ✅ TextArea: body (maxLength 5000, char counter, 10 rows)
+     - ✅ Select: category (Writing, Analysis, Coding, Creative, Education, Business, Other)
+     - ✅ TextInput: tags (comma-separated)
+     - ✅ Checkbox: isPublic (Công khai prompt)
+   - ✅ Inline toggle button: Public/Private status
+   - ✅ Edit button per row → Pre-fill modal
+   - ✅ Delete button per row → Confirmation dialog
+   - ⏸️ Version history button (deferred to future)
+   - ✅ Loading states & error handling
+   - ✅ Empty state UI
+
+2. **Apps Management Page** (`app/admin/apps/page.tsx`) ✅ COMPLETED
+
+   - ✅ Table list với columns: Tên, Slug, Danh mục, Status, Thao tác
+   - ✅ SearchBar input (tìm theo name/slug)
+   - ✅ Filter by category dropdown
+   - ✅ Filter by status (Draft, Published)
+   - ✅ Create button → Open wide modal (max-w-4xl)
+   - ✅ Create/Edit modal form:
+     - ✅ TextInput: slug (disabled on edit) (required)
+     - ✅ TextInput: name (required)
+     - ✅ TextArea: description (2 rows)
+     - ✅ Select: category (Tuvi, Greeting, Poetry, Caption, Other)
+     - ✅ Select: type (text_only, image_template, svg_dynamic)
+     - ✅ TextArea: inputSchema (JSON, 6 rows)
+     - ✅ TextArea: promptTemplate (8 rows)
+     - ✅ Accordion: Advanced Config (optional):
+       - ✅ TextArea: outputSchema (JSON, 4 rows)
+       - ✅ TextArea: renderConfig (JSON, 4 rows)
+       - ✅ TextArea: shareConfig (JSON, 4 rows)
+       - ✅ TextArea: limits (JSON, 4 rows)
+     - ✅ Select: status (Draft, Published)
+   - ✅ Inline toggle: Published/Draft status button
+   - ✅ Stats button per row → Stats modal
+     - ✅ Display: Views, Submits, Shares, Results (4 cards grid)
+   - ✅ Clone button per row → Prompt new slug
+   - ✅ Edit button per row → Pre-fill modal
+   - ✅ Delete button per row → Confirmation dialog
+   - ✅ JSON validation with error alerts
+   - ✅ Loading states & error handling
+   - ✅ Empty state UI
+
+3. **Integration with existing API routes** ✅ COMPLETED
+   - ✅ Use `/api/prompts` (GET, POST, PUT, DELETE)
+   - ✅ Use `/api/admin/apps` (GET, POST)
+   - ✅ Use `/api/admin/apps/[id]` (GET, PUT, DELETE)
+   - ✅ Use `/api/admin/apps/[id]/clone` (POST)
+   - ✅ Use `/api/admin/apps/[id]/stats` (GET)
+
+**Files Created**:
+
+- ✅ `app/admin/prompts/page.tsx` (390 lines)
+- ✅ `app/admin/apps/page.tsx` (685 lines)
+
+---
+
+### ✅ SESSION 7: Style Guides Management Pages - Phase 3 COMPLETED
+
+**Duration**: 45 min - 1 giờ (completed in ~40 minutes)
+**Complexity**: ⭐⭐⭐ Medium
+
+**Mục tiêu**: Tạo trang quản lý Style Guides (Văn phong) với ví dụ CRUD
+
+**Tasks**:
+
+1. **Style Guides List Page** (`app/admin/style-guides/page.tsx`) ✅ COMPLETED
+
+   - ✅ Table list với columns: Tên, Mô tả, Default, Ví dụ, Thao tác
+   - ✅ SearchBar input (tìm theo name/description)
+   - ✅ Create button → Navigate to `/admin/style-guides/create`
+   - ✅ Default badge indicator
+   - ✅ Example count display
+   - ✅ Set as Default button (radio toggle)
+   - ✅ View button → Navigate to detail page
+   - ✅ Edit button → Navigate to edit page
+   - ✅ Delete button → Confirmation dialog
+   - ✅ Loading states & error handling
+   - ✅ Empty state UI
+
+2. **Create Style Guide Page** (`app/admin/style-guides/create/page.tsx`) ✅ COMPLETED
+
+   - ✅ Form:
+     - ✅ TextInput: name (required)
+     - ✅ TextArea: description
+     - ✅ TextArea: characteristics (comma-separated)
+     - ✅ TextArea: tone (comma-separated)
+     - ✅ Select: language (default: vi)
+     - ✅ Checkbox: isDefault (Set as default style guide)
+   - ✅ Create button → POST `/api/admin/style-guides`
+   - ✅ Cancel button → Back to list
+   - ✅ Success notification → Redirect to detail page
+   - ✅ Error handling & validation
+   - ✅ Loading state on button
+
+3. **Style Guide Detail Page** (`app/admin/style-guides/[id]/page.tsx`) ✅ COMPLETED
+
+   - ✅ Display style guide info (name, description, characteristics, tone badges)
+   - ✅ Edit button → Navigate to edit page
+   - ✅ Delete button → Confirmation + Redirect to list
+   - ✅ Examples section:
+     - ✅ List of examples (before/after comparison cards)
+     - ✅ Add Example button → Open modal
+     - ✅ Add Example modal:
+       - ✅ TextArea: before (original text)
+       - ✅ TextArea: after (improved text)
+       - ✅ Create button
+     - ✅ Edit example modal (pre-filled)
+     - ✅ Delete example per row → Confirmation
+   - ✅ Loading states & error handling
+
+4. **Edit Style Guide Page** (`app/admin/style-guides/[id]/edit/page.tsx`) ✅ COMPLETED
+
+   - ✅ Pre-filled form with existing data
+   - ✅ Same fields as create page
+   - ✅ Update button → PATCH `/api/admin/style-guides/[id]`
+   - ✅ Cancel button → Back to detail page
+   - ✅ Success notification → Redirect to detail page
+   - ✅ Error handling & validation
+   - ✅ Loading state on button
+
+5. **Integration with existing API routes** ✅ COMPLETED
+   - ✅ Use `/api/admin/style-guides` (GET, POST)
+   - ✅ Use `/api/admin/style-guides/[id]` (GET, PATCH, DELETE)
+   - ✅ Use `/api/admin/style-guides/[id]/examples` (POST)
+   - ✅ Use `/api/admin/style-guides/[id]/examples/[exampleId]` (PATCH, DELETE)
+
+**Files Created**:
+
+- ✅ `app/admin/style-guides/page.tsx` (320 lines)
+- ✅ `app/admin/style-guides/create/page.tsx` (205 lines)
+- ✅ `app/admin/style-guides/[id]/page.tsx` (395 lines)
+- ✅ `app/admin/style-guides/[id]/edit/page.tsx` (210 lines)
+
+---
+
+### ✅ SESSION 8: Video Prompts Manager Pages - Phase 4 (COMPLETED)
+
+**Duration**: 45 min - 1 giờ  
+**Complexity**: ⭐⭐⭐ Medium
+
+**Mục tiêu**: Tạo trang quản lý Video Prompts (Prompt Video) với editor JSON
+
+**Tasks**:
+
+1. **Video Prompts List Page** (`app/admin/video-prompts/page.tsx`) ✅
+
+   - ✅ Cards grid display (not table - friendly UI)
+   - ✅ SearchBar input (tìm theo name)
+   - ✅ Create button → Navigate to `/admin/video-prompts/create`
+   - ✅ Card per prompt:
+     - ✅ Name/title
+     - ✅ Short description (first 100 chars)
+     - ✅ Segment count badge (P1, P2, ... Pn)
+     - ✅ View button → Navigate to detail page
+     - ✅ Delete button → Confirmation dialog
+   - ✅ Loading states & error handling
+   - ✅ Empty state UI
+
+2. **Video Prompt Detail Page** (`app/admin/video-prompts/[name]/page.tsx`) ✅
+
+   - ✅ Title + breadcrumb navigation
+   - ✅ Back button → To list page
+   - ✅ Edit button → Edit mode
+   - ✅ Delete button → Confirmation + Redirect to list
+   - ✅ Tabs navigation: Full + P1, P2, ... P9 (dynamic based on content)
+   - ✅ Tab content (each tab shows JSON for that segment):
+     - ✅ Monospace code display
+     - ✅ Copy button (copy full JSON to clipboard)
+     - ✅ Copy field buttons (copy individual fields: voiceover, scene_description, camera, data_visualization)
+   - ✅ Edit mode (toggle):
+     - ✅ JSON textarea editor (syntax highlighting optional)
+     - ✅ Save button → PUT `/api/admin/video-prompts/[name]`
+     - ✅ Cancel button → Exit edit mode
+     - ✅ Validation error display
+   - ✅ Loading states & error handling
+
+3. **Create Video Prompt Page** (`app/admin/video-prompts/create/page.tsx`) ✅
+
+   - ✅ Form:
+     - ✅ TextInput: name (prompt name, required)
+     - ✅ TextArea: fullJson (JSON editor, 20 rows)
+     - ✅ Helper text with JSON structure example
+   - ✅ Create button → POST `/api/admin/video-prompts`
+   - ✅ Cancel button → Back to list
+   - ✅ JSON validation with error alerts
+   - ✅ Auto-generate segment files (P1-PN) from fullJson
+   - ✅ Success notification → Redirect to detail page
+   - ✅ Error handling & validation
+   - ✅ Loading state on button
+
+4. **Integration with existing API routes** ✅
+   - ✅ Use `/api/admin/video-prompts` (GET, POST)
+   - ✅ Use `/api/admin/video-prompts/[name]` (GET, PUT, DELETE)
+
+**Files Created**:
+
+- `app/admin/video-prompts/page.tsx` (280 lines) ✅
+- `app/admin/video-prompts/[name]/page.tsx` (410 lines) ✅
+- `app/admin/video-prompts/create/page.tsx` (200 lines) ✅
+
+---
+
+### ✅ SESSION 9: Legal Library Import + Final Polish - Phase 5 (COMPLETED)
+
+**Duration**: 30 min - 45 min (completed in ~35 minutes)
+**Complexity**: ⭐⭐ Low
+
+**Mục tiêu**: Tạo trang import/export Legal Library, cập nhật admin layout, final polish
+
+**Tasks**:
+
+1. **Legal Library Import Page** (`app/admin/documents/import/page.tsx`) ✅ COMPLETED
+
+   - ✅ Page header + breadcrumb
+   - ✅ File upload input (JSON file)
+   - ✅ Import button → Trigger `/api/admin/legal-library/import`
+   - ✅ Preview section:
+     - ✅ Show imported documents count
+     - ✅ Show imported procedures count
+     - ✅ Display: Documents to import (name, type, category)
+     - ✅ Display: Procedures to import (name, category)
+   - ✅ Results section (after import):
+     - ✅ Success message + count
+     - ✅ Error/warning messages per item
+     - ✅ "Back to Documents" button
+   - ✅ Loading states during import
+   - ✅ Error handling with retry option
+   - ✅ Add Export button to Documents list page
+     - ✅ Export JSON data → GET `/api/admin/legal-library/export`
+     - ✅ Auto-download as `legal-library-{date}.json`
+
+2. **Admin Layout Enhancements** (Dashboard Page) ✅ COMPLETED
+
+   - ✅ Update sidebar navigation to include all new pages:
+     - ✅ 📊 Dashboard (/admin/dashboard)
+     - ✅ 📜 Documents (/admin/documents)
+     - ✅ 📋 Procedures (/admin/procedures)
+     - ✅ 💬 Prompts (/admin/prompts)
+     - ✅ 🎯 Apps (/admin/apps)
+     - ✅ ✍️ Style Guides (/admin/style-guides)
+     - ✅ 🎬 Video Prompts (/admin/video-prompts)
+     - ✅ 📥 Import/Export (/admin/documents/import)
+   - ✅ Active link highlighting for current page
+   - ✅ Mobile responsive sidebar (hidden on mobile, shown on desktop)
+   - ✅ Dashboard cards with emoji icons
+
+3. **Final Polish** ✅ COMPLETED
+   - ✅ Added Export buttons to Documents and Procedures pages
+   - ✅ Reset admin credentials to admin@trolyphaply.vn / LamKhanh1823$$$
+   - ✅ All API routes verified and working
+   - ✅ All pages have proper navigation and back buttons
+   - ✅ Loading states implemented on all buttons
+   - ✅ Error handling with clear error messages
+   - ✅ Success notifications on all CRUD operations
+
+**Files Created**:
+
+- ✅ `app/admin/documents/import/page.tsx` (410 lines)
+- ✅ `scripts/reset-admin.js` (admin password reset utility)
+- ✅ `scripts/reset-admin.sql` (SQL backup for admin reset)
+
+**Files Updated**:
+
+- ✅ `app/admin/dashboard/page.tsx` (enhanced with sidebar navigation)
+- ✅ `app/admin/documents/page.tsx` (added Export button)
+- ✅ `app/admin/procedures/page.tsx` (added Export button)
 
 ---
 

@@ -1,151 +1,150 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { 
+  LayoutDashboard, 
+  FileText, 
+  ListChecks, 
+  MessageSquare, 
+  Palette,
+  AppWindow,
+  LogOut,
+  Menu,
+  X
+} from 'lucide-react';
 
-/**
- * Admin Layout with Auth Protection
- */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/admin/session');
-      const data = await response.json();
-
-      if (!data.authenticated && pathname !== '/admin/login') {
+    // Check authentication
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/admin/check-auth');
+        if (!response.ok) {
+          router.push('/admin/login');
+        }
+      } catch (error) {
         router.push('/admin/login');
-        return;
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setAuthenticated(data.authenticated);
-    } catch (error) {
-      console.error('Auth check error:', error);
-      router.push('/admin/login');
-    } finally {
-      setLoading(false);
-    }
-  };
+    checkAuth();
+  }, [router]);
 
   const handleLogout = async () => {
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
       router.push('/admin/login');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout failed:', error);
     }
   };
 
-  // Don't show layout on login page
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
+  const navigation = [
+    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Văn Bản', href: '/admin/documents', icon: FileText },
+    { name: 'Thủ Tục', href: '/admin/procedures', icon: ListChecks },
+    { name: 'Prompts', href: '/admin/prompts', icon: MessageSquare },
+    { name: 'Hỏi/Đáp', href: '/admin/qa-prompts', icon: MessageSquare },
+    { name: 'Văn Phong', href: '/admin/legal-styles', icon: Palette },
+    { name: 'Mini Apps', href: '/admin/apps', icon: AppWindow },
+  ];
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted">Đang kiểm tra xác thực...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-gray-500">Đang tải...</div>
       </div>
     );
   }
 
-  if (!authenticated) {
-    return null;
-  }
-
-  const navItems = [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/documents', label: 'Văn bản', icon: '📜' },
-    { href: '/admin/procedures', label: 'Thủ tục', icon: '📋' },
-    { href: '/admin/prompts', label: 'Prompts', icon: '💬' },
-    { href: '/admin/style-guides', label: 'Văn Phong', icon: '✍️' },
-    { href: '/admin/apps', label: 'Apps', icon: '🎯' },
-    { href: '/admin/video-prompts', label: 'Video Prompts', icon: '🎬' },
-  ];
-
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--color-bg)' }}>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside
-        className="w-64 flex flex-col border-r"
-        style={{
-          background: 'var(--color-surface)',
-          borderColor: 'var(--color-border-subtle)',
-        }}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-lg transition-transform lg:translate-x-0 lg:static ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        {/* Logo */}
-        <div className="p-6 border-b" style={{ borderColor: 'var(--color-border-subtle)' }}>
-          <Link href="/" className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-              style={{ background: 'var(--color-primary-soft)' }}
-            >
-              ⚖️
-            </div>
-            <div>
-              <h2 className="font-bold text-base">TroLyPhapLy</h2>
-              <p className="text-xs text-muted">Admin Panel</p>
-            </div>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all"
-                style={{
-                  background: isActive ? 'var(--color-primary-soft)' : 'transparent',
-                  color: isActive ? 'var(--color-primary)' : 'var(--color-text)',
-                  fontWeight: isActive ? 600 : 400,
-                }}
-              >
-                <span className="text-xl">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout Button */}
-        <div className="p-4 border-t" style={{ borderColor: 'var(--color-border-subtle)' }}>
+        <div className="flex h-16 items-center justify-between px-6 border-b">
+          <h1 className="text-xl font-bold text-blue-600">TroLyPhapLy</h1>
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all hover:bg-error-light text-error"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-            <span>Đăng xuất</span>
+            <X className="h-6 w-6" />
           </button>
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">{children}</div>
-      </main>
+        <nav className="mt-6 px-3">
+          <div className="space-y-1">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || 
+                               (item.href !== '/admin' && pathname?.startsWith(item.href));
+              
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+
+        <div className="absolute bottom-0 w-full border-t p-4">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
+          >
+            <LogOut className="h-5 w-5" />
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1">
+        {/* Mobile header */}
+        <div className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-4 lg:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          <h1 className="text-xl font-bold text-blue-600">TroLyPhapLy</h1>
+        </div>
+
+        {/* Page content */}
+        <main className="min-h-screen">{children}</main>
+      </div>
     </div>
   );
 }

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     let query = supabase
       .from('apps')
-      .select('slug, name, description, category, icon, input_schema, published, created_at', {
+      .select('slug, name, description, category, status, input_schema, type, created_at', {
         count: 'exact',
       })
       .order('name', { ascending: true });
@@ -30,9 +30,11 @@ export async function GET(req: NextRequest) {
       query = query.eq('category', category);
     }
 
-    // Filter by published status
+    // Filter by published status (use status='active' instead)
     if (published !== null && published !== undefined) {
-      query = query.eq('published', published === 'true');
+      if (published === 'true') {
+        query = query.eq('status', 'active');
+      }
     }
 
     // Pagination

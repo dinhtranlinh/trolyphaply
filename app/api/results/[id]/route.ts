@@ -26,7 +26,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from('results')
-      .select('*, apps(slug, name, icon)')
+      .select('*, apps(slug, name)')
       .eq('id', id)
       .single();
 

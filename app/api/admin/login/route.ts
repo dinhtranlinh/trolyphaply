@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 /**
@@ -13,12 +13,18 @@ const supabase = createClient(
  * Admin authentication
  */
 export async function POST(req: NextRequest) {
+  console.log('\n🔐 [SERVER] ===== LOGIN REQUEST START =====');
+  
   try {
     const body = await req.json();
     const { email, password } = body;
 
+    console.log('📧 [SERVER] Email:', email);
+    console.log('🔑 [SERVER] Password length:', password?.length);
+
     // Validation
     if (!email || !password) {
+      console.log('❌ [SERVER] Validation failed: Missing email or password');
       return NextResponse.json(
         { success: false, error: 'Email và mật khẩu là bắt buộc' },
         { status: 400 }
@@ -26,23 +32,39 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch admin user
+    console.log('🔍 [SERVER] Fetching admin from database...');
     const { data: admin, error } = await supabase
       .from('admin_users')
       .select('id, email, password')
       .eq('email', email)
       .single();
 
-    if (error || !admin) {
+    if (error) {
+      console.error('❌ [SERVER] Database error:', error);
       return NextResponse.json(
         { success: false, error: 'Email hoặc mật khẩu không đúng' },
         { status: 401 }
       );
     }
 
+    if (!admin) {
+      console.log('❌ [SERVER] Admin not found in database');
+      return NextResponse.json(
+        { success: false, error: 'Email hoặc mật khẩu không đúng' },
+        { status: 401 }
+      );
+    }
+
+    console.log('✅ [SERVER] Admin found:', admin.email);
+    console.log('🔐 [SERVER] Password hash from DB:', admin.password.substring(0, 20) + '...');
+
     // Verify password
+    console.log('🔍 [SERVER] Comparing passwords...');
     const isValid = await comparePassword(password, admin.password);
+    console.log('🔐 [SERVER] Password match:', isValid);
 
     if (!isValid) {
+      console.log('❌ [SERVER] Password verification failed');
       return NextResponse.json(
         { success: false, error: 'Email hoặc mật khẩu không đúng' },
         { status: 401 }
@@ -51,6 +73,7 @@ export async function POST(req: NextRequest) {
 
     // Create session token
     const sessionToken = `admin_${admin.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    console.log('🎫 [SERVER] Session token generated:', sessionToken.substring(0, 30) + '...');
 
     // Set cookie
     const cookieStore = await cookies();
@@ -61,18 +84,27 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
+    console.log('🍪 [SERVER] Cookie set successfully');
 
     // Store session in memory or database (for production, use Redis or database)
-    // For now, we'll just return success with admin info
-    return NextResponse.json({
+    // For now, we'll just return success with admin info and token
+    const response = {
       success: true,
+      token: sessionToken, // Add token for localStorage
       admin: {
         id: admin.id,
         email: admin.email,
       },
-    });
+    };
+    
+    console.log('✅ [SERVER] Login successful! Returning response...');
+    console.log('📤 [SERVER] Response:', { ...response, token: response.token.substring(0, 30) + '...' });
+    console.log('🔐 [SERVER] ===== LOGIN REQUEST END =====\n');
+    
+    return NextResponse.json(response);
   } catch (error: any) {
-    console.error('Login error:', error);
+    console.error('❌ [SERVER] Exception:', error);
+    console.error('❌ [SERVER] Stack:', error.stack);
     return NextResponse.json(
       { success: false, error: 'Lỗi đăng nhập', details: error.message },
       { status: 500 }

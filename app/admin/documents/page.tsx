@@ -1,310 +1,406 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import SearchBar from '@/components/ui/SearchBar';
-import TextInput from '@/components/forms/TextInput';
-import TextArea from '@/components/forms/TextArea';
-import Select from '@/components/forms/Select';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface LegalDocument {
+interface Document {
   id: string;
   title: string;
   doc_number: string | null;
   type: string;
+  category: string;
   authority: string;
   issue_date: string;
   effective_date: string;
   summary: string | null;
   content: any;
   tags: string[];
-  category: string;
   status: string;
   created_at: string;
-  updated_at: string;
 }
 
-/**
- * Admin Documents Management Page
- */
-export default function AdminDocumentsPage() {
-  const [documents, setDocuments] = useState<LegalDocument[]>([]);
+export default function DocumentsManagementPage() {
+  const router = useRouter();
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [showModal, setShowModal] = useState(false);
-  const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('active');
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+  
+  // Form state
   const [formData, setFormData] = useState({
     title: '',
-    docNumber: '',
+    doc_number: '',
     type: 'law',
-    authority: '',
-    issueDate: '',
-    effectiveDate: '',
-    summary: '',
-    content: '{}',
-    tags: '',
     category: 'civil',
+    authority: '',
+    issue_date: '',
+    effective_date: '',
+    summary: '',
+    content: '',
+    tags: '',
     status: 'active',
   });
-  const [submitting, setSubmitting] = useState(false);
 
+  const [error, setError] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Check authorization
   useEffect(() => {
-    loadDocuments();
-  }, [search, categoryFilter]);
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      router.push('/admin');
+      return;
+    }
+    fetchDocuments();
+  }, [router, search, categoryFilter, typeFilter, statusFilter]);
 
-  const loadDocuments = async () => {
+  const fetchDocuments = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (categoryFilter !== 'all') params.append('category', categoryFilter);
+      if (typeFilter !== 'all') params.append('type', typeFilter);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
 
-      const response = await fetch(`/api/admin/documents?${params}`);
-      const data = await response.json();
-      setDocuments(data.documents || []);
-    } catch (error) {
-      console.error('Error loading documents:', error);
+      const res = await fetch(`/api/admin/documents?${params}`);
+      const data = await res.json();
+      
+      if (res.ok) {
+        setDocuments(data.documents || []);
+      } else {
+        setError(data.error || 'Failed to fetch documents');
+      }
+    } catch (err) {
+      setError('Failed to fetch documents');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreate = () => {
-    setEditingDoc(null);
+    setModalMode('create');
     setFormData({
       title: '',
-      docNumber: '',
+      doc_number: '',
       type: 'law',
-      authority: '',
-      issueDate: '',
-      effectiveDate: '',
-      summary: '',
-      content: '{}',
-      tags: '',
       category: 'civil',
+      authority: '',
+      issue_date: '',
+      effective_date: '',
+      summary: '',
+      content: '',
+      tags: '',
       status: 'active',
     });
-    setShowModal(true);
+    setIsModalOpen(true);
   };
 
-  const handleEdit = (doc: LegalDocument) => {
-    setEditingDoc(doc);
+  const handleEdit = (doc: Document) => {
+    setModalMode('edit');
+    setSelectedDoc(doc);
     setFormData({
       title: doc.title,
-      docNumber: doc.doc_number || '',
+      doc_number: doc.doc_number || '',
       type: doc.type,
+      category: doc.category,
       authority: doc.authority,
-      issueDate: doc.issue_date.split('T')[0],
-      effectiveDate: doc.effective_date.split('T')[0],
+      issue_date: doc.issue_date.split('T')[0],
+      effective_date: doc.effective_date.split('T')[0],
       summary: doc.summary || '',
       content: JSON.stringify(doc.content, null, 2),
       tags: doc.tags.join(', '),
-      category: doc.category,
       status: doc.status,
     });
-    setShowModal(true);
+    setIsModalOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
+    setError('');
 
     try {
       const payload = {
-        title: formData.title,
-        docNumber: formData.docNumber || null,
-        type: formData.type,
-        authority: formData.authority,
-        issueDate: formData.issueDate,
-        effectiveDate: formData.effectiveDate,
-        summary: formData.summary || null,
-        content: JSON.parse(formData.content || '{}'),
+        ...formData,
+        docNumber: formData.doc_number,
+        issueDate: formData.issue_date,
+        effectiveDate: formData.effective_date,
+        content: formData.content ? JSON.parse(formData.content) : {},
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
-        category: formData.category,
-        status: formData.status,
       };
 
-      const url = editingDoc
-        ? `/api/admin/documents/${editingDoc.id}`
-        : '/api/admin/documents';
-      const method = editingDoc ? 'PUT' : 'POST';
+      const url = modalMode === 'create' 
+        ? '/api/admin/documents'
+        : `/api/admin/documents/${selectedDoc?.id}`;
+      
+      const method = modalMode === 'create' ? 'POST' : 'PUT';
 
-      const response = await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        setShowModal(false);
-        loadDocuments();
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsModalOpen(false);
+        fetchDocuments();
       } else {
-        const data = await response.json();
-        alert(data.error || 'Failed to save document');
+        setError(data.error || 'Failed to save document');
       }
-    } catch (error) {
-      console.error('Error saving document:', error);
-      alert('Failed to save document');
-    } finally {
-      setSubmitting(false);
+    } catch (err) {
+      setError('Failed to save document');
+      console.error(err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa văn bản này?')) return;
+    if (deleteConfirm !== id) {
+      setDeleteConfirm(id);
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/admin/documents/${id}`, {
+      const res = await fetch(`/api/admin/documents/${id}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        loadDocuments();
+      if (res.ok) {
+        fetchDocuments();
+        setDeleteConfirm(null);
       } else {
-        alert('Failed to delete document');
+        const data = await res.json();
+        setError(data.error || 'Failed to delete document');
       }
-    } catch (error) {
-      console.error('Error deleting document:', error);
+    } catch (err) {
+      setError('Failed to delete document');
+      console.error(err);
     }
   };
 
-  const categories = [
-    { value: 'all', label: 'Tất cả' },
-    { value: 'civil', label: 'Dân sự' },
-    { value: 'criminal', label: 'Hình sự' },
-    { value: 'administrative', label: 'Hành chính' },
-    { value: 'labor', label: 'Lao động' },
-    { value: 'tax', label: 'Thuế' },
-    { value: 'other', label: 'Khác' },
-  ];
-
-  const documentTypes = [
-    { value: 'law', label: 'Luật' },
-    { value: 'decree', label: 'Nghị định' },
-    { value: 'circular', label: 'Thông tư' },
-    { value: 'decision', label: 'Quyết định' },
-    { value: 'other', label: 'Khác' },
-  ];
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted">Đang tải...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const handleExport = () => {
-    window.open('/api/admin/legal-library/export?type=documents', '_blank');
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    router.push('/admin');
   };
 
-  const handleImport = () => {
-    window.location.href = '/admin/documents/import';
+  const handleExport = async () => {
+    try {
+      const res = await fetch('/api/admin/legal-library/export?type=documents');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `documents-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      setError('Failed to export documents');
+      console.error(err);
+    }
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="page-title mb-1">Quản lý Văn bản</h1>
-          <p className="text-muted">{documents.length} văn bản</p>
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push('/admin/dashboard')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back
+            </button>
+            <h1 className="text-3xl font-bold text-gray-900">Documents Management</h1>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+            >
+              📥 Export
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleImport}>
-            📥 Import
-          </Button>
-          <Button variant="outline" onClick={handleExport}>
-            📤 Export
-          </Button>
-          <Button variant="primary" onClick={handleCreate}>
-            ➕ Thêm văn bản
-          </Button>
-        </div>
-      </div>
+      </header>
 
-      {/* Filters */}
-      <Card className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Tìm theo tên hoặc số văn bản..."
-          />
-          <Select
-            label="Lĩnh vực"
-            value={categoryFilter}
-            onChange={setCategoryFilter}
-            options={categories}
-          />
-        </div>
-      </Card>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <input
+              type="text"
+              placeholder="Search by title or doc number..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
 
-      {/* Table */}
-      <Card>
-        {documents.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-3">📜</div>
-            <p className="text-muted">Chưa có văn bản nào</p>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Categories</option>
+              <option value="civil">Civil</option>
+              <option value="criminal">Criminal</option>
+              <option value="administrative">Administrative</option>
+              <option value="labor">Labor</option>
+              <option value="tax">Tax</option>
+              <option value="other">Other</option>
+            </select>
+
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Types</option>
+              <option value="law">Law</option>
+              <option value="decree">Decree</option>
+              <option value="circular">Circular</option>
+              <option value="decision">Decision</option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <button
+            onClick={handleCreate}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            + Create Document
+          </button>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* Documents Table */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : documents.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="text-gray-400 text-6xl mb-4">📜</div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No documents found</h3>
+            <p className="text-gray-500 mb-4">Create your first legal document to get started.</p>
+            <button
+              onClick={handleCreate}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Create Document
+            </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '2px solid var(--color-border-subtle)' }}>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Tên văn bản</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Số VB</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Loại</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Lĩnh vực</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold">Trạng thái</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold">Thao tác</th>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Doc Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {documents.map((doc, index) => (
-                  <tr
-                    key={doc.id}
-                    style={{
-                      borderBottom:
-                        index < documents.length - 1 ? '1px solid var(--color-border-subtle)' : 'none',
-                    }}
-                  >
-                    <td className="py-3 px-4">
-                      <div className="font-medium">{doc.title}</div>
-                      <div className="text-sm text-muted">{doc.authority}</div>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {documents.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{doc.title}</div>
                     </td>
-                    <td className="py-3 px-4 text-sm">{doc.doc_number || '-'}</td>
-                    <td className="py-3 px-4 text-sm">{doc.type}</td>
-                    <td className="py-3 px-4 text-sm">{doc.category}</td>
-                    <td className="py-3 px-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{doc.doc_number || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {doc.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{doc.category}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className="px-2 py-1 rounded text-xs"
-                        style={{
-                          background:
-                            doc.status === 'active' ? 'var(--color-success-light)' : 'var(--color-muted)',
-                          color: doc.status === 'active' ? 'var(--color-success)' : 'var(--color-text-muted)',
-                        }}
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          doc.status === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
                       >
                         {doc.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <button
                         onClick={() => handleEdit(doc)}
-                        className="text-primary hover:underline text-sm mr-3"
+                        className="text-indigo-600 hover:text-indigo-900"
                       >
-                        Sửa
+                        Edit
                       </button>
                       <button
                         onClick={() => handleDelete(doc.id)}
-                        className="text-error hover:underline text-sm"
+                        className={`${
+                          deleteConfirm === doc.id
+                            ? 'text-red-900 font-bold'
+                            : 'text-red-600 hover:text-red-900'
+                        }`}
                       >
-                        Xóa
+                        {deleteConfirm === doc.id ? 'Confirm?' : 'Delete'}
                       </button>
+                      {deleteConfirm === doc.id && (
+                        <button
+                          onClick={() => setDeleteConfirm(null)}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -312,119 +408,190 @@ export default function AdminDocumentsPage() {
             </table>
           </div>
         )}
-      </Card>
+      </main>
 
       {/* Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.5)' }}
-          onClick={() => setShowModal(false)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="section-title mb-6">{editingDoc ? 'Sửa văn bản' : 'Thêm văn bản mới'}</h2>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                {modalMode === 'create' ? 'Create Document' : 'Edit Document'}
+              </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <TextInput
-                label="Tên văn bản *"
-                value={formData.title}
-                onChange={(val) => setFormData({ ...formData, title: val })}
-                required
-              />
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <TextInput
-                  label="Số văn bản"
-                  value={formData.docNumber}
-                  onChange={(val) => setFormData({ ...formData, docNumber: val })}
-                />
-                <Select
-                  label="Loại văn bản *"
-                  value={formData.type}
-                  onChange={(val) => setFormData({ ...formData, type: val })}
-                  options={documentTypes}
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Doc Number
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.doc_number}
+                      onChange={(e) => setFormData({ ...formData, doc_number: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
 
-              <TextInput
-                label="Cơ quan ban hành *"
-                value={formData.authority}
-                onChange={(val) => setFormData({ ...formData, authority: val })}
-                required
-              />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Type <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="law">Law</option>
+                      <option value="decree">Decree</option>
+                      <option value="circular">Circular</option>
+                      <option value="decision">Decision</option>
+                    </select>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <TextInput
-                  label="Ngày ban hành *"
-                  type="date"
-                  value={formData.issueDate}
-                  onChange={(val) => setFormData({ ...formData, issueDate: val })}
-                  required
-                />
-                <TextInput
-                  label="Ngày hiệu lực *"
-                  type="date"
-                  value={formData.effectiveDate}
-                  onChange={(val) => setFormData({ ...formData, effectiveDate: val })}
-                  required
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="civil">Civil</option>
+                      <option value="criminal">Criminal</option>
+                      <option value="administrative">Administrative</option>
+                      <option value="labor">Labor</option>
+                      <option value="tax">Tax</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
 
-              <Select
-                label="Lĩnh vực *"
-                value={formData.category}
-                onChange={(val) => setFormData({ ...formData, category: val })}
-                options={categories.filter((c) => c.value !== 'all')}
-              />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Authority <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.authority}
+                      onChange={(e) => setFormData({ ...formData, authority: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
 
-              <TextArea
-                label="Tóm tắt"
-                value={formData.summary}
-                onChange={(val) => setFormData({ ...formData, summary: val })}
-                rows={3}
-              />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Issue Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.issue_date}
+                      onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
 
-              <TextInput
-                label="Tags (phân cách bằng dấu phẩy)"
-                value={formData.tags}
-                onChange={(val) => setFormData({ ...formData, tags: val })}
-                placeholder="dân sự, hợp đồng, tranh chấp"
-              />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Effective Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.effective_date}
+                      onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
 
-              <TextArea
-                label="Nội dung (JSON)"
-                value={formData.content}
-                onChange={(val) => setFormData({ ...formData, content: val })}
-                rows={6}
-                helperText="Format: {&quot;chapters&quot;: [{&quot;title&quot;: &quot;...&quot;, &quot;content&quot;: &quot;...&quot;}]}"
-              />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="active">Active</option>
+                      <option value="archived">Archived</option>
+                    </select>
+                  </div>
 
-              <Select
-                label="Trạng thái"
-                value={formData.status}
-                onChange={(val) => setFormData({ ...formData, status: val })}
-                options={[
-                  { value: 'active', label: 'Hoạt động' },
-                  { value: 'archived', label: 'Lưu trữ' },
-                ]}
-              />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Summary
+                    </label>
+                    <textarea
+                      value={formData.summary}
+                      onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                    />
+                  </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  fullWidth
-                >
-                  Hủy
-                </Button>
-                <Button variant="primary" type="submit" loading={submitting} fullWidth>
-                  {editingDoc ? 'Cập nhật' : 'Tạo mới'}
-                </Button>
-              </div>
-            </form>
-          </Card>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Content (JSON format)
+                    </label>
+                    <textarea
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                      rows={6}
+                      placeholder='{"chapters": [{"title": "...", "content": "..."}]}'
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Enter valid JSON format</p>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tags (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.tags}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="civil, contract, law"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  >
+                    {modalMode === 'create' ? 'Create' : 'Update'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

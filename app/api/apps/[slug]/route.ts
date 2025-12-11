@@ -46,6 +46,14 @@ export async function GET(
       );
     }
 
+    // Check if app is published (status = active)
+    if (data.status !== 'active') {
+      return NextResponse.json(
+        { success: false, error: 'App is not published', isNotPublished: true },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       app: data,

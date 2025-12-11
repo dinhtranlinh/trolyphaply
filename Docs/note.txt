@@ -1,0 +1,146 @@
+# QUY TẮC LÀM VIỆC - TROLYPHAPLY PROJECT
+admin@trolyphaply.vn / LamKhanh1823$$$
+> **Created**: December 8, 2025  
+> **Purpose**: Ghi nhớ các thống nhất và quy tắc làm việc giữa Developer và AI Assistant
+
+---
+
+## 🔴 QUY TẮC BẮT BUỘC
+
+### 1. Môi trường Development vs Production
+
+**⚠️ QUAN TRỌNG: Luôn làm việc trên site DEV trước!**
+
+- **Development Site**: http://localhost:3456 (port 3456)
+  - Script: `npm run dev` → Chạy ở port 3456
+  - Mặc định cho mọi thay đổi code
+  - Test và verify ở đây trước
+
+- **Production Site**: http://localhost:8686 (port 8686)
+  - Script: `npm run start` hoặc `npm run dev:prod`
+  - CHỈ cập nhật khi được yêu cầu rõ ràng
+  - Phải có xác nhận trước khi deploy
+
+**❌ KHÔNG ĐƯỢC:**
+- Tự động deploy lên production mà không được yêu cầu
+- Giả định rằng code dev đã sẵn sàng cho production
+- Chạy build production khi không cần thiết
+
+### 2. Xác nhận trước khi thực hiện
+
+**⚠️ BẮT BUỘC: Hỏi xác nhận trước khi làm bất kỳ thay đổi nào**
+
+**CẦN XÁC NHẬN:**
+- ✅ Tạo file mới
+- ✅ Sửa đổi code hiện có
+- ✅ Xóa file/code
+- ✅ Cập nhật database
+- ✅ Chạy scripts
+- ✅ Build production
+- ✅ Deploy lên production
+
+**KHÔNG CẦN XÁC NHẬN:**
+- Đọc file để hiểu code
+- Tìm kiếm trong workspace
+- Giải thích/tư vấn về code
+- Trả lời câu hỏi
+
+**Cách hỏi xác nhận:**
+```
+Tôi sẽ [MÔ TẢ HÀNH ĐỘNG]:
+1. [Chi tiết bước 1]
+2. [Chi tiết bước 2]
+...
+
+Bạn có muốn tôi tiếp tục không?
+```
+
+### 3. Quy trình làm việc chuẩn
+
+```
+1. Hiểu yêu cầu
+   ↓
+2. Đọc code liên quan
+   ↓
+3. ĐỀ XUẤT giải pháp + HỎI XÁC NHẬN
+   ↓
+4. Chờ xác nhận từ Developer
+   ↓
+5. Thực hiện thay đổi trên DEV (port 3456)
+   ↓
+6. Thông báo hoàn thành + yêu cầu test
+   ↓
+7. Chờ feedback
+   ↓
+8. (Nếu có yêu cầu) Deploy lên Production
+```
+
+---
+
+## 📋 CHECKLIST TRƯỚC KHI CODE
+
+Trước khi bắt đầu làm bất kỳ task nào, hãy kiểm tra:
+
+- [ ] Tôi đã đọc và hiểu yêu cầu chưa?
+- [ ] Tôi đã đọc code liên quan chưa?
+- [ ] Tôi đang làm việc trên môi trường DEV (port 3456) chứ không phải Production?
+- [ ] Tôi đã hỏi xác nhận từ Developer trước khi code chưa?
+- [ ] Tôi có đang cố gắng deploy lên production mà không được yêu cầu không?
+
+---
+
+## 🎯 MỤC TIÊU
+
+**Mục tiêu chính:**
+- Tránh làm hỏng code production
+- Đảm bảo Developer luôn kiểm soát được mọi thay đổi
+- Code an toàn, có thể rollback dễ dàng
+- Communication rõ ràng trước khi action
+
+**Nguyên tắc:**
+> "Hỏi trước, code sau. Dev trước, production sau."
+
+---
+
+## 📝 LƯU Ý BỔ SUNG
+
+### Port Configuration
+```json
+// package.json
+"scripts": {
+  "dev": "next dev -p 3456",           // ← Development (MẶC ĐỊNH)
+  "dev:prod": "next dev -p 8686",      // ← Production test
+  "start": "next start -p 8686"        // ← Production build
+}
+```
+
+### Database Updates
+- Mọi thay đổi database đều cần backup trước
+- Test trên dev database trước khi áp dụng cho production
+- Ghi lại migration scripts
+
+### File Structure
+```
+d:\DTL\trolyphaply\
+├── app/                    # Next.js App Router
+│   ├── admin/             # Admin pages (cần xác nhận)
+│   ├── api/               # API routes (cần xác nhận)
+│   └── ...
+├── scripts/               # Utility scripts (cần xác nhận trước khi chạy)
+├── Docs/                  # Documentation (an toàn để đọc/sửa)
+│   └── note.txt          # File này
+└── ...
+```
+
+---
+
+## 🔄 CẬP NHẬT QUY TẮC
+
+File này có thể được cập nhật thêm các thống nhất khác trong tương lai.
+
+**Last Updated**: December 8, 2025
+
+---
+
+**⚠️ LƯU Ý CHO AI ASSISTANT:**
+Hãy đọc file này TRƯỚC KHI BẮT ĐẦU làm việc với project TroLyPhapLy!

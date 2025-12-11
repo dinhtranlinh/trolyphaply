@@ -49,7 +49,7 @@ async function main() {
         name: styleGuide.name,
         description: styleGuide.description,
         characteristics: styleGuide.characteristics,
-        tone: styleGuide.tone,
+        tone: Array.isArray(styleGuide.tone) ? styleGuide.tone.join(', ') : styleGuide.tone,
         language: styleGuide.language,
         isDefault: styleGuide.isDefault,
         examples: {
@@ -65,7 +65,7 @@ async function main() {
     });
 
     console.log(`   ✅ Created style guide with ID: ${created.id}`);
-    console.log(`   ✅ Created ${created.examples.length} examples`);
+    console.log(`   ✅ Created ${styleGuide.examples.length} examples`);
   }
 
   console.log('\n🎉 Seeding completed successfully!');
