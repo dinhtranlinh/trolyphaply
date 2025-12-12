@@ -135,15 +135,27 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Use error message from API (already user-friendly)
         throw new Error(data.error || 'Không thể lấy câu trả lời');
       }
 
       setAnswer(data.answer);
       setShareText(data.shareText || ''); // AI-generated shareable content
     } catch (err: any) {
-      const errorMessage = err.message || 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
+      // Display user-friendly error message
+      let errorMessage = err.message || 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
+      
+      // Handle network errors
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        errorMessage = '🌐 Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+      }
+      
       setError(errorMessage);
-      console.error('Q&A API Error:', errorMessage, err);
+      
+      // Only log to console in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Q&A API Error:', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -268,8 +280,33 @@ export default function Home() {
 
             {/* Error Display */}
             {error && (
-              <div className="bg-red-50 border border-red-300 rounded-xl p-4 mt-4">
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mt-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">⚠️</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-800 mb-1">
+                      {error}
+                    </p>
+                    {error.includes('bận') && (
+                      <p className="text-xs text-red-600">
+                        💡 Mẹo: Thử đặt câu hỏi ngắn gọn hơn hoặc chờ 10-20 giây rồi thử lại.
+                      </p>
+                    )}
+                    {error.includes('mạng') && (
+                      <p className="text-xs text-red-600">
+                        💡 Kiểm tra kết nối internet và refresh trang.
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setError('')}
+                    className="text-red-400 hover:text-red-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             )}
 

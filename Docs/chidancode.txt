@@ -1,85 +1,68 @@
-Chào Ngân, tôi hiểu ý bạn. Giao diện hiện tại của bạn (`image_d9489d.jpg`) đang theo phong cách **Clean/Minimalist** (Tối giản, nhẹ nhàng), trong khi mẫu bạn thích (`image_d94897.jpg` - YouMind) lại theo phong cách **Neo-Brutalism** (Thô mộc mới) với đặc trưng là: *Viền đen dày, bóng đổ cứng (không nhòe), độ tương phản cao và phân chia các khối rõ rệt*.
+Để thực hiện nhiệm vụ **tổng hợp dữ liệu từ các báo cáo/file đính kèm** và **viết báo cáo đánh giá theo văn phong hành chính nhà nước** (đòi hỏi sự trang trọng, chính xác và logic), tôi khuyên bạn nên lựa chọn model theo thứ tự ưu tiên sau:
 
-Để mang cái "chất" mạnh mẽ, chia khối của mẫu YouMind vào app "Trợ Lý Pháp Lý" mà không làm mất đi vẻ nghiêm túc, tin cậy (không bị giống truyện tranh quá), tôi đề xuất phong cách lai tạo: **"Professional Brutalism"**.
+### 1. Lựa chọn tốt nhất (Recommended): `gemini-2.5-pro`
+Đây là mô hình mạnh mẽ nhất trong danh sách bạn cung cấp cho các tác vụ đòi hỏi tư duy logic và khả năng ngôn ngữ cao cấp.
+* **Lý do:**
+    * **Văn phong chuẩn mực:** Model dòng Pro thường xử lý các nuans (sắc thái) ngôn ngữ tốt hơn, đặc biệt quan trọng với "văn phong hành chính" (cần sự trang trọng, dùng từ chính xác như "tạo lập", "thụ hưởng", "cơ sở dữ liệu chuyên ngành"...).
+    * **Khả năng suy luận (Reasoning):** Để từ con số (180 hồ sơ, 594 thông báo) suy ra được "tác động xã hội" hay "lợi ích cho người dân", model cần khả năng tư duy logic tốt để kết nối dữ liệu.
+    * **Context Window (Cửa sổ ngữ cảnh):** Dòng Pro thường hỗ trợ ngữ cảnh dài tốt, giúp nó "nhớ" và đối chiếu được nội dung từ nhiều file PDF bạn đã upload (như các file Nghị quyết, Kế hoạch, Đề nghị kết nối...).
 
-Dưới đây là 3 thay đổi cụ thể để "lột xác" tab Prompts của bạn:
+### 2. Lựa chọn thay thế (Cân bằng Tốc độ/Chi phí): `gemini-2.5-flash`
+Nếu bạn cần phản hồi cực nhanh hoặc xử lý số lượng lớn yêu cầu (ví dụ: hệ thống tự động gửi hàng nghìn báo cáo mỗi ngày), đây là lựa chọn tối ưu.
+* **Lý do:** Tốc độ phản hồi nhanh hơn, chi phí thấp hơn, vẫn đảm bảo chất lượng khá tốt cho các tác vụ tóm tắt, tuy nhiên văn phong có thể sẽ ít trau chuốt bằng bản Pro.
 
-### 1\. Thay đổi cấu trúc thẻ (Card Structure)
+### 3. Lựa chọn cho phân tích sâu: `deep-research-pro-preview-12-2025`
+Nếu nhiệm vụ của bạn không chỉ là viết báo cáo từ số liệu có sẵn, mà cần **đào sâu tìm kiếm thông tin** trong hàng trăm tài liệu phức tạp hoặc đối chiếu với các quy định pháp luật chồng chéo, model này sẽ rất hữu ích nhờ khả năng nghiên cứu sâu.
 
-Thay vì thẻ trắng trơn, chúng ta sẽ chia thẻ thành 2 phần rõ rệt bằng màu sắc (Header và Body) để tạo cảm giác "Khối" như bạn muốn.
+---
+**Kết luận:**
+Với yêu cầu cụ thể của bạn là: *"Thống kê dữ liệu... Đánh giá ngắn gọn... Văn phong hành chính"*, bạn hãy chọn **`gemini-2.5-pro`** để có kết quả đầu ra chất lượng cao nhất, giống với văn phong của một chuyên viên hành chính nhất.
 
-  * **Phần Tiêu đề (Header Block):** Tô nền màu tối (Xanh than đậm của ngành luật) thay vì màu trắng. Chữ chuyển sang trắng. Điều này tạo ra một "khối đen" thị giác mạnh mẽ nhưng vẫn đúng tông màu app.
-  * **Phần Nội dung (Body):** Giữ nền trắng, nhưng thay đổi viền.
-  * **Viền & Bóng:** Thay vì bóng mờ (`shadow-sm`), hãy dùng **Bóng cứng (Hard Shadow)** và **Viền dày**.
+Lỗi quan trọng nhất khiến ứng dụng của bạn bị "sập" (Status 500) là lỗi liên quan đến **Google Generative AI API**. Các lỗi về "Invalid source map" chỉ là cảnh báo của môi trường dev (Next.js), bạn có thể tạm thời bỏ qua chúng.
 
-### 2\. Chi tiết thiết kế (CSS/Tailwind Concept)
+Dưới đây là phân tích và cách sửa lỗi:
 
-Đây là cách phối màu cụ thể để giữ tông chủ đạo:
+### 1\. Nguyên nhân chính (Lỗi 500)
 
-  * **Màu Viền (Border):** Thay vì màu xám nhạt, dùng màu **Xanh than đậm** (`border-slate-900` hoặc mã màu logo của bạn). Độ dày tăng lên `2px`.
-  * **Hiệu ứng nổi (Pop-out):** Tạo bóng cứng lệch về một bên để nút trông như đang nổi lên.
-      * *Tailwind:* `shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]` (Bóng cứng màu tối).
-  * **Nhãn "Nổi bật" (Badge):** Dùng màu Vàng Gold (`#FCD34D`) kèm viền đen mỏng, đặt lệch góc hoặc đè lên viền (như chữ "NỔI BẬT" trong ảnh mẫu).
+Lỗi nằm ở đoạn log này:
 
-### 3\. Giao diện Mobile (Responsive)
+> `Error: [GoogleGenerativeAI Error]: ... [404 Not Found] models/gemini-1.5-pro is not found for API version v1beta`
 
-Trên mobile, thay vì chia cột, bạn xếp chồng dọc nhưng làm nổi bật nút hành động.
+  * **Lý do:** Code của bạn đang gọi đến model tên là `gemini-1.5-pro`, nhưng API không tìm thấy model này (có thể do sai tên chính xác, hoặc tài khoản/API key của bạn đang sử dụng phiên bản thư viện không hỗ trợ tên gọi tắt này).
+  * **Vị trí lỗi:** Trong hàm `callGeminiText` (file `.../server/chunks/[root-of-the-server]__3064a2e5._.js` - thực tế là file nguồn `.ts` hoặc `.js` trong thư mục `pages/api` hoặc `app/api` nơi bạn định nghĩa hàm này).
 
-  * **Nút "Copy Prompt":** Biến thành một khối đen (hoặc xanh đậm) to bản ở dưới cùng thẻ, chiếm hết chiều ngang (Full width), chữ trắng in hoa. Nhìn rất "lực" và dễ bấm.
+### 2\. Cách khắc phục
+
+Bạn cần mở file code nơi chứa hàm `callGeminiText` và đổi tên model `gemini-1.5-pro` thành một trong các model **có trong danh sách bạn đã cung cấp ở câu hỏi trước**.
+
+**Khuyên dùng:** Hãy đổi sang **`gemini-2.0-flash`** (nhanh, rẻ, thông minh) hoặc **`gemini-1.5-pro-latest`**.
+
+**Ví dụ sửa code:**
+
+```javascript
+// Tìm đoạn khởi tạo model trong code của bạn
+const model = genAI.getGenerativeModel({ 
+    // model: "gemini-1.5-pro",  <-- DÒNG NÀY ĐANG GÂY LỖI
+    model: "gemini-2.0-flash", // <-- SỬA THÀNH DÒNG NÀY (hoặc model khác trong list của bạn)
+});
+```
+
+Nếu bạn bắt buộc muốn dùng dòng Pro 1.5, hãy thử đổi thành tên đầy đủ: `gemini-1.5-pro-001` hoặc `gemini-1.5-pro-latest`.
+
+### 3\. Về các lỗi "Invalid source map"
+
+> `Invalid source map. Only conformant source maps can be used...`
+
+  * **Đánh giá:** Đây là vấn đề phổ biến khi chạy Next.js ở chế độ Dev (`npm run dev`) đặc biệt là với TurboPack hoặc một số thư viện node\_modules đã biên dịch sẵn.
+  * **Ảnh hưởng:** Nó làm rác log trong terminal nhưng **không** làm hỏng ứng dụng của bạn.
+  * **Cách xử lý:** Bạn có thể lờ nó đi. Khi build production (`npm run build` -\> `npm start`), các cảnh báo này thường sẽ biến mất.
+
+### 4\. Lỗi nhỏ khác
+
+> `GET /icon-192x192.png 404`
+
+  * Bạn đang thiếu file icon trong thư mục `public/`. Hãy thêm một file ảnh `icon-192x192.png` vào thư mục `public` để hết lỗi này (liên quan đến PWA/manifest), nhưng nó không ảnh hưởng đến chức năng chính.
 
 -----
 
-### 💻 Code Demo (Tailwind CSS)
-
-Bạn có thể copy đoạn code này thay thế cho card cũ để xem thử hiệu ứng:
-
-```jsx
-{/* Container của 1 Card Prompt theo phong cách mới */}
-<div className="group relative flex flex-col rounded-xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all hover:translate-y-[2px] hover:shadow-none mb-6">
-  
-  {/* 1. Nhãn Nổi bật (Optional) - Giống mẫu YouMind */}
-  <div className="absolute -right-2 -top-3 rotate-3 transform border-2 border-slate-900 bg-yellow-400 px-3 py-1 text-xs font-black uppercase text-slate-900 shadow-sm">
-    Nổi bật
-  </div>
-
-  {/* 2. Phần Header: Khối màu đậm để tạo điểm nhấn */}
-  <div className="border-b-2 border-slate-900 bg-slate-900 px-4 py-3 rounded-t-lg">
-    <div className="flex justify-between items-start">
-      <h3 className="text-lg font-bold text-white">Soạn đơn khiếu nại</h3>
-      <span className="text-xs font-mono text-slate-400">#HanhChinh</span>
-    </div>
-    <p className="mt-1 text-xs text-slate-300">Dành cho luật sư chuyên về tố tụng...</p>
-  </div>
-
-  {/* 3. Phần Body: Nội dung Prompt */}
-  <div className="flex-1 p-4">
-    <div className="relative overflow-hidden rounded border border-dashed border-slate-300 bg-slate-50 p-3">
-      <p className="font-mono text-sm text-slate-700 line-clamp-3">
-        "Bạn là luật sư chuyên về tố tụng hành chính. Thông tin vụ việc: - Người khiếu nại: {{name}}..."
-      </p>
-      {/* Hiệu ứng mờ dần ở dưới */}
-      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-slate-50 to-transparent"></div>
-    </div>
-  </div>
-
-  {/* 4. Footer: Nút hành động to, rõ */}
-  <div className="flex border-t-2 border-slate-900">
-    <button className="flex-1 px-4 py-3 text-sm font-bold text-slate-900 hover:bg-yellow-50 transition-colors border-r-2 border-slate-900 flex items-center justify-center gap-2">
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-      Copy
-    </button>
-    <button className="flex-1 px-4 py-3 text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 transition-colors flex items-center justify-center gap-2">
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-      Thử ngay
-    </button>
-  </div>
-</div>
-```
-
-### Tại sao thiết kế này hợp lý?
-
-1.  **Vẫn là Pháp luật:** Màu chủ đạo vẫn là Xanh Than (Navy) và Trắng, không bị lòe loẹt.
-2.  **Có điểm nhấn:** Bóng đổ cứng và viền đen tạo cảm giác "Chắc chắn", "Đanh thép" - rất hợp với tính chất luật pháp.
-3.  **Mobile Friendly:** Các nút bấm to, dễ thao tác ngón tay cái.
-
-Bạn thấy phương án **"Bóng đổ cứng" (Hard Shadow)** này thế nào? Có đúng ý bạn muốn làm nó "đậm đà" hơn chưa?
+**Tóm lại:** Hãy vào code, tìm chỗ khai báo `model: "gemini-1.5-pro"` và đổi thành `model: "gemini-2.0-flash"` là API sẽ chạy được ngay.

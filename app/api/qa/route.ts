@@ -161,8 +161,11 @@ CÂU HỎI: ${question.trim()}
 
 Hãy trả lời câu hỏi trên một cách chuyên nghiệp và dễ hiểu.`;
 
-    // Gọi Gemini API
-    const answer = await callGeminiText(fullPrompt);
+    // Gọi Gemini API - sử dụng gemini-2.5-pro cho văn phong hành chính chuẩn mực
+    const answer = await callGeminiText(fullPrompt, {
+      model: 'gemini-2.5-pro',
+      temperature: 0.3, // Giữ mức thấp để văn phong hành chính chuẩn xác, ít bịa đặt
+    });
 
     if (!answer) {
       return NextResponse.json(
@@ -208,9 +211,24 @@ Chỉ trả về nội dung bài đăng, không cần giải thích.`;
   } catch (error: any) {
     console.error('Q&A API Error:', error);
 
+    // Determine user-friendly error message based on error type
+    let userMessage = 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
+    
+    if (error.status === 503 || error.message?.includes('overloaded')) {
+      userMessage = '🎄 Hệ thống AI đang bận xử lý nhiều câu hỏi. Vui lòng thử lại sau 10-20 giây.';
+    } else if (error.status === 429 || error.message?.includes('rate limit')) {
+      userMessage = '⏰ Bạn đã hỏi quá nhiều câu hỏi trong thời gian ngắn. Vui lòng đợi 1 phút.';
+    } else if (error.status === 401 || error.message?.includes('API key')) {
+      userMessage = '🔑 Lỗi xác thực hệ thống. Vui lòng liên hệ quản trị viên.';
+    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      userMessage = '🌐 Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.';
+    } else if (error.message?.includes('timeout')) {
+      userMessage = '⏱️ Câu hỏi quá phức tạp, hệ thống cần nhiều thời gian hơn. Thử đặt câu hỏi ngắn gọn hơn.';
+    }
+
     return NextResponse.json(
       {
-        error: 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.',
+        error: userMessage,
         details: process.env.NODE_ENV === 'development' ? error.message : undefined,
       },
       { status: 500 }

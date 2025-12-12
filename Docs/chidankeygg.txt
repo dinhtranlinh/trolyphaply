@@ -1,0 +1,60 @@
+Dựa trên danh sách model bạn sở hữu và mục tiêu là **"tổng hợp dữ liệu từ tài liệu/web"** để viết báo cáo theo **"văn phong hành chính"**, tôi xin tư vấn chiến lược sử dụng model tối ưu nhất như sau:
+
+### 1\. Lựa chọn "Vàng" cho chất lượng (Khuyên dùng nhất): `gemini-2.5-pro`
+
+Đây là model mạnh mẽ nhất trong danh sách của bạn để thay thế cho `gemini-1.5-pro` (đã bị lỗi).
+
+  * **Tại sao chọn?**
+      * **Tư duy Logic & Văn phong:** Dòng **Pro** (đặc biệt là bản 2.5) có khả năng hiểu các sắc thái ngôn ngữ (nuance) tốt hơn hẳn dòng Flash. Nó sẽ viết được giọng văn "hành chính", "trang trọng" mà không bị khô khan như robot.
+      * **Xử lý ngữ cảnh dài (Long Context):** Khi bạn ném vào nhiều file PDF văn bản pháp luật, Nghị quyết, model này có khả năng "nhớ" và liên kết các dữ liệu rời rạc tốt hơn để đưa ra đánh giá tổng quan.
+  * **Sử dụng khi:** Bạn cần viết báo cáo cuối cùng, cần phân tích sâu, hoặc cần tổng hợp câu trả lời từ nhiều nguồn phức tạp.
+
+### 2\. Lựa chọn cho Tốc độ & Khối lượng lớn: `gemini-2.5-flash`
+
+Nếu hệ thống của bạn cần xử lý hàng nghìn yêu cầu mỗi giờ hoặc người dùng cần câu trả lời tức thì (dưới 2 giây).
+
+  * **Tại sao chọn?**
+      * **Tốc độ:** Phản hồi cực nhanh.
+      * **Chi phí hiệu năng:** Dòng Flash 2.5 đã được nâng cấp rất nhiều, thông minh gần bằng Pro đời cũ nhưng nhẹ hơn.
+  * **Sử dụng khi:** Bạn dùng để trích xuất dữ liệu thô (ví dụ: "Tìm cho tôi con số trong file Excel này"), hoặc tóm tắt nhanh nội dung web trước khi đưa vào model Pro để xử lý bước cuối.
+
+### 3\. Lựa chọn đặc biệt cho Nghiên cứu: `deep-research-pro-preview-12-2025`
+
+Do bạn có nhắc đến việc **"tổng hợp từ nguồn web"**, đây là một model rất đáng thử nghiệm.
+
+  * **Tại sao chọn?** Tên model gợi ý khả năng "Deep Research" (Nghiên cứu sâu). Model này thường được tối ưu để thực hiện nhiều bước suy luận: *Tìm kiếm -\> Đọc -\> Đối chiếu -\> Tìm kiếm tiếp -\> Tổng hợp*.
+  * **Sử dụng khi:** Câu hỏi của người dùng mang tính chất tra cứu phức tạp (VD: "So sánh chính sách hỗ trợ hộ nghèo của tỉnh A và tỉnh B dựa trên các văn bản mới nhất trên mạng").
+
+-----
+
+### PHƯƠNG ÁN TRIỂN KHAI TỐI ƯU (Code mẫu)
+
+Để khắc phục lỗi `404 Not Found` bạn vừa gặp và đạt hiệu quả tốt nhất, hãy sửa code khởi tạo model như sau:
+
+**Cách 1: Ưu tiên chất lượng (Dùng cho ứng dụng Trợ lý pháp lý chuyên sâu)**
+
+Tìm đoạn code định nghĩa model trong file API của bạn và sửa thành:
+
+```javascript
+// File: .../api/qa/route.ts hoặc tương tự
+const model = genAI.getGenerativeModel({ 
+    // Thay thế "gemini-1.5-pro" cũ bằng model mạnh nhất bạn có
+    model: "gemini-2.5-pro", 
+    
+    // Cấu hình an toàn (nếu cần)
+    generationConfig: {
+        temperature: 0.3, // Giữ mức thấp để văn phong hành chính được chuẩn xác, ít bịa đặt
+        topP: 0.95,
+        topK: 40,
+    }
+});
+```
+
+**Cách 2: Chiến lược kết hợp (Nâng cao)**
+
+Nếu bạn muốn tận dụng cả 4 Key và các model khác nhau, bạn có thể viết hàm chọn model động:
+
+  * Nếu input người dùng ngắn/đơn giản -\> Gọi `gemini-2.5-flash` (Tiết kiệm, nhanh).
+  * Nếu input yêu cầu "Phân tích", "So sánh", "Viết báo cáo" -\> Gọi `gemini-2.5-pro`.
+
+**Tóm lại:** Hãy đổi ngay thành **`gemini-2.5-pro`** trong code của bạn. Đây là sự cân bằng hoàn hảo nhất cho tác vụ "Hành chính công chủ động" mà bạn đang xây dựng.
