@@ -24,22 +24,61 @@ export async function callGeminiText(
     model?: string;
   }
 ): Promise<string> {
-  const apiKey = getNextApiKey();
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: options?.model || 'gemini-2.5-flash',
-  });
+  const maxRetries = 3;
+  const models = [
+    options?.model || 'gemini-2.5-flash',
+    'gemini-1.5-flash', // Fallback model
+  ];
+  
+  for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
+    const modelName = models[modelIndex];
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const apiKey = getNextApiKey();
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+        });
 
-  const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: options?.temperature ?? 0.9,
-      maxOutputTokens: options?.maxOutputTokens ?? 2048,
-    },
-  });
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: options?.temperature ?? 0.9,
+            maxOutputTokens: options?.maxOutputTokens ?? 2048,
+          },
+        });
 
-  const response = result.response;
-  return response.text();
+        const response = result.response;
+        return response.text();
+      } catch (error: any) {
+        const isOverloaded = error.status === 503 || error.message?.includes('overloaded');
+        const isLastAttempt = attempt === maxRetries - 1;
+        const isLastModel = modelIndex === models.length - 1;
+        
+        if (isOverloaded && !isLastAttempt) {
+          // Wait before retry (exponential backoff)
+          const waitTime = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          console.log(`Retry ${attempt + 1}/${maxRetries} for model ${modelName}...`);
+          continue;
+        }
+        
+        if (isOverloaded && !isLastModel) {
+          // Try next model
+          console.log(`Model ${modelName} overloaded, trying ${models[modelIndex + 1]}...`);
+          break;
+        }
+        
+        // Re-throw error if all retries failed
+        if (isLastAttempt && isLastModel) {
+          throw error;
+        }
+      }
+    }
+  }
+  
+  throw new Error('All models failed after retries');
 }
 
 export async function parseGeminiJSON<T = any>(

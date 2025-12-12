@@ -24,6 +24,7 @@ interface StyleGuide {
 export default function Home() {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const [shareText, setShareText] = useState(''); // AI-generated shareable content
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [styleGuides, setStyleGuides] = useState<StyleGuide[]>([]);
@@ -90,12 +91,37 @@ export default function Home() {
     { icon: '🎲', label: 'Ứng dụng AI', href: '/apps' },
   ];
 
+  // Format text for social sharing - remove markdown and add appropriate formatting
+  const formatShareText = (rawAnswer: string): string => {
+    let formatted = rawAnswer
+      // Remove markdown bold/italic
+      .replace(/\*\*\*(.+?)\*\*\*/g, '$1')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      // Remove "Lưu ý quan trọng" section and similar disclaimers
+      .replace(/\*\*Lưu ý quan trọng:?\*\*/gi, '')
+      .replace(/Lưu ý quan trọng:?/gi, '')
+      .replace(/\*\*Lưu ý:?\*\*/gi, '')
+      .replace(/Lưu ý:?/gi, '')
+      // Remove disclaimer sentences
+      .replace(/Đây chỉ là thông tin tham khảo.*?\.?/gi, '')
+      .replace(/không thay thế.*?pháp lý.*?\.?/gi, '')
+      .replace(/nên tham khảo.*?chuyên gia.*?\.?/gi, '')
+      // Clean up extra whitespace
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    return formatted;
+  };
+
   const handleSubmit = async () => {
     if (!question.trim()) return;
 
     setLoading(true);
     setError('');
     setAnswer('');
+    setShareText('');
 
     try {
       const response = await fetch('/api/qa', {
@@ -113,6 +139,7 @@ export default function Home() {
       }
 
       setAnswer(data.answer);
+      setShareText(data.shareText || ''); // AI-generated shareable content
     } catch (err: any) {
       const errorMessage = err.message || 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
       setError(errorMessage);
@@ -274,6 +301,54 @@ export default function Home() {
                     <p className="text-sm text-gray-600 italic mt-3">
                       💡 Nếu câu trả lời chưa đầy đủ, hãy nhấn &quot;Hỏi ngay&quot; để AI tổng hợp lại.
                     </p>
+                    
+                    {/* Social Sharing Buttons */}
+                    <div className="mt-4 pt-3 border-t border-[#EEF1F4]">
+                      <p className="text-sm font-medium text-[#1A2B49] mb-2">📤 Chia sẻ câu trả lời:</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            // Use AI-generated shareText if available, fallback to formatted answer
+                            const content = shareText || formatShareText(answer);
+                            const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(content)}`;
+                            window.open(fbUrl, '_blank', 'width=600,height=400');
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                          </svg>
+                          Facebook
+                        </button>
+                        <button
+                          onClick={() => {
+                            const content = shareText || formatShareText(answer);
+                            const zaloUrl = `https://sp.zalo.me/share?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(content)}`;
+                            window.open(zaloUrl, '_blank', 'width=600,height=400');
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-[#0068FF] text-white rounded-lg hover:bg-[#0052CC] transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652.521 2.411-.343 6.237-.343 6.237s3.48-.908 5.513-2.051c.651.14 1.324.24 2.017.29.18.013.362.022.545.027.18-.005.362-.014.542-.027.693-.05 1.366-.15 2.017-.29 2.033 1.143 5.513 2.051 5.513 2.051s-.864-3.826-.343-6.237C22.255 17.727 24 14.608 24 11.111 24 4.975 18.627 0 12 0zm.545 19.644c-.18.013-.362.022-.545.027-.183-.005-.365-.014-.545-.027-5.621-.406-10.11-4.46-10.11-9.422C1.345 5.26 6.172.889 12 .889s10.655 4.37 10.655 9.733c0 4.962-4.489 9.016-10.11 9.422z"/>
+                          </svg>
+                          Zalo
+                        </button>
+                        <button
+                          onClick={() => {
+                            const content = shareText || formatShareText(answer);
+                            navigator.clipboard.writeText(content);
+                            alert('✅ Đã copy nội dung chia sẻ!');
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                    
                     <div className="mt-4 pt-3 border-t border-[#EEF1F4]">
                       <p className="text-xs text-[#7D8DA6]">
                         ⚠️ Thông tin mang tính tham khảo. Vui lòng tham khảo ý kiến chuyên gia pháp lý cho các vấn đề quan trọng.

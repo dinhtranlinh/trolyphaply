@@ -171,9 +171,32 @@ Hãy trả lời câu hỏi trên một cách chuyên nghiệp và dễ hiểu.`
       );
     }
 
+    // Tạo nội dung chia sẻ Facebook với văn phong tự nhiên
+    const sharePrompt = `Hãy viết lại câu hỏi và câu trả lời sau đây thành một bài đăng Facebook ngắn gọn, thu hút, dễ đọc:
+
+CÂU HỎI: ${question.trim()}
+
+CÂU TRẢ LỜI: ${answer.trim()}
+
+YÊU CẦU:
+- Văn phong tự nhiên, thân thiện như đang tư vấn cho bạn bè
+- Sử dụng emoji phù hợp (💡 📌 ✅ ⚠️ 📋 🔍 💰 🏠 ⚖️ etc.)
+- Ngắn gọn 200-300 từ
+- Bỏ các phần disclaimer, lưu ý pháp lý
+- Định dạng dễ đọc với bullet points hoặc đoạn ngắn
+- Kết thúc bằng 1 câu call-to-action nhẹ nhàng
+
+Chỉ trả về nội dung bài đăng, không cần giải thích.`;
+
+    const shareText = await callGeminiText(sharePrompt, {
+      temperature: 0.8,
+      maxOutputTokens: 800,
+    });
+
     return NextResponse.json({
       success: true,
       answer: answer.trim(),
+      shareText: shareText.trim(),
       question: question.trim(),
       styleGuide: styleGuide
         ? {
