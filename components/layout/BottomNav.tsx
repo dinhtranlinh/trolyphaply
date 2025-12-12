@@ -51,9 +51,9 @@ export default function BottomNav() {
       ),
     },
     {
-      id: 'prompts',
-      label: 'Prompts',
-      href: '/prompts',
+      id: 'ai-prompts',
+      label: 'AI Prompts',
+      href: '/ai-prompts',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

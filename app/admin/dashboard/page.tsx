@@ -61,11 +61,11 @@ export default function AdminDashboard() {
               <span>Procedures</span>
             </Link>
             <Link
-              href="/admin/prompts"
+              href="/admin/ai-prompts"
               className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
             >
-              <span>💬</span>
-              <span>Prompts</span>
+              <span>🎨</span>
+              <span>AI Prompts</span>
             </Link>
             <Link
               href="/admin/apps"

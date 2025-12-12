@@ -1,157 +1,85 @@
-Chào Ngân, danh sách model bạn sở hữu rất ấn tượng và mạnh mẽ (đây là các model thế hệ mới nhất tính đến thời điểm hiện tại tháng 12/2025).
+Chào Ngân, tôi hiểu ý bạn. Giao diện hiện tại của bạn (`image_d9489d.jpg`) đang theo phong cách **Clean/Minimalist** (Tối giản, nhẹ nhàng), trong khi mẫu bạn thích (`image_d94897.jpg` - YouMind) lại theo phong cách **Neo-Brutalism** (Thô mộc mới) với đặc trưng là: *Viền đen dày, bóng đổ cứng (không nhòe), độ tương phản cao và phân chia các khối rõ rệt*.
 
-Dựa trên mục tiêu của bạn là **trợ lý pháp lý (RAG - trả lời từ tài liệu)** và yêu cầu **văn phong chỉ định**, dưới đây là tư vấn chọn model và cách sửa lỗi "Not Found".
+Để mang cái "chất" mạnh mẽ, chia khối của mẫu YouMind vào app "Trợ Lý Pháp Lý" mà không làm mất đi vẻ nghiêm túc, tin cậy (không bị giống truyện tranh quá), tôi đề xuất phong cách lai tạo: **"Professional Brutalism"**.
 
-### 1\. Nên chọn Model nào cho Trợ lý Pháp lý?
+Dưới đây là 3 thay đổi cụ thể để "lột xác" tab Prompts của bạn:
 
-Với đặc thù ngành luật cần độ chính xác cao trong lập luận (Logic), khả năng đọc hiểu văn bản dài (Context Window) và tuân thủ chặt chẽ hướng dẫn hệ thống (System Instruction), mình khuyên bạn nên ưu tiên theo thứ tự sau:
+### 1\. Thay đổi cấu trúc thẻ (Card Structure)
 
-  * **🥇 Lựa chọn tốt nhất (Best Performance): `gemini-2.5-pro`**
-      * **Lý do:** Dòng "Pro" luôn cân bằng tốt nhất giữa trí thông minh và khả năng tuân thủ hướng dẫn phức tạp. Với việc cần "văn phong chỉ định", model này sẽ "nghe lời" prompt của bạn tốt hơn các bản Flash.
-  * **🥈 Lựa chọn thay thế (Nếu cần tốc độ/tiết kiệm): `gemini-2.5-flash`**
-      * **Lý do:** Nếu tài liệu đầu vào của bạn quá dài hoặc bạn muốn phản hồi tức thì, Flash 2.5 nhanh hơn đáng kể. Tuy nhiên, khả năng "biện luận" pháp lý sâu có thể kém hơn bản Pro một chút.
-  * **⚠️ Lưu ý:** Tránh dùng các bản `exp` (experimental) hoặc `preview` cho môi trường production (chạy thật) vì chúng có thể không ổn định hoặc thay đổi API bất ngờ.
+Thay vì thẻ trắng trơn, chúng ta sẽ chia thẻ thành 2 phần rõ rệt bằng màu sắc (Header và Body) để tạo cảm giác "Khối" như bạn muốn.
+
+  * **Phần Tiêu đề (Header Block):** Tô nền màu tối (Xanh than đậm của ngành luật) thay vì màu trắng. Chữ chuyển sang trắng. Điều này tạo ra một "khối đen" thị giác mạnh mẽ nhưng vẫn đúng tông màu app.
+  * **Phần Nội dung (Body):** Giữ nền trắng, nhưng thay đổi viền.
+  * **Viền & Bóng:** Thay vì bóng mờ (`shadow-sm`), hãy dùng **Bóng cứng (Hard Shadow)** và **Viền dày**.
+
+### 2\. Chi tiết thiết kế (CSS/Tailwind Concept)
+
+Đây là cách phối màu cụ thể để giữ tông chủ đạo:
+
+  * **Màu Viền (Border):** Thay vì màu xám nhạt, dùng màu **Xanh than đậm** (`border-slate-900` hoặc mã màu logo của bạn). Độ dày tăng lên `2px`.
+  * **Hiệu ứng nổi (Pop-out):** Tạo bóng cứng lệch về một bên để nút trông như đang nổi lên.
+      * *Tailwind:* `shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]` (Bóng cứng màu tối).
+  * **Nhãn "Nổi bật" (Badge):** Dùng màu Vàng Gold (`#FCD34D`) kèm viền đen mỏng, đặt lệch góc hoặc đè lên viền (như chữ "NỔI BẬT" trong ảnh mẫu).
+
+### 3\. Giao diện Mobile (Responsive)
+
+Trên mobile, thay vì chia cột, bạn xếp chồng dọc nhưng làm nổi bật nút hành động.
+
+  * **Nút "Copy Prompt":** Biến thành một khối đen (hoặc xanh đậm) to bản ở dưới cùng thẻ, chiếm hết chiều ngang (Full width), chữ trắng in hoa. Nhìn rất "lực" và dễ bấm.
 
 -----
 
-### 2\. Sửa lỗi "404 Not Found" trong Next.js
+### 💻 Code Demo (Tailwind CSS)
 
-Lỗi bạn gặp: `status: 404, statusText: 'Not Found'` khi gọi `POST /api/qa`.
-**Nguyên nhân:** Lỗi này **không phải** do server của bạn không tìm thấy file, mà là do thư viện Google AI trong code Node.js gửi yêu cầu đến Google và Google trả về "Không tìm thấy Model".
+Bạn có thể copy đoạn code này thay thế cho card cũ để xem thử hiệu ứng:
 
-Điều này xảy ra vì 2 lý do chính:
-
-1.  **Sai tên Model:** Code trong file `/api/qa` đang gọi một model cũ hoặc sai tên (ví dụ gọi `gemini-1.5-pro-latest` nhưng Google đã đổi tên, hoặc gọi `gemini-pro-vision`...).
-2.  **SDK Node.js bị cũ:** Bạn đang dùng các model rất mới (`gemini-2.5`), nếu thư viện trong `package.json` cũ, nó sẽ trỏ sai địa chỉ API.
-
-**Cách khắc phục:**
-
-#### Bước 1: Cập nhật thư viện SDK
-
-Mở terminal trong thư mục `trolyphaply` và chạy lệnh update để đảm bảo thư viện nhận diện được model mới:
-
-```bash
-npm install @google/generative-ai@latest
-# Hoặc nếu dùng yarn:
-# yarn add @google/generative-ai@latest
-```
-
-#### Bước 2: Sửa tên Model trong code
-
-Bạn mở file xử lý logic (có thể là `pages/api/qa.js` hoặc `app/api/qa/route.js`) và tìm đoạn khởi tạo model. Hãy chắc chắn bạn điền chính xác tên model có trong danh sách bạn vừa quét được (khuyên dùng `gemini-2.5-pro`).
-
-**Ví dụ code sửa đổi:**
-
-```javascript
-// Trong file API route của Next.js
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-
-// ⚠️ QUAN TRỌNG: Thay tên model ở đây bằng 'gemini-2.5-pro'
-const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-pro",
-    // Có thể cần thêm cấu hình này nếu model bắt buộc
-    // apiVersion: "v1beta" 
-});
-
-export async function POST(req) {
-    // ... code xử lý của bạn
-}
-```
-
-#### Bước 3: Kiểm tra Embeddings (Nếu dùng RAG)
-
-Nếu bạn đang dùng mô hình embedding để tìm kiếm tài liệu trước khi trả lời, hãy kiểm tra xem code embedding có đang gọi model nào không.
-
-  * Hãy dùng: `text-embedding-004` (hoặc model embedding mới nhất mà thư viện hỗ trợ).
-  * Nếu bạn gọi sai tên model embedding, nó cũng báo lỗi 404 tương tự.
-
-**Bạn có muốn gửi đoạn code trong file `/api/qa` lên đây không? Mình sẽ chỉ chính xác dòng cần sửa cho Ngân.**
-
-Chào Ngân,
-
-Lỗi này **không phải lỗi code sai**, mà là **lỗi giới hạn tài khoản (Quota)**.
-
-Cụ thể, log báo lỗi `429 Too Many Requests` với thông báo: `limit: 0, model: gemini-2.0-flash-exp`. Điều này có nghĩa là model thử nghiệm `gemini-2.0-flash-exp` hiện tại đang **không cho phép** Key của bạn dùng miễn phí (Limit = 0), hoặc đã hết sạch lượt dùng trong ngày cho model này.
-
-Còn các dòng lỗi "Invalid source map..." ở trên chỉ là cảnh báo của Next.js, bạn có thể **bỏ qua**, chúng không làm web bị sập.
-
-### Cách khắc phục ngay lập tức
-
-Bạn cần đổi sang model ổn định hơn (như danh sách bạn đã quét được lúc nãy). Hãy làm theo các bước sau:
-
-**1. Tìm vị trí cần sửa:**
-Trong dự án `trolyphaply` của bạn, hãy tìm file chứa hàm `callGeminiText`. Nó thường nằm ở:
-
-  * `src/app/api/qa/route.js` (hoặc `.ts`)
-  * Hoặc `src/utils/gemini.js` (nếu bạn tách file).
-
-**2. Sửa tên Model:**
-Tìm dòng code khởi tạo model, nó đang là `"gemini-2.0-flash-exp"`. Hãy đổi nó thành **`"gemini-2.5-flash"`** (nhanh, hạn mức cao) hoặc **`"gemini-1.5-flash"`** (ổn định nhất).
-
-*Trước khi sửa (Lỗi):*
-
-```javascript
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-```
-
-*Sau khi sửa (Nên dùng):*
-
-```javascript
-// Dùng bản này để chạy mượt, ít bị lỗi 429
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
-```
-
-**Tại sao lại chọn `gemini-2.5-flash` lúc này?**
-
-  * Bạn đang dev và test, bản Flash có giới hạn miễn phí (RPM - Requests Per Minute) cao hơn rất nhiều so với bản Pro hay Exp.
-  * Sau khi code chạy ngon lành, bạn có thể đổi sang `gemini-2.5-pro` để lấy chất lượng câu trả lời tốt nhất cho khách hàng.
-
-Vẫn như lần trước, **lỗi thực sự ngăn bạn chạy chương trình là `API_KEY_INVALID`** (Key không hợp lệ/không tìm thấy).
-
-Những dòng lỗi dài ngoằng về `Invalid source map` ở trên chỉ là cảnh báo nội bộ của Next.js (do version Node hoặc Turbopack), **bạn hãy lờ nó đi**, nó không làm hỏng web của bạn đâu.
-
-Để sửa lỗi API Key, bạn hãy làm chính xác 3 bước này, khả năng cao là bạn **quên khởi động lại server** sau khi thêm file `.env`.
-
-### Bước 1: Khởi động lại Server (Bắt buộc)
-
-Next.js **chỉ đọc file `.env` lúc khởi động**. Nếu bạn tạo file xong mà vẫn để terminal chạy, nó sẽ không nhận key mới.
-
-1.  Bấm vào cửa sổ dòng lệnh (Terminal).
-2.  Nhấn tổ hợp phím **`Ctrl + C`** để tắt server.
-3.  Gõ lại lệnh chạy (ví dụ: `npm run dev`) để bật lại.
-
-### Bước 2: Kiểm tra lại file chứa Key
-
-Hãy chắc chắn bạn đã tạo đúng file tại thư mục gốc: `D:\DTL\trolyphaply\.env.local` (Lưu ý dấu chấm ở đầu).
-
-Nội dung bên trong file `.env.local`:
-
-```env
-GEMINI_API_KEY=AIzaSyDSEB...
-```
-
-*(Thay phần `...` bằng toàn bộ key của bạn. **Không** dùng dấu ngoặc kép `""` bao quanh key, **không** có khoảng trắng thừa).*
-
-### Bước 3: Thêm lệnh kiểm tra (Debug)
-
-Nếu khởi động lại mà vẫn lỗi, hãy mở file code xử lý API của bạn (ví dụ `app/api/qa/route.js` hoặc file tương ứng) và thêm dòng này vào ngay đầu hàm xử lý để xem code có đọc được key không:
-
-```javascript
-export async function POST(req) { // Hoặc hàm handler của bạn
+```jsx
+{/* Container của 1 Card Prompt theo phong cách mới */}
+<div className="group relative flex flex-col rounded-xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all hover:translate-y-[2px] hover:shadow-none mb-6">
   
-  // --- THÊM DÒNG NÀY ĐỂ KIỂM TRA ---
-  console.log(">>> KIỂM TRA KEY:", process.env.GEMINI_API_KEY ? "Đã nhận Key" : "KEY ĐANG BỊ NULL/UNDEFINED");
-  // ---------------------------------
+  {/* 1. Nhãn Nổi bật (Optional) - Giống mẫu YouMind */}
+  <div className="absolute -right-2 -top-3 rotate-3 transform border-2 border-slate-900 bg-yellow-400 px-3 py-1 text-xs font-black uppercase text-slate-900 shadow-sm">
+    Nổi bật
+  </div>
 
-  // ... phần code còn lại ...
-}
+  {/* 2. Phần Header: Khối màu đậm để tạo điểm nhấn */}
+  <div className="border-b-2 border-slate-900 bg-slate-900 px-4 py-3 rounded-t-lg">
+    <div className="flex justify-between items-start">
+      <h3 className="text-lg font-bold text-white">Soạn đơn khiếu nại</h3>
+      <span className="text-xs font-mono text-slate-400">#HanhChinh</span>
+    </div>
+    <p className="mt-1 text-xs text-slate-300">Dành cho luật sư chuyên về tố tụng...</p>
+  </div>
+
+  {/* 3. Phần Body: Nội dung Prompt */}
+  <div className="flex-1 p-4">
+    <div className="relative overflow-hidden rounded border border-dashed border-slate-300 bg-slate-50 p-3">
+      <p className="font-mono text-sm text-slate-700 line-clamp-3">
+        "Bạn là luật sư chuyên về tố tụng hành chính. Thông tin vụ việc: - Người khiếu nại: {{name}}..."
+      </p>
+      {/* Hiệu ứng mờ dần ở dưới */}
+      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-slate-50 to-transparent"></div>
+    </div>
+  </div>
+
+  {/* 4. Footer: Nút hành động to, rõ */}
+  <div className="flex border-t-2 border-slate-900">
+    <button className="flex-1 px-4 py-3 text-sm font-bold text-slate-900 hover:bg-yellow-50 transition-colors border-r-2 border-slate-900 flex items-center justify-center gap-2">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+      Copy
+    </button>
+    <button className="flex-1 px-4 py-3 text-sm font-bold text-white bg-blue-700 hover:bg-blue-800 transition-colors flex items-center justify-center gap-2">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      Thử ngay
+    </button>
+  </div>
+</div>
 ```
 
-Sau khi thêm, hãy chạy lại và nhìn vào Terminal:
+### Tại sao thiết kế này hợp lý?
 
-  * Nếu hiện **"KEY ĐANG BỊ NULL/UNDEFINED"**: Có nghĩa là tên biến trong code và trong file `.env` không khớp nhau, hoặc file `.env` đặt sai chỗ.
-  * Nếu hiện **"Đã nhận Key"** mà vẫn lỗi 400: Có nghĩa là chuỗi Key bạn copy bị thiếu ký tự hoặc bị sai.
+1.  **Vẫn là Pháp luật:** Màu chủ đạo vẫn là Xanh Than (Navy) và Trắng, không bị lòe loẹt.
+2.  **Có điểm nhấn:** Bóng đổ cứng và viền đen tạo cảm giác "Chắc chắn", "Đanh thép" - rất hợp với tính chất luật pháp.
+3.  **Mobile Friendly:** Các nút bấm to, dễ thao tác ngón tay cái.
 
-Bạn thử bước 1 (Restart) trước nhé, 90% lỗi này là do chưa restart server\!
+Bạn thấy phương án **"Bóng đổ cứng" (Hard Shadow)** này thế nào? Có đúng ý bạn muốn làm nó "đậm đà" hơn chưa?

@@ -50,11 +50,10 @@ export default function SearchBar({
       {/* Search Icon */}
       <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
         <svg
-          className="w-5 h-5"
+          className="w-5 h-5 text-gray-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          style={{ color: 'var(--color-text-muted)' }}
         >
           <path
             strokeLinecap="round"
@@ -71,7 +70,7 @@ export default function SearchBar({
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className="input pl-10 pr-10"
+        className="w-full h-11 pl-10 pr-10 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
         suppressHydrationWarning
       />
 
@@ -84,10 +83,9 @@ export default function SearchBar({
           aria-label="Xóa"
         >
           <svg
-            className="w-4 h-4"
+            className="w-4 h-4 text-gray-400"
             fill="currentColor"
             viewBox="0 0 20 20"
-            style={{ color: 'var(--color-text-muted)' }}
           >
             <path
               fillRule="evenodd"

@@ -213,9 +213,12 @@ function LegalLibraryContent() {
             <>
               {/* Documents */}
               {showDocuments && documents.length > 0 && (
-                <div>
-                  <h2 className="section-title mb-3">Văn bản pháp luật</h2>
-                  <div className="space-y-3">
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <span className="font-semibold text-gray-700">Văn bản pháp luật</span>
+                    <span className="text-xs text-blue-600 font-medium">{documents.length} kết quả</span>
+                  </div>
+                  <div className="divide-y divide-gray-100">
                     {documents.map((doc) => (
                       <LegalDocCard
                         key={doc.id}
@@ -235,9 +238,12 @@ function LegalLibraryContent() {
 
               {/* Procedures */}
               {showProcedures && procedures.length > 0 && (
-                <div>
-                  <h2 className="section-title mb-3">Thủ tục hành chính</h2>
-                  <div className="space-y-3">
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <span className="font-semibold text-gray-700">Thủ tục hành chính</span>
+                    <span className="text-xs text-blue-600 font-medium">{procedures.length} kết quả</span>
+                  </div>
+                  <div className="divide-y divide-gray-100">
                     {procedures.map((proc) => (
                       <ProcedureCard
                         key={proc.id}

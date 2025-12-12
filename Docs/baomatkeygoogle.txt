@@ -1,0 +1,24 @@
+
+Quy tắc bảo mật quan trọng
+Giữ bí mật các khoá: Khoá API cho Gemini có thể truy cập vào dữ liệu nhạy cảm mà ứng dụng của bạn phụ thuộc vào.
+
+Tuyệt đối không chuyển khoá API vào tính năng kiểm soát nguồn. Đừng kiểm tra khoá API của bạn trong các hệ thống quản lý phiên bản như Git.
+
+Tuyệt đối không để lộ khoá API ở phía máy khách. Không sử dụng trực tiếp khoá API trong các ứng dụng web hoặc di động trong quá trình sản xuất. Các khoá trong mã phía máy khách (bao gồm cả thư viện JavaScript/TypeScript và lệnh gọi REST) có thể được trích xuất.
+
+Hạn chế quyền truy cập: Hạn chế việc sử dụng khoá API ở các địa chỉ IP, HTTP referrer hoặc ứng dụng Android/iOS cụ thể (nếu có thể).
+
+Hạn chế việc sử dụng: Chỉ bật những API cần thiết cho mỗi khoá.
+
+Thực hiện kiểm tra thường xuyên: Thường xuyên kiểm tra và xoay vòng khoá API định kỳ.
+
+Các phương pháp hay nhất
+Sử dụng các lệnh gọi phía máy chủ bằng khoá API Cách an toàn nhất để sử dụng khoá API là gọi Gemini API từ một ứng dụng phía máy chủ, trong đó khoá có thể được giữ bí mật.
+
+Sử dụng mã thông báo tạm thời để truy cập phía máy khách (chỉ Live API): Để truy cập trực tiếp vào Live API phía máy khách, bạn có thể sử dụng mã thông báo tạm thời. Chúng có rủi ro bảo mật thấp hơn và có thể phù hợp để sử dụng trong bản phát hành chính thức. Hãy xem hướng dẫn về mã thông báo tạm thời để biết thêm thông tin.
+
+Cân nhắc việc thêm các quy tắc hạn chế đối với khoá: Bạn có thể giới hạn các quyền của khoá bằng cách thêm các quy tắc hạn chế đối với khoá API. Điều này giúp giảm thiểu thiệt hại tiềm ẩn nếu khoá bị rò rỉ.
+
+Để biết một số phương pháp hay nhất chung, bạn cũng có thể xem bài viết hỗ trợ này.
+
+=> Hãy cho tôi phương án đảm bảo chúng ta không vi phạm các nguyên tắc đó

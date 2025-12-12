@@ -1,6 +1,4 @@
 import React from 'react';
-import Card from '../ui/Card';
-import Chip from '../ui/Chip';
 
 interface ProcedureCardProps {
   title: string;
@@ -14,8 +12,8 @@ interface ProcedureCardProps {
 }
 
 /**
- * ProcedureCard Component
- * Hiển thị thủ tục hành chính trong danh sách
+ * ProcedureCard Component - Clean List Design
+ * Giao diện tối giản, Mobile-first, phong cách hiện đại
  */
 export default function ProcedureCard({
   title,
@@ -28,9 +26,9 @@ export default function ProcedureCard({
   className = '',
 }: ProcedureCardProps) {
   const difficultyColors = {
-    easy: { bg: 'bg-green-100', text: 'text-green-700', label: 'Dễ' },
-    medium: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Trung bình' },
-    hard: { bg: 'bg-red-100', text: 'text-red-700', label: 'Khó' },
+    easy: { bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500', label: 'Dễ' },
+    medium: { bg: 'bg-yellow-100', text: 'text-yellow-700', dot: 'bg-yellow-500', label: 'TB' },
+    hard: { bg: 'bg-red-100', text: 'text-red-red-700', dot: 'bg-red-500', label: 'Khó' },
   };
 
   const difficultyConfig =
@@ -38,67 +36,45 @@ export default function ProcedureCard({
     difficultyColors.medium;
 
   return (
-    <Card variant="outlined" className={className} onClick={onClick}>
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-semibold text-sm flex-1" style={{ color: 'var(--color-primary)' }}>
-          {title}
-        </h3>
-
-        {/* Difficulty Badge */}
-        <span
-          className={`text-xs font-medium px-2 py-0.5 rounded shrink-0 ${difficultyConfig.bg} ${difficultyConfig.text}`}
-        >
+    <div
+      className={`group p-4 border-b border-gray-100 hover:bg-gray-50 active:bg-blue-50 transition-colors cursor-pointer ${className}`}
+      onClick={onClick}
+    >
+      {/* Dòng 1: Meta-data (Loại • Độ khó) */}
+      <div className="flex items-center gap-2 mb-1">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-wide">
+          Thủ tục
+        </span>
+        <span className={`flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded ${difficultyConfig.bg} ${difficultyConfig.text}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${difficultyConfig.dot}`}></span>
           {difficultyConfig.label}
         </span>
       </div>
-
-      {/* Category */}
-      <p className="text-xs text-muted mb-3">{category}</p>
-
-      {/* Meta Info */}
-      <div className="grid grid-cols-2 gap-3 mb-3">
+      
+      {/* Dòng 2: Tiêu đề chính */}
+      <h3 className="text-base font-semibold text-gray-900 leading-snug mb-1.5 group-hover:text-blue-700 line-clamp-2">
+        {title}
+      </h3>
+      
+      {/* Dòng 3: Thông tin bổ trợ (Thời gian • Cơ quan) */}
+      <div className="flex items-center gap-3 text-xs text-gray-500">
         {estimatedTime && (
-          <div className="flex items-center gap-2 text-xs text-muted">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+          <span className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{estimatedTime}</span>
-          </div>
+            {estimatedTime}
+          </span>
         )}
         {authority && (
-          <div className="flex items-center gap-2 text-xs text-muted">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
+          <span className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
-            <span>{authority}</span>
-          </div>
+            {authority}
+          </span>
         )}
       </div>
-
-      {/* Tags */}
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {tags.slice(0, 3).map((tag) => (
-            <Chip key={tag} size="sm">
-              {tag}
-            </Chip>
-          ))}
-          {tags.length > 3 && (
-            <span className="text-xs text-muted">+{tags.length - 3}</span>
-          )}
-        </div>
-      )}
-    </Card>
+    </div>
   );
 }

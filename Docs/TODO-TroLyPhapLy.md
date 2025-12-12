@@ -2,8 +2,248 @@
 
 > **Project**: TroLyPhapLy (Trợ Lý Pháp Lý - Nâng cấp)  
 > **Location**: `D:\DTL\trolyphaply\`  
-> **Date**: December 8, 2025  
-> **Status**: ✅ SESSIONS 5-9 HOÀN THÀNH (100% Admin Dashboard Complete!) 🎉
+> **Date**: December 12, 2025  
+> **Status**: ✅ SESSION 11 HOÀN THÀNH (AI Image Prompts System - Production Ready) 🎉
+
+---
+
+## ✅ SESSION 11 - AI Image Prompts Library (December 12, 2025)
+
+### 🎯 Mục tiêu: Xây dựng thư viện AI Prompts cho tạo ảnh trên Banana, với CRUD Admin đầy đủ
+
+### Database Schema ✅
+
+- ✅ **Bảng mới**: `ai_image_prompts` với 12 cột:
+  - UUID id, title, description, prompt_template
+  - example_image_url (Supabase Storage)
+  - **creator_code** (OPTIONAL - NULL = anonymous, updated from UNIQUE to nullable)
+  - tags TEXT[], category (9 loại)
+  - likes_count, views_count, is_public
+  - created_at, updated_at (auto-trigger)
+- ✅ **Migrations**:
+  - `Docs/MIGRATION-ai-prompts.sql` (104 lines) - Schema ban đầu
+  - `Docs/MIGRATION-UPDATE-creator-code-optional.sql` (49 lines) - Update creator_code to optional
+- ✅ **Constraints**: Length check (3-30 chars), format (alphanumeric+underscore), category validation
+- ✅ **Indexes**: creator_code (NOT NULL only), category, dates, counters, is_public
+
+### Storage Setup ✅
+
+- ✅ **Supabase Storage**: Bucket `ai-prompt-images` (public, 5MB, jpg/png/webp)
+- ✅ **Server-side library**: `lib/supabaseStorage.ts` (87 lines)
+  - uploadImage(): Validate type/size → upload → return public URL
+  - deleteImage(): Parse URL → remove from bucket
+  - Fallback to anon key if service key missing
+- ✅ **Client-side library**: `lib/imageUtils.ts` (60 lines - NEW)
+  - resizeImage(): Canvas API → max 1200px width → maintain aspect ratio
+  - Separated from server code to avoid build errors
+
+### API Endpoints (5 routes) ✅
+
+- ✅ **Main CRUD**:
+  - `GET /api/ai-prompts` - List với filters (search, category, creatorCode, sortBy, limit, offset)
+  - `POST /api/ai-prompts` - Create prompt (NO uniqueness check on creator_code)
+- ✅ **Individual Operations**:
+  - `GET /api/ai-prompts/[id]` - Fetch single prompt ✅ **FIXED**: Async params for Next.js 15+
+  - `PUT /api/ai-prompts/[id]` - Update prompt ✅ **FIXED**: Async params for Next.js 15+
+  - `DELETE /api/ai-prompts/[id]` - Delete prompt ✅ **FIXED**: Async params for Next.js 15+
+- ✅ **Utilities**:
+  - `GET /api/ai-prompts/check-creator-code` - Validate code (always returns available=true now)
+  - `POST /api/ai-prompts/upload-image` - Upload to Supabase Storage
+
+### Public UI (/ai-prompts) ✅
+
+- ✅ **Main Page**: `app/ai-prompts/page.tsx` (317 lines)
+  - 3 tabs: Tất cả | Của tôi | Phổ biến
+  - Search bar, category filter (9 categories với icons)
+  - Tab "Của tôi": Input creator code → filter prompts
+  - Grid view với AIPromptCard components
+  - FAB (Floating Action Button) bottom-right
+  - 2 Bottom Sheets: Category filter + Create form
+- ✅ **Components**:
+  - `AIPromptCard.tsx` (165 lines) - 16:9 image, category badge, prompt textarea (read-only), copy button, creator (@code or "Ẩn danh"), stats (views/likes), tags (max 4 + counter)
+  - `CreateAIPromptForm.tsx` (468 lines) - Title, creator code (OPTIONAL với localStorage), category, image upload, description, prompt template, tags
+    - Creator code features:
+      - LocalStorage: `current_creator_code`, `creator_code_history` (10 recent codes)
+      - Auto-fill from last used code on mount
+      - Suggestions dropdown (filtered by input, show 5 codes)
+      - Real-time validation (500ms debounce, always available=true)
+      - Anonymous mode: Bỏ trống = "Ẩn danh"
+  - **UI Design**: Clean List design như ảnh mẫu chidancode.txt
+
+### Admin UI (/admin/ai-image-prompts) ✅
+
+- ✅ **Main Page**: `app/admin/ai-image-prompts/page.tsx` (400+ lines)
+  - Header với total count + refresh button
+  - Filters: search (title/desc/creator/tags), category dropdown, "Chỉ prompts công khai" checkbox
+  - Table view: title (với description + tags preview), creator (@code or "Ẩn danh"), category badge, views, likes, status (Công khai/Riêng tư), created date, actions (edit/delete)
+  - Edit modal + Delete confirmation dialog
+  - Auto-refresh sau khi edit/delete thành công
+- ✅ **Components**:
+  - `EditPromptModal.tsx` (398 lines) - Full form với all fields
+    - **Image Management**:
+      - Display current image (16:9 aspect ratio preview)
+      - Upload new image button (resize before upload)
+      - Delete current image (X button on preview)
+      - Replace workflow: show "Ảnh mới" badge when new file selected
+      - Upload flow: resize → upload → get URL → PUT with new URL
+      - Loading states: "Đang upload ảnh..." → "Đang lưu..."
+  - `DeleteConfirmDialog.tsx` (70 lines) - Warning dialog với prompt title, yellow warning box ("Hành động này không thể hoàn tác"), Delete/Cancel buttons
+- ✅ **Navigation**: Updated `app/admin/layout.tsx` - Added "AI Image Prompts" → `/admin/ai-image-prompts` (Palette icon)
+
+### Technical Fixes ✅
+
+- ✅ **Next.js 15+ Compatibility**: Fixed critical bug in `/api/ai-prompts/[id]/route.ts`
+  - Changed all 3 handlers (GET, PUT, DELETE): `{ params: { id: string } }` → `{ params: Promise<{ id: string }> }`
+  - Added `const { id } = await params;` as first line in each handler
+  - Error before: "invalid input syntax for type uuid: 'undefined'" (params.id was undefined)
+  - Error after: ✅ All CRUD operations working (upload 200 OK, PUT succeeds)
+- ✅ **TypeScript Error**: Fixed `debounceTimeoutRef` in CreateAIPromptForm.tsx - Changed from `useRef<NodeJS.Timeout>()` to `useRef<NodeJS.Timeout | null>(null)`
+- ✅ **Client/Server Separation**: Created `lib/imageUtils.ts` to avoid importing server-side Supabase in client components
+- ✅ **UI Overlap**: Removed sticky positioning from filter bar in `/ai-prompts` page
+- ✅ **Bottom Nav**: Updated `/components/layout/BottomNav.tsx` - Changed label from "Prompts" to "AI Prompts", href from `/prompts` to `/ai-prompts`
+
+### LocalStorage Features ✅
+
+- ✅ **Keys**:
+  - `current_creator_code` - Last used creator code
+  - `creator_code_history` - JSON array of 10 recent codes
+  - `my_creator_code` - For "Của tôi" tab filter
+- ✅ **Functions**:
+  - `getCreatorHistory()` - Parse history array từ localStorage
+  - `saveCreatorCode(code)` - Add code to history (max 10), set as current
+  - `getCurrentCreatorCode()` - Get last used code
+  - `getFilteredSuggestions()` - Filter history by input, return top 5
+
+### Documentation ✅
+
+- ✅ **Migration Guides**:
+  - `Docs/MIGRATION-ai-prompts.sql` - Full schema with comments
+  - `Docs/MIGRATION-UPDATE-creator-code-optional.sql` - Update script for optional creator_code
+  - `Docs/UPDATE-creator-code-optional.md` (150+ lines) - Comprehensive guide with usage, localStorage keys, code changes, test checklist
+- ✅ **Setup Instructions**:
+  - `Docs/SUPABASE-STORAGE-SETUP.md` - Bucket creation, policies (public read, authenticated upload/update/delete)
+  - `Docs/FIX-SUPABASE-KEYS.md` - How to get correct JWT tokens from Supabase dashboard
+
+### Test Results ✅
+
+- ✅ **Dev Server**: Runs without errors on port 3456
+- ✅ **Public Page**: Loads and displays prompts correctly
+- ✅ **Create Prompt**: Works with optional creator code (anonymous or with code)
+- ✅ **Creator Code Features**:
+  - Auto-fill from localStorage on page load ✅
+  - Suggestions dropdown shows history ✅
+  - Saves code after successful creation ✅
+  - "Của tôi" tab filters by creator code ✅
+- ✅ **Admin Page**: Table loads with all prompts
+- ✅ **Delete Functionality**: Works with confirmation dialog
+- ✅ **Edit Functionality**: ✅ **NOW WORKING** after async params fix
+  - Image upload succeeds (200 OK)
+  - PUT request succeeds (200 OK)
+  - Prompt updates in database
+  - Table refreshes with new data
+
+### Pending Enhancements 🔄
+
+- ⏳ **Database Migration**: User needs to run `MIGRATION-UPDATE-creator-code-optional.sql` in Supabase SQL Editor
+- ⏳ **Storage Bucket**: User needs to create `ai-prompt-images` bucket in Supabase Storage (follow `SUPABASE-STORAGE-SETUP.md`)
+- ⏳ **View Counter**: Auto-increment views_count when prompt clicked
+- ⏳ **Like Feature**: Toggle like button, localStorage for liked prompts, API endpoint for toggle-like
+- ⏳ **Image Cleanup**: Delete image from storage when prompt deleted (TODO in DELETE handler)
+- ⏳ **Production Deployment**: Test production build, deploy to port 8686
+
+### Git Status 🔄
+
+- ⏳ **Pending Review**: Many files changed (components, API routes, migrations, docs)
+- ⏳ **Security Check**: Verify `.gitignore` protects `.env` files (confirmed: `.env*` in .gitignore, `.env.example` not ignored)
+- ⏳ **Ready for Commit**: After user confirms deployment to production
+
+---
+
+## ✅ SESSION 10 - Q&A Prompt Management System (December 11, 2025)
+
+### 🎯 Mục tiêu: Xây dựng hệ thống quản lý prompts động từ database với 4 phong cách viết pháp lý Việt Nam
+
+### Database Schema ✅
+
+- ✅ **5 bảng mới**: `legal_writing_styles`, `qa_prompts`, `qa_prompt_writing_styles`, `data_sources`, `qa_prompt_history`
+- ✅ Migration SQL: `scripts/migrations/create-qa-system.sql` (168 dòng)
+- ✅ Seed data: 4 phong cách viết pháp lý từ vanmau.txt (626 dòng văn bản gốc)
+  - Phản biện xây dựng (proverbs, critical analysis)
+  - Dân gian gần dân (folk sayings, accessible language)
+  - Nhân văn cảm động (storytelling, emotional engagement)
+  - Học thuật phân tích (academic, structured reasoning)
+- ✅ 5 nguồn dữ liệu với thứ tự ưu tiên
+- ✅ 1 prompt mặc định active với multi-style support
+
+### API Endpoints (12 routes) ✅
+
+- ✅ **QA Prompts CRUD**:
+  - `GET /api/admin/qa-prompts` - List all prompts
+  - `POST /api/admin/qa-prompts` - Create new prompt
+  - `GET /api/admin/qa-prompts/[id]` - Get single prompt
+  - `PUT /api/admin/qa-prompts/[id]` - Update prompt (auto increment version)
+  - `DELETE /api/admin/qa-prompts/[id]` - Delete prompt
+  - `POST /api/admin/qa-prompts/[id]/activate` - Activate prompt (auto deactivate others)
+  - `GET /api/admin/qa-prompts/[id]/history` - Version history
+  - `GET /api/admin/qa-prompts/active` - Get active prompt
+- ✅ **Legal Writing Styles CRUD**:
+  - `GET /api/admin/legal-writing-styles` - List all styles
+  - `POST /api/admin/legal-writing-styles` - Create style
+  - `GET /api/admin/legal-writing-styles/[id]` - Get single style
+  - `PUT /api/admin/legal-writing-styles/[id]` - Update style
+  - `DELETE /api/admin/legal-writing-styles/[id]` - Delete (with usage check)
+- ✅ **Data Sources**:
+  - `GET /api/admin/data-sources` - List all sources
+  - `PUT /api/admin/data-sources/[id]` - Update priority
+- ✅ **Authentication**:
+  - `GET /api/admin/check-auth` - Auth status
+  - `POST /api/admin/logout` - Logout
+
+### Admin UI (6 pages) ✅
+
+- ✅ **QA Prompts Management**:
+  - `/app/admin/qa-prompts/page.tsx` (280 lines) - List với active badges, version display, multi-style pills
+  - `/app/admin/qa-prompts/create/page.tsx` (200 lines) - Create form với multi-select styles
+  - `/app/admin/qa-prompts/[id]/edit/page.tsx` (296 lines) - Edit form với all fields, auto-priority
+- ✅ **Legal Writing Styles**:
+  - `/app/admin/legal-styles/page.tsx` (100 lines) - Grid view
+  - `/app/admin/legal-styles/[id]/edit/page.tsx` (271 lines) - Edit với characteristics manager
+- ✅ **Admin Layout**:
+  - `/app/admin/layout.tsx` (155 lines) - Sidebar với "Hỏi/Đáp" menu
+- ✅ **Auth Pages**:
+  - `/app/admin/login/page.tsx` - Login form
+
+### Integration với Q&A API ✅
+
+- ✅ Modified `/app/api/qa/route.ts` (197 lines):
+  - Fetch active prompt từ database
+  - Load associated writing styles by priority
+  - Build dynamic system prompt
+  - Fallback to hard-coded nếu DB empty
+  - Gemini API integration (12.5-12.6s response)
+
+### Technical Fixes ✅
+
+- ✅ **Next.js 15+ compatibility**: Fixed 10+ route handlers - params phải await
+- ✅ **TypeScript errors**: Fixed seed scripts (tone type, examples property)
+- ✅ **Syntax errors**: Fixed missing `}` brace trong /api/qa/route.ts
+- ✅ **Database**: Added missing version column to qa_prompts table
+- ✅ **UI**: Fixed loadStyles to handle array vs object response
+
+### Deployment ✅
+
+- ✅ Production build successful (8.5s compile, 44 routes, 0 errors)
+- ✅ Deployed to port 8686 (Ready in 796ms)
+- ✅ Git commit: hash 4bdd869 (98 files changed, +13647 -4368 lines)
+- ✅ GitHub push successful (138 objects, 195.61 KiB)
+
+### Pending Enhancements 🔄
+
+- ⏳ Refresh API keys (Gemini key leaked, Supabase anon key invalid)
+- ⏳ Create PWA icons (icon-192x192.png, icon-512x512.png)
+- ⏳ Build admin authentication middleware (real session management)
+- ⏳ Create history comparison feature (side-by-side diff viewer)
+- ⏳ Add missing admin components (QAPromptForm, LegalStyleSelector, DataSourcePriority, PromptHistoryModal)
 
 ---
 

@@ -1,6 +1,4 @@
 import React from 'react';
-import Card from '../ui/Card';
-import Chip from '../ui/Chip';
 
 interface LegalDocCardProps {
   title: string;
@@ -16,8 +14,8 @@ interface LegalDocCardProps {
 }
 
 /**
- * LegalDocCard Component
- * Hiển thị văn bản pháp luật trong danh sách
+ * LegalDocCard Component - Clean List Design
+ * Giao diện tối giản, Mobile-first, phong cách hiện đại
  */
 export default function LegalDocCard({
   title,
@@ -34,73 +32,41 @@ export default function LegalDocCard({
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString('vi-VN');
+    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: '2-digit' });
   };
 
   return (
-    <Card variant="outlined" className={className} onClick={onClick}>
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-medium px-2 py-0.5 rounded bg-blue-100 text-blue-700">
-              {code}
-            </span>
-            {status === 'active' && (
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
-            )}
-          </div>
-          <h3 className="font-semibold text-sm" style={{ color: 'var(--color-primary)' }}>
-            {title}
-          </h3>
-        </div>
-
-        {/* Document Type Icon */}
-        <svg
-          className="w-5 h-5 shrink-0 text-muted"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
+    <div
+      className={`group p-4 border-b border-gray-100 hover:bg-gray-50 active:bg-blue-50 transition-colors cursor-pointer ${className}`}
+      onClick={onClick}
+    >
+      {/* Dòng 1: Meta-data (Loại văn bản • Số hiệu) */}
+      <div className="flex items-center gap-2 mb-1">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase tracking-wide">
+          {documentType}
+        </span>
+        <span className="text-xs text-gray-400">{code}</span>
       </div>
-
-      {/* Meta Info */}
-      <div className="space-y-1 mb-3">
-        <p className="text-xs text-muted">
-          <span className="font-medium">Loại:</span> {documentType}
-        </p>
-        {issuedDate && (
-          <p className="text-xs text-muted">
-            <span className="font-medium">Ban hành:</span> {formatDate(issuedDate)}
-          </p>
-        )}
-        {effectiveDate && (
-          <p className="text-xs text-muted">
-            <span className="font-medium">Hiệu lực:</span> {formatDate(effectiveDate)}
-          </p>
-        )}
+      
+      {/* Dòng 2: Tiêu đề chính */}
+      <h3 className="text-base font-semibold text-gray-900 leading-snug mb-1.5 group-hover:text-blue-700 line-clamp-2">
+        {title}
+      </h3>
+      
+      {/* Dòng 3: Thông tin bổ trợ (Trạng thái • Ngày ban hành) */}
+      <div className="flex items-center gap-3 text-xs text-gray-500">
+        <span className={`flex items-center gap-1 font-medium px-2 py-0.5 rounded-full ${
+          status === 'active' 
+            ? 'text-green-600 bg-green-50' 
+            : 'text-red-600 bg-red-50'
+        }`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${
+            status === 'active' ? 'bg-green-500' : 'bg-red-500'
+          }`}></span>
+          {status === 'active' ? 'Hiệu lực' : 'Hết hiệu lực'}
+        </span>
+        {issuedDate && <span>{formatDate(issuedDate)}</span>}
       </div>
-
-      {/* Tags */}
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {tags.slice(0, 3).map((tag) => (
-            <Chip key={tag} size="sm">
-              {tag}
-            </Chip>
-          ))}
-          {tags.length > 3 && (
-            <span className="text-xs text-muted">+{tags.length - 3}</span>
-          )}
-        </div>
-      )}
-    </Card>
+    </div>
   );
 }

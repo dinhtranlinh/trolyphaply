@@ -298,3 +298,36 @@ body {
     font-size: 1.25rem;
   }
 }
+
+/* ========================================
+   CHRISTMAS SNOW EFFECT
+   ======================================== */
+.snowflake {
+  position: absolute;
+  top: -10px;
+  color: #fff;
+  font-size: 1em;
+  font-family: Arial;
+  text-shadow: 0 0 1px #000;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fall {
+  0% { 
+    transform: translateY(-10vh) translateX(0px); 
+  }
+  100% { 
+    transform: translateY(100vh) translateX(20px); 
+  }
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

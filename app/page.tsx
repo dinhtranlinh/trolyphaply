@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import TextArea from '@/components/forms/TextArea';
 import Chip from '@/components/ui/Chip';
 import Card from '@/components/ui/Card';
+import SnowEffect from '@/components/SnowEffect';
 import { MagnifyingGlassIcon, ArrowRightIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 /**
@@ -50,30 +51,42 @@ export default function Home() {
     fetchStyleGuides();
   }, []);
 
-  // Suggested question chips
-  const suggestionChips = [
-    'Thủ tục dân sự',
-    'Thuế & Doanh nghiệp',
-    'Hộ khẩu & Cư trú',
-    'Phạt hành chính',
-    'Đất đai',
-    'Lao động',
-  ];
-
-  // Popular questions
-  const popularQuestions = [
-    'Thủ tục đăng ký kết hôn cần những giấy tờ gì?',
-    'Cách tính thuế thu nhập cá nhân năm 2026?',
-    'Thời gian làm việc tối đa theo luật lao động?',
-    'Thủ tục chuyển hộ khẩu nội tỉnh như thế nào?',
-    'Mức phạt vi phạm giao thông không đội mũ bảo hiểm?',
+  // Suggested questions with short labels
+  const suggestedQuestions = [
+    {
+      category: "Pháp luật",
+      icon: "📚",
+      questions: [
+        { short: "Sang tên Sổ đỏ", full: "Thủ tục sang tên Sổ đỏ năm 2025 cần những giấy tờ gì?" },
+        { short: "Rút BHXH 1 lần", full: "Điều kiện để rút Bảo hiểm xã hội một lần mới nhất là gì?" },
+        { short: "Ly hôn đơn phương", full: "Ly hôn đơn phương nộp hồ sơ ở đâu và mất bao lâu?" },
+        { short: "Đòi nợ không giấy tờ", full: "Cho vay tiền qua tin nhắn không viết giấy có kiện đòi được không?" },
+        { short: "Phạt nồng độ cồn", full: "Mức phạt nồng độ cồn xe máy hiện nay là bao nhiêu?" },
+        { short: "Chia thừa kế đất đai", full: "Chia thừa kế đất đai khi cha mẹ mất không để lại di chúc như thế nào?" },
+        { short: "Bồi thường sa thải", full: "Công ty sa thải nhân viên không báo trước phải bồi thường những gì?" },
+        { short: "Trả nợ thay chồng", full: "Chồng vay nợ cờ bạc vợ có phải trả thay không?" },
+        { short: "Giấy phép xây dựng", full: "Xây nhà cấp 4 ở nông thôn có cần xin giấy phép xây dựng không?" },
+        { short: "Tố giác lừa đảo", full: "Bị lừa đảo chuyển tiền qua mạng thì tố giác ở đâu để lấy lại tiền?" }
+      ]
+    },
+    {
+      category: "Thủ tục hành chính",
+      icon: "🏢",
+      questions: [
+        { short: "Làm Hộ chiếu online", full: "Hướng dẫn cách làm Hộ chiếu (Passport) online nhận tại nhà." },
+        { short: "Lý lịch tư pháp", full: "Thủ tục xin cấp phiếu Lý lịch tư pháp trên ứng dụng VNeID." },
+        { short: "Đổi thẻ Căn cước", full: "Thủ tục đổi thẻ Căn cước công dân sang thẻ Căn cước mới nhất." },
+        { short: "Đăng ký tạm trú", full: "Cách đăng ký tạm trú online cho người thuê trọ không cần ra công an phường." },
+        { short: "Đăng ký khai sinh", full: "Thủ tục liên thông đăng ký khai sinh và cấp thẻ BHYT cho trẻ sơ sinh." }
+      ]
+    }
   ];
 
   // Quick access links
   const quickLinks = [
     { icon: '📋', label: 'Thủ tục', href: '/law?tab=procedures' },
     { icon: '📚', label: 'Văn bản', href: '/law?tab=documents' },
-    { icon: '💡', label: 'Câu hỏi mẫu', href: '/prompts' },
+    { icon: '🎨', label: 'AI Prompts', href: '/ai-prompts' },
     { icon: '🎲', label: 'Ứng dụng AI', href: '/apps' },
   ];
 
@@ -90,26 +103,27 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           question,
-          styleGuideId: selectedStyleGuideId || undefined,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Không thể lấy câu trả lời');
+        throw new Error(data.error || 'Không thể lấy câu trả lời');
       }
 
-      const data = await response.json();
       setAnswer(data.answer);
-    } catch (err) {
-      setError('Không thể lấy câu trả lời. Vui lòng thử lại sau.');
-      console.error('Q&A Error:', err);
+    } catch (err: any) {
+      const errorMessage = err.message || 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
+      setError(errorMessage);
+      console.error('Q&A API Error:', errorMessage, err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setQuestion(`Tôi muốn hỏi về ${suggestion.toLowerCase()}`);
+  const handleSuggestionClick = (fullQuestion: string) => {
+    setQuestion(fullQuestion);
   };
 
   const handleQuestionClick = (q: string) => {
@@ -118,6 +132,7 @@ export default function Home() {
 
   return (
     <AppShell showHeader={true} showBottomNav={true}>
+      <SnowEffect />
       {/* Content Container - Max Width 760px Centered with semi-transparent gradient */}
       <div className="max-w-[760px] mx-auto px-4 py-10 space-y-10 min-h-screen" style={{
         background: 'linear-gradient(180deg, rgba(249, 251, 255, 0.92) 0%, rgba(238, 242, 248, 0.92) 100%)',
@@ -153,7 +168,7 @@ export default function Home() {
                 <textarea
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  placeholder="Nhập câu hỏi của bạn về pháp luật, thủ tục hành chính…"
+                  placeholder="🎄 Ông già Noel ơi, cho hỏi về thủ tục pháp lý..."
                   maxLength={1000}
                   rows={6}
                   className="w-full bg-[#F9FAFC] border border-[#D6DFEA] rounded-xl px-[14px] py-3 text-sm text-[#1A2B49] placeholder:text-[#8897AC] focus:outline-none focus:border-[#1F4FB2] focus:ring-2 focus:ring-[#1F4FB2]/10 transition-all resize-none"
@@ -164,42 +179,38 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Style Guide Selector */}
-            {styleGuides.length > 0 && (
-              <div className="space-y-2">
-                <label htmlFor="style-guide" className="text-xs font-medium text-[#44536E]">
-                  Phong cách trả lời
-                </label>
-                <select
-                  id="style-guide"
-                  value={selectedStyleGuideId}
-                  onChange={(e) => setSelectedStyleGuideId(e.target.value)}
-                  className="w-full h-10 bg-[#F9FAFC] border border-[#D6DFEA] rounded-xl px-[14px] text-sm text-[#1A2B49] focus:outline-none focus:border-[#1F4FB2] focus:ring-2 focus:ring-[#1F4FB2]/10 transition-all"
-                >
-                  {styleGuides.map((sg) => (
-                    <option key={sg.id} value={sg.id}>
-                      {sg.name} {sg.is_default ? '(Mặc định)' : ''}
-                    </option>
-                  ))}
-                </select>
-                {styleGuides.find(sg => sg.id === selectedStyleGuideId)?.description && (
-                  <p className="text-xs text-[#7D8DA6]">
-                    {styleGuides.find(sg => sg.id === selectedStyleGuideId)?.description}
-                  </p>
-                )}
-              </div>
-            )}
+            {/* Style Guide Selector - REMOVED */}
 
-            {/* Category Chips */}
-            <div className="flex flex-wrap gap-2">
-              {suggestionChips.map((chip) => (
-                <button
-                  key={chip}
-                  onClick={() => handleSuggestionClick(chip)}
-                  className="h-8 px-[14px] rounded-full bg-[#F3F5F9] border border-[#D6DFEA] text-sm font-medium text-[#44536E] hover:bg-[#E8F0FF] hover:border-[#B2D4FF] hover:text-[#1F4FB2] transition-all"
-                >
-                  {chip}
-                </button>
+            {/* Suggested Questions */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-medium text-[#1A2B49]">💡 Gợi ý câu hỏi</span>
+              </div>
+              
+              {suggestedQuestions.map((group, groupIdx) => (
+                <div key={group.category} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-medium ${
+                      groupIdx === 0 ? 'text-blue-900' : 'text-green-900'
+                    }`}>{group.icon} {group.category}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {group.questions.map((q, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleSuggestionClick(q.full)}
+                        title={q.full}
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors cursor-pointer ${
+                          groupIdx === 0 
+                            ? 'bg-blue-50 border border-blue-200 text-blue-900 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-green-50 border border-green-200 text-green-900 hover:bg-green-100 hover:border-green-300'
+                        }`}
+                      >
+                        {q.short}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
 
@@ -212,11 +223,16 @@ export default function Home() {
               <button
                 onClick={handleSubmit}
                 disabled={!question.trim() || loading}
-                className="h-12 min-w-[160px] px-5 rounded-xl bg-gradient-to-r from-[#F0CD71] to-[#E9C35A] shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#1A2B49] font-semibold text-base hover:brightness-105 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="h-12 min-w-[160px] px-5 rounded-xl bg-[#D42426] shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-white font-semibold text-base hover:bg-[#b01b1d] active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
-                {loading ? 'Đang xử lý...' : (
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>🎄 Trợ lý đang tổng hợp dữ liệu...</span>
+                  </div>
+                ) : (
                   <>
-                    Hỏi ngay
+                    🎁 Hỏi ngay
                     <ArrowRightIcon className="w-[18px] h-[18px]" />
                   </>
                 )}
@@ -255,6 +271,9 @@ export default function Home() {
                           .replace(/^(.+)$/, '<p>$1</p>')
                       }}
                     />
+                    <p className="text-sm text-gray-600 italic mt-3">
+                      💡 Nếu câu trả lời chưa đầy đủ, hãy nhấn &quot;Hỏi ngay&quot; để AI tổng hợp lại.
+                    </p>
                     <div className="mt-4 pt-3 border-t border-[#EEF1F4]">
                       <p className="text-xs text-[#7D8DA6]">
                         ⚠️ Thông tin mang tính tham khảo. Vui lòng tham khảo ý kiến chuyên gia pháp lý cho các vấn đề quan trọng.
@@ -266,39 +285,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Popular Questions Section */}
-          {!answer && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-[20px] font-semibold text-[#1A2B49] mb-1">
-                  Câu hỏi phổ biến
-                </h2>
-                <p className="text-sm text-[#7D8DA6]">
-                  Một số câu hỏi thường gặp về thủ tục và quy định
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                {popularQuestions.map((q, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuestionClick(q)}
-                    className="w-full h-14 px-4 bg-white rounded-xl border border-[#EEF1F4] hover:bg-[#F9FBFF] hover:border-[#D6DFEA] transition-all group flex items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3 flex-1 text-left">
-                      <div className="w-5 h-5 rounded-full bg-[#FFF8E6] flex items-center justify-center shrink-0">
-                        <span className="text-[#E9C35A] text-sm font-bold">?</span>
-                      </div>
-                      <span className="text-[15px] font-medium text-[#44536E] group-hover:text-[#1F4FB2] transition-colors">
-                        {q}
-                      </span>
-                    </div>
-                    <ChevronRightIcon className="w-[18px] h-[18px] text-[#C0CAD8] group-hover:text-[#1F4FB2] transition-colors shrink-0" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Popular Questions Section - REMOVED */}
 
           {/* Quick Links */}
           <div className="space-y-4">
