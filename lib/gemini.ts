@@ -27,7 +27,8 @@ export async function callGeminiText(
   const maxRetries = 3;
   const models = [
     options?.model || 'gemini-2.5-flash',
-    'gemini-1.5-flash', // Fallback model
+    'gemini-1.5-pro', // Fallback to stable model
+    'gemini-pro', // Final fallback
   ];
   
   for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
