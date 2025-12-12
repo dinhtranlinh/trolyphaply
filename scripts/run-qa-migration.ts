@@ -3,8 +3,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import * as dotenv from 'dotenv';
 
-// Load .env files
-dotenv.config({ path: join(process.cwd(), '.env.development') });
+// Load .env file
 dotenv.config();
 
 /**
