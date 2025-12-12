@@ -1,0 +1,80 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0B3B70;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E5A8E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7AB8;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Pattern overlay -->
+    <pattern id="pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  <rect width="1200" height="630" fill="url(#pattern)"/>
+  
+  <!-- Main icon/logo area -->
+  <circle cx="600" cy="220" r="80" fill="white" opacity="0.15"/>
+  <circle cx="600" cy="220" r="60" fill="white" opacity="0.2"/>
+  
+  <!-- Scale/Justice icon -->
+  <g transform="translate(600, 220)">
+    <!-- Base -->
+    <rect x="-4" y="40" width="8" height="25" fill="white"/>
+    <rect x="-30" y="65" width="60" height="5" fill="white" rx="2"/>
+    
+    <!-- Pole -->
+    <rect x="-3" y="-50" width="6" height="90" fill="white"/>
+    
+    <!-- Left pan -->
+    <line x1="-40" y1="-30" x2="0" y2="-50" stroke="white" stroke-width="3"/>
+    <ellipse cx="-40" cy="-30" rx="20" ry="8" fill="none" stroke="white" stroke-width="2.5"/>
+    
+    <!-- Right pan -->
+    <line x1="0" y1="-50" x2="40" y2="-30" stroke="white" stroke-width="3"/>
+    <ellipse cx="40" cy="-30" rx="20" ry="8" fill="none" stroke="white" stroke-width="2.5"/>
+    
+    <!-- Top decoration -->
+    <circle cx="0" cy="-53" r="5" fill="white"/>
+  </g>
+  
+  <!-- Main title -->
+  <text x="600" y="380" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+    TroLyPhapLy
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="440" font-family="Arial, sans-serif" font-size="36" fill="white" text-anchor="middle" opacity="0.9">
+    Trợ lý pháp lý thông minh
+  </text>
+  
+  <!-- Feature badges -->
+  <g transform="translate(600, 500)">
+    <!-- AI Badge -->
+    <rect x="-200" y="0" width="110" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="-145" y="27" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">
+      🤖 AI
+    </text>
+    
+    <!-- Q&A Badge -->
+    <rect x="-70" y="0" width="140" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="0" y="27" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">
+      💬 Hỏi đáp
+    </text>
+    
+    <!-- Tools Badge -->
+    <rect x="90" y="0" width="110" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="145" y="27" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">
+      🎨 Tools
+    </text>
+  </g>
+  
+  <!-- Bottom text -->
+  <text x="600" y="590" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" opacity="0.7">
+    trolyphaply.vn
+  </text>
+</svg>
