@@ -8,10 +8,12 @@
     "build": "next build",
     "build:dev": "NODE_ENV=development next build",
     "build:prod": "NODE_ENV=production next build",
+    "build:safe": "npm run check && npm run build",
     "start": "next start -p 8686",
     "start:dev": "next start -p 3456",
     "start:prod": "next start -p 8686",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check": "npx tsx scripts/comprehensive-check.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -19,11 +21,14 @@
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
     "@supabase/supabase-js": "^2.86.0",
+    "@types/node-cron": "^3.0.11",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.556.0",
     "next": "16.0.6",
+    "node-cron": "^4.2.1",
+    "openai": "^4.104.0",
     "pg": "^8.16.3",
     "prisma": "^7.0.1",
     "react": "19.2.0",

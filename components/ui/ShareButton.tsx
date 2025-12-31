@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { trackShare } from '@/lib/analytics';
 
 interface ShareButtonProps {
   /** Tiêu đề nội dung chia sẻ */
@@ -37,6 +36,25 @@ export default function ShareButton({
   className = '',
 }: ShareButtonProps) {
   const [showCopied, setShowCopied] = useState(false);
+
+  // Lightweight share tracker (no-op placeholder)
+  const trackShare = (
+    platform: 'facebook' | 'zalo' | 'copy',
+    shareType?: ShareButtonProps['type'],
+    shareUrl?: string
+  ) => {
+    try {
+      if (typeof console !== 'undefined') {
+        console.debug('trackShare', {
+          platform,
+          type: shareType ?? type,
+          url: shareUrl ?? url,
+        });
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   // Build share text với hashtags
   const shareText = `${title}\n\n${description}\n\n${hashtags.map(tag => `#${tag}`).join(' ')}`;

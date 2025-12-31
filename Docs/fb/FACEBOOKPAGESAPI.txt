@@ -1,0 +1,229 @@
+Dưới đây là **tài liệu lập trình tổng hợp về Facebook Pages API** dựa trên **tài liệu chính thức của Meta (developers.facebook.com)** và các nguồn tài liệu bổ sung. Tài liệu này **tập trung vào các chủ đề bạn yêu cầu**, gồm tổng quan, cách bắt đầu, quản lý Trang, bài viết & bình luận, thông tin chi tiết, tìm kiếm Trang, tab, Webhooks, mã lỗi và nhật ký thay đổi.
+
+---
+
+# 📘 **TÀI LIỆU LẬP TRÌNH FACEBOOK PAGES API – TỔNG HỢP & THỰC HÀNH**
+
+*(Dành cho lập trình viên phát triển ứng dụng tương tác với Facebook Page)*
+
+---
+
+## **1. Tổng quan về Facebook Pages API**
+
+Facebook Pages API là một phần của **Facebook Graph API** – giao diện lập trình chính dùng để truy vấn và thao tác dữ liệu trên nền tảng Facebook. Qua API này, ứng dụng có thể đọc/ghi dữ liệu về Trang Facebook (Page), bài viết, bình luận, thông tin tương tác, insight, v.v. ([Best UGC Platform][1])
+
+### **1.1 Facebook Graph API là gì**
+
+* Graph API đại diện mọi đối tượng trên Facebook dưới dạng **đồ thị**, với:
+
+  * **Nodes**: các đối tượng (User, Page, Post, Photo…)
+  * **Edges**: kết nối giữa các node
+  * **Fields**: thuộc tính dữ liệu cần lấy ([Late][2])
+
+Mọi yêu cầu tới API đều là HTTP request (GET, POST, DELETE, v.v.) tới endpoint `graph.facebook.com/{version}/{node-id}/{edge}` với access token hợp lệ. ([Late][2])
+
+### **1.2 Quy trình xác thực & access token**
+
+Để tương tác với Pages API, bạn cần:
+
+1. **Đăng ký Facebook Developer App** tại [https://developers.facebook.com](https://developers.facebook.com).
+2. **Tạo access token** theo OAuth 2.0.
+3. Cấp các quyền (permissions) phù hợp:
+
+   * `pages_show_list`, `pages_manage_posts`, `pages_read_engagement`, `pages_manage_engagement`, `pages_read_user_content`, v.v.
+     (Một số permission mới thay cho `manage_pages`/`publish_pages` đã bị deprecate) ([Stack Overflow][3])
+
+> **Page Access Token** là access token cho phép ứng dụng thực hiện thao tác trên Page, cần phải có quyền phù hợp và app phải được duyệt đủ quyền. ([Viblo][4])
+
+---
+
+## **2. Bắt đầu – Hướng dẫn đăng bài lên Trang Facebook**
+
+### **2.1 Thiết lập môi trường**
+
+1. Tạo Facebook Developer App.
+2. Request OAuth login để lấy access token với các scope cần thiết (ví dụ `pages_manage_posts`).
+3. Dùng Graph API Explorer để thử nghiệm token và endpoint. ([OneAds.vn I Growth Digital Marketing][5])
+
+### **2.2 Đăng bài đơn giản**
+
+Endpoint phổ biến để tạo bài viết trên Page:
+
+```
+POST https://graph.facebook.com/{page-id}/feed
+```
+
+Thân request có thể chứa:
+
+* `message` (chuỗi văn bản)
+* `link` (nếu cần kèm liên kết)
+* Token là Page Access Token hợp lệ ([Go2Share][6])
+
+```bash
+curl -X POST "https://graph.facebook.com/{page-id}/feed" \
+  -d "message=Hello, world!" \
+  -d "access_token={page-access-token}"
+```
+
+---
+
+## **3. Quản lý Trang**
+
+### **3.1 Lấy danh sách Trang bạn quản lý**
+
+Bạn có thể lấy danh sách Page mà người dùng quản lý bằng:
+
+```
+GET /me/accounts
+```
+
+Token người dùng cần có `pages_show_list`. Mỗi Page object trả về chứa ID và Page Access Token. ([Go2Share][6])
+
+### **3.2 Thay đổi cài đặt Trang**
+
+Bạn có thể cập nhật thông tin Page (miêu tả, tên, category…) thông qua tương tác các edge tương ứng của Page node nếu token và permission cho phép. 📘 *Tài liệu chi tiết chính thức có trong dev docs.* ([apitracker.io][7])
+
+---
+
+## **4. Bài viết & Bình luận**
+
+### **4.1 Tạo bài viết**
+
+Như phần 2, sử dụng `/feed` edge.
+
+### **4.2 Cập nhật bài viết**
+
+Để sửa nội dung đã đăng, bạn dùng:
+
+```
+POST https://graph.facebook.com/{post-id}
+```
+
+Thân chứa thuộc tính mới (ví dụ `message`). ✔️
+
+### **4.3 Xóa bài viết**
+
+```
+DELETE https://graph.facebook.com/{post-id}
+```
+
+Phải dùng Page Access Token có quyền `pages_manage_posts`. ✔️
+
+### **4.4 Quản lý bình luận**
+
+Bạn có thể lấy bình luận từ bài viết qua:
+
+```
+GET /{post-id}/comments
+```
+
+và tạo/sửa/xóa bình luận bằng POST/DELETE tương ứng. 📘 *Dev docs hỗ trợ chi tiết endpoints.* ([apitracker.io][7])
+
+---
+
+## **5. Thông tin chi tiết Trang (Insights)**
+
+Bạn có thể lấy dữ liệu phân tích hiệu suất bài viết hoặc Page tổng quan với edge:
+
+```
+GET /{page-id}/insights
+```
+
+Ngoài ra còn có `/post-id/insights` để lấy chỉ số riêng của từng bài. Dữ liệu insights yêu cầu token có quyền đọc thống kê (`pages_read_engagement`, `read_insights`). 📘 *Chi tiết trên dev docs.* ([apitracker.io][7])
+
+---
+
+## **6. Tìm kiếm Trang**
+
+Facebook có endpoint tìm kiếm Trang, ví dụ:
+
+```
+GET /search?type=page&q={text}
+```
+
+Tuy nhiên, để truy cập dữ liệu Page public cần có các permission thích hợp hoặc tính năng được duyệt (`Page Public Content Access`). ([Stack Overflow][8])
+
+---
+
+## **7. Tab trên Trang**
+
+Menu/Tab của Page (ví dụ “Posts”, “About”, “Events”) có thể được truy vấn qua các endpoint tương ứng nếu API hỗ trợ. 📘 *Dev docs chứa danh sách các edge có thể gọi được.* ([apitracker.io][7])
+
+---
+
+## **8. Webhooks của Meta – Thông báo realtime**
+
+Webhooks cho phép server của bạn **nhận callback khi có sự kiện xảy ra** trên Page như:
+
+* New posts
+* Comments
+* Reactions
+* Mentions
+* Information changes ([rollout.com][9])
+
+Để sử dụng:
+
+1. Đăng ký callback URL server của bạn.
+2. Subscribe tới các chủ đề Page events.
+3. Xác thực webhook theo hướng dẫn dev docs.
+
+📌 Webhooks giúp bạn xử lý realtime mà không cần polling định kỳ.
+
+---
+
+## **9. Thay đổi sắp tới & API Versioning**
+
+Facebook Graph API thường xuyên cập nhật:
+
+* Permission deprecations (ví dụ: `manage_pages` và `publish_pages` đã bị thay bởi `pages_manage_posts`, v.v.) ([Stack Overflow][3])
+* Giới hạn rate limit
+* Điểm cuối mới
+  👉 Bạn nên theo dõi **changelog chính thức trên developers.facebook.com/docs/graph-api/changelog** để cập nhật. *(dev docs chính thức)*
+
+---
+
+## **10. Mã lỗi & Xử lý lỗi**
+
+Facebook API trả lỗi dạng JSON với:
+
+* `error.code`
+* `error.message`
+* `error.error_subcode`
+* Thông tin trợ giúp
+
+Common errors liên quan đến:
+
+* Thiếu permission cần thiết
+* Expired/invalid token
+* Hạn mức rate limit
+
+👉 Luôn xử lý lỗi trả về và in ra chi tiết `error.message` để debug hiệu quả.
+
+---
+
+## **11. Nhật ký thay đổi (Changelog)**
+
+Graph API thay đổi theo từng version (ví dụ v17, v18, …). Mỗi version có:
+
+* Thêm endpoints mới
+* Remove endpoints cũ
+* Deprecate permissions
+
+Theo dõi **developers.facebook.com/docs/graph-api/changelog** để biết chi tiết.
+
+---
+
+## **12. Tài nguyên & công cụ hỗ trợ**
+
+📌 **Graph API Explorer**: thử nghiệm query trực tiếp.
+📌 **SDKs của Meta**: hỗ trợ nhiều ngôn ngữ (JavaScript, PHP, Python, v.v.).
+📌 **Postman Collections**: mẫu API request. ([postman.com][10])
+
+---
+
+### 📌 Ghi chú quan trọng
+
+Vì tài liệu Facebook paging API chính thức có rất nhiều endpoint chi tiết (quản lý Page settings, media uploads, scheduled posts, reactions), bạn nên tham khảo **developers.facebook.com/docs/pages-api/** và các trang con theo từng phần cụ thể khi thực hiện. *(đây là chủ đề tài liệu chính gốc từ Meta)*.
+
+---
+

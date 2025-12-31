@@ -1,0 +1,372 @@
+Dưới đây là **Flowchart + State Machine** (mức “dev đọc là code được”) cho 2 luồng chính: **Auto Reply Comment** và **Auto Message**, kèm **các state, điều kiện, dedupe, rate limit, retry, DLQ**, và cách **tương tác Webhooks → Queue → Workers**.
+
+---
+
+# B) FLOWCHART + STATE MACHINE
+
+## 0) Kiến trúc xử lý (event-driven)
+
+**Nguồn sự kiện:** Meta Webhooks (Page: feed/comments/reactions …)
+**Ingestion service:** Webhook Receiver (Express)
+**Hàng đợi:** Queue (BullMQ/Redis hoặc RabbitMQ)
+**Workers:**
+
+* `commentWorker` (auto reply)
+* `messageWorker` (auto message)
+  **Storage:** DB (Postgres/Mongo) + cache (Redis)
+  **Observability:** Logs + Metrics
+
+**Nguyên tắc:** Webhook endpoint chỉ làm 3 việc:
+
+1. Verify signature + parse
+2. Persist event minimal + dedupe
+3. Push job vào queue và trả 200 nhanh
+
+---
+
+# 1) FLOWCHART: Webhook Ingestion (chung)
+
+```
+[Webhook POST nhận payload]
+        |
+        v
+[Verify X-Hub-Signature-256?]
+   |Yes               |No
+   v                  v
+[Parse entry/changes] [Return 401]
+        |
+        v
+[Normalize event -> internal Event]
+        |
+        v
+[Idempotency check (event_id/hash) in DB/Redis]
+   |Duplicate                 |New
+   v                          v
+[Return 200]           [Persist Event (status=RECEIVED)]
+                               |
+                               v
+                     [Route -> enqueue job]
+                     | comment event -> commentQueue
+                     | reaction event -> messageQueue (if enabled)
+                               |
+                               v
+                          [Return 200]
+```
+
+**Điểm cần code:**
+
+* `event_key = object + entry.id + change.field + value.item + value.comment_id/post_id + time`
+* Dedupe window 24–72h tùy bạn
+
+---
+
+# 2) AUTO REPLY COMMENT – FLOWCHART (chi tiết)
+
+## 2.1 Luồng tổng quan
+
+```
+[commentWorker job: {page_id, post_id, comment_id}]
+        |
+        v
+[Load Page config + Post config]
+        |
+        v
+[Global Safe Mode ON?]--Yes-->[SKIP: SAFE_MODE]
+        |
+        No
+        v
+[Page automation enabled?]--No-->[SKIP: PAGE_DISABLED]
+        |
+        Yes
+        v
+[Post automation enabled?]--No-->[SKIP: POST_DISABLED]
+        |
+        Yes
+        v
+[Fetch comment details via Graph API]
+        |
+        v
+[Validate: from admin/page itself?]--Yes-->[SKIP: SELF_COMMENT]
+        |
+        No
+        v
+[Rule selection: post rule else page default]
+        |
+        v
+[Rule exists & active?]--No-->[SKIP: NO_RULE]
+        |
+        Yes
+        v
+[Condition match? (keywords/include/exclude)]--No-->[SKIP: NOT_MATCH]
+        |
+        Yes
+        v
+[Dedupe: already replied to this comment?]--Yes-->[SKIP: ALREADY_REPLIED]
+        |
+        No
+        v
+[Dedupe: already replied to this user in cooldown window?]--Yes-->[SKIP: USER_COOLDOWN]
+        |
+        No
+        v
+[Rate limit check (page/rule)]--Fail-->[DELAY job / SKIP: RATE_LIMIT]
+        |
+        Pass
+        v
+[Generate reply text (spin + variables)]
+        |
+        v
+[Anti-duplicate: hash in no-repeat window?]--Yes-->[Re-generate N times]
+        |                                       |
+        |                             [still duplicate?]
+        |                                       |
+        |                                   Yes v
+        |                               [SKIP: DUP_TEXT]
+        v
+[POST /{comment-id}/comments (reply)]
+        |
+        v
+[Success?]-----No----->[Retry policy]
+  |Yes                  |
+  v                     v
+[Mark replied]    [retry_count < max?]
+[Log success]        |Yes        |No
+                     v           v
+                [Requeue]     [DLQ + alert]
+```
+
+---
+
+## 2.2 State Machine: Comment Reply
+
+### States
+
+* `RECEIVED` (event saved)
+* `ENQUEUED`
+* `PROCESSING`
+* `FETCHED` (comment fetched ok)
+* `EVALUATED` (rule evaluated)
+* `GENERATED` (reply text created)
+* `SENT` (API success)
+* `SKIPPED` (with reason)
+* `FAILED_RETRYING`
+* `FAILED_PERMANENT` (DLQ)
+
+### Events/Transitions
+
+* `enqueue_ok`: RECEIVED → ENQUEUED
+* `worker_start`: ENQUEUED → PROCESSING
+* `fetch_ok`: PROCESSING → FETCHED
+* `evaluate_ok`: FETCHED → EVALUATED
+* `generate_ok`: EVALUATED → GENERATED
+* `send_ok`: GENERATED → SENT
+* `skip(reason)`: ANY → SKIPPED
+* `send_fail_transient`: GENERATED → FAILED_RETRYING → (requeue) → PROCESSING
+* `send_fail_permanent`: GENERATED → FAILED_PERMANENT
+
+### Skip Reasons (chuẩn hóa để log)
+
+* `SAFE_MODE`
+* `PAGE_DISABLED`
+* `POST_DISABLED`
+* `SELF_COMMENT`
+* `NO_RULE`
+* `NOT_MATCH`
+* `ALREADY_REPLIED`
+* `USER_COOLDOWN`
+* `RATE_LIMIT`
+* `DUP_TEXT`
+* `PERMISSION_ERROR`
+* `TOKEN_EXPIRED`
+
+**Acceptance rule:** mọi comment job phải kết thúc ở `SENT` hoặc `SKIPPED` hoặc `FAILED_PERMANENT` (không treo).
+
+---
+
+## 2.3 Spin Engine (logic chuẩn hoá)
+
+**Input template:**
+`Chào {full_name}, bạn [hãy|vui lòng] [check|kiểm tra] [inbox|tin nhắn] để [được tư vấn|trao đổi trực tiếp] nhé`
+
+**Algorithm (gợi ý)**
+
+1. Parse variables `{...}` → replace from commenter profile
+2. Parse groups `[...]`:
+
+   * split by `|`
+   * random pick
+3. Normalize whitespace + punctuation
+4. Compute `content_hash = sha256(normalized_text)`
+5. Check `hash` in Redis `no_repeat:{rule_id}` (TTL = no-repeat window)
+6. If duplicate → retry generate up to N lần (ex: 5)
+7. If still dup → SKIP:DUP_TEXT
+
+**Admin UI mapping:**
+
+* Cooldown per user: default 30–60 phút
+* No-repeat window: 24h
+* Rate limit: 10–30 replies/min tùy Page
+
+---
+
+# 3) AUTO MESSAGE – FLOWCHART (commenter/reactor)
+
+## 3.1 Trigger options
+
+* Trigger A: **New comment**
+* Trigger B: **New reaction**
+* Trigger C: **Manual campaign** (từ Post detail → “Message commenters”)
+
+## 3.2 Luồng worker
+
+```
+[messageWorker job: {page_id, user_id, post_id, trigger_type}]
+        |
+        v
+[Global Safe Mode ON?]--Yes-->[SKIP: SAFE_MODE]
+        |
+        No
+        v
+[Auto message enabled on page/post?]--No-->[SKIP: MSG_DISABLED]
+        |
+        Yes
+        v
+[Eligibility checks]
+   - already messaged this user for this post?
+   - already messaged within last X days?
+   - user opted-out?
+   - blacklist keywords? (if context available)
+        |
+        v
+[Rate limit check]--Fail-->[DELAY/REQUEUE]
+        |
+        Pass
+        v
+[Generate message (spin + variables)]
+        |
+        v
+[Send message via API]
+        |
+        v
+[Success?]--No-->[Retry -> DLQ]
+   |
+  Yes
+   v
+[Mark sent + log]
+```
+
+---
+
+## 3.3 State Machine: Message Sending
+
+### States
+
+* `RECEIVED`
+* `ENQUEUED`
+* `PROCESSING`
+* `ELIGIBLE`
+* `GENERATED`
+* `SENT`
+* `SKIPPED`
+* `FAILED_RETRYING`
+* `FAILED_PERMANENT`
+
+### Skip Reasons
+
+* `SAFE_MODE`
+* `MSG_DISABLED`
+* `ALREADY_MESSAGED_POST`
+* `RECENTLY_MESSAGED`
+* `OPTOUT`
+* `RATE_LIMIT`
+* `PERMISSION_ERROR`
+* `TOKEN_EXPIRED`
+
+---
+
+# 4) Retry Policy (chuẩn hóa)
+
+## 4.1 Khi nào retry
+
+Retry các lỗi “transient”:
+
+* 5xx từ Meta
+* timeout/network
+* rate limit (có backoff)
+
+Không retry (fail permanent):
+
+* thiếu permission
+* token expired (chuyển trạng thái cần admin reconnect)
+* error do payload invalid
+
+## 4.2 Backoff đề xuất
+
+* Retry 1: sau 30s
+* Retry 2: sau 2m
+* Retry 3: sau 10m
+* Max 3–5 lần
+* Sau đó đưa vào **DLQ** + tạo **Alert** trên dashboard
+
+---
+
+# 5) Idempotency & Dedupe (rất quan trọng)
+
+## 5.1 Key dedupe
+
+* Comment reply idempotency key:
+
+  * `reply:{page_id}:{comment_id}`
+* User cooldown key:
+
+  * `cooldown:{rule_id}:{user_id}`
+* No-repeat content key:
+
+  * `hash:{rule_id}:{content_hash}`
+* Message dedupe:
+
+  * `msg:{page_id}:{post_id}:{user_id}`
+
+## 5.2 TTL đề xuất
+
+* reply key: 30–90 ngày (tùy storage)
+* cooldown key: 30–120 phút
+* hash key: 24h
+* msg key: 7–30 ngày
+
+---
+
+# 6) Event → API fetch strategy (tối ưu)
+
+Webhook payload thường thiếu chi tiết → Worker sẽ:
+
+* Fetch comment detail (message, from, created_time)
+* Fetch user info tối thiểu (name/full_name nếu được)
+* Nếu fetch fail do permissions → SKIP/PERM_ERROR
+
+---
+
+# 7) Admin Controls (Kill switches) gắn vào state machine
+
+Các toggle ảnh hưởng trực tiếp transitions:
+
+* Global Safe Mode: bất kỳ job nào vào PROCESSING → SKIP:SAFE_MODE
+* Page Disabled: → SKIP:PAGE_DISABLED
+* Post Disabled: → SKIP:POST_DISABLED
+* Rule Disabled: → SKIP:NO_RULE
+
+---
+
+# 8) Những màn hình “debug” phải có (để vận hành)
+
+* **Event Stream**: xem event → trạng thái → link log
+* **Log Drilldown**: hiển thị:
+
+  * applied_rule_id
+  * generated_text + hash
+  * skip reason
+  * meta error code/subcode
+  * correlation_id
+* **DLQ view**: requeue / dismiss / mark resolved
+
+---

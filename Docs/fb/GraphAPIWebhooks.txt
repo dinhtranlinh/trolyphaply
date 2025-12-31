@@ -1,0 +1,334 @@
+Dưới đây là **TÀI LIỆU LẬP TRÌNH TỔNG HỢP – META GRAPH API WEBHOOKS**, được biên soạn **tương tự các tài liệu trước** (Pages API, Facebook Login, Videos API, Page Stories API), dựa trên tài liệu chính thức tại
+👉 [https://developers.facebook.com/docs/graph-api/webhooks/](https://developers.facebook.com/docs/graph-api/webhooks/)
+
+Tài liệu này phù hợp để:
+
+* Làm **tài liệu kỹ thuật nội bộ**
+* Thiết kế **kiến trúc hệ thống nhận sự kiện realtime từ Facebook**
+* Triển khai **tích hợp Page, User, Video, Comment, Message…**
+
+---
+
+# 📘 **TÀI LIỆU LẬP TRÌNH META GRAPH API – WEBHOOKS**
+
+*(Meta Platforms, Inc.)*
+
+---
+
+## **1. Tổng quan về Graph API Webhooks**
+
+### **1.1 Webhooks là gì**
+
+**Webhooks** là cơ chế cho phép Meta:
+
+* **Gửi thông báo theo thời gian thực (HTTP callback)**
+* Tới máy chủ (server) của bạn
+* Khi có sự kiện xảy ra trên đối tượng mà ứng dụng đang theo dõi
+
+👉 Thay vì ứng dụng phải **poll API liên tục**, Webhooks giúp:
+
+* Giảm tải hệ thống
+* Phản ứng realtime
+* Phù hợp kiến trúc event-driven
+
+---
+
+### **1.2 Webhooks dùng để làm gì**
+
+Webhooks thường dùng để:
+
+* Nhận thông báo khi Page có bài viết/bình luận mới
+* Theo dõi tương tác (comment, reaction)
+* Xử lý tin nhắn (Messenger)
+* Theo dõi thay đổi thông tin Page
+* Xử lý deauthorization (người dùng gỡ app)
+
+---
+
+## **2. Kiến trúc tổng thể Webhooks**
+
+### **2.1 Các thành phần**
+
+| Thành phần           | Vai trò                    |
+| -------------------- | -------------------------- |
+| Facebook App         | Định danh ứng dụng         |
+| Webhook Subscription | Đăng ký sự kiện            |
+| Callback URL         | Endpoint server nhận event |
+| Verify Token         | Xác thực ban đầu           |
+| Graph API            | Quản lý subscription       |
+
+---
+
+### **2.2 Mô hình hoạt động**
+
+1. App đăng ký Webhook với Meta
+2. Meta gửi **Verify Request** để xác thực endpoint
+3. Server phản hồi đúng verify_token
+4. Meta bắt đầu gửi **Event Payload** khi có sự kiện
+5. Server xử lý và phản hồi HTTP 200
+
+---
+
+## **3. Các đối tượng hỗ trợ Webhooks**
+
+Meta hỗ trợ Webhooks cho nhiều đối tượng:
+
+| Đối tượng | Ví dụ sự kiện           |
+| --------- | ----------------------- |
+| Page      | Post, Comment, Reaction |
+| User      | Deauthorization         |
+| Instagram | Media, Comment          |
+| Messenger | Message, Delivery       |
+| Video     | Live status, comment    |
+
+📌 Mỗi object có **field (event type)** riêng.
+
+---
+
+## **4. Thiết lập Webhooks**
+
+### **4.1 Bước 1: Tạo Facebook App**
+
+* Tạo app tại Meta Developers
+* App phải ở trạng thái **Live** để nhận webhook thật
+
+---
+
+### **4.2 Bước 2: Cấu hình Webhooks**
+
+Trong App Dashboard:
+
+* Add Product → **Webhooks**
+* Chọn object (Page, User, …)
+* Khai báo:
+
+  * Callback URL
+  * Verify Token
+
+---
+
+### **4.3 Bước 3: Xác thực Callback URL**
+
+Khi đăng ký, Meta gửi request:
+
+```
+GET /webhook?
+hub.mode=subscribe
+hub.verify_token=...
+hub.challenge=...
+```
+
+Server phải:
+
+* Kiểm tra verify_token
+* Trả về giá trị `hub.challenge`
+
+📌 Nếu sai → không đăng ký được webhook.
+
+---
+
+## **5. Đăng ký Subscription (Subscribe Fields)**
+
+### **5.1 Subscribe bằng Dashboard**
+
+* Chọn object (ví dụ Page)
+* Chọn các field:
+
+  * feed
+  * comments
+  * reactions
+  * mentions
+  * videos
+  * live_videos
+
+---
+
+### **5.2 Subscribe bằng Graph API**
+
+```
+POST /{app-id}/subscriptions
+```
+
+Dùng **App Access Token**.
+
+---
+
+## **6. Nhận & xử lý Webhook Event**
+
+### **6.1 Cấu trúc payload**
+
+Ví dụ Page event:
+
+```json
+{
+  "object": "page",
+  "entry": [
+    {
+      "id": "PAGE_ID",
+      "time": 1234567890,
+      "changes": [
+        {
+          "field": "feed",
+          "value": {
+            "item": "comment",
+            "verb": "add",
+            "comment_id": "123"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### **6.2 Yêu cầu xử lý**
+
+* Phải trả HTTP **200 OK**
+* Xử lý trong thời gian ngắn
+* Không retry logic phức tạp trong callback
+
+📌 Nếu server không trả 200 → Meta sẽ retry.
+
+---
+
+## **7. Xác thực & bảo mật Webhooks**
+
+### **7.1 Xác thực chữ ký (X-Hub-Signature)**
+
+Meta gửi header:
+
+```
+X-Hub-Signature-256
+```
+
+Server cần:
+
+* Dùng App Secret
+* Verify payload chưa bị thay đổi
+
+📌 **Bắt buộc với hệ thống production**.
+
+---
+
+### **7.2 Best practices bảo mật**
+
+* HTTPS bắt buộc
+* Validate IP / signature
+* Không xử lý business logic nặng trong webhook
+
+---
+
+## **8. Webhooks cho Page (Phổ biến nhất)**
+
+### **8.1 Các field thường dùng**
+
+| Field       | Ý nghĩa         |
+| ----------- | --------------- |
+| feed        | Post, comment   |
+| comments    | Bình luận       |
+| reactions   | Cảm xúc         |
+| mentions    | Page được nhắc  |
+| videos      | Video mới       |
+| live_videos | Trạng thái live |
+
+---
+
+### **8.2 Ứng dụng thực tế**
+
+* Tự động phản hồi comment
+* Đồng bộ dữ liệu CMS
+* Ghi log tương tác Page
+* Trigger workflow xử lý nội dung
+
+---
+
+## **9. Deauthorization Callback**
+
+### **9.1 Khi nào xảy ra**
+
+* Người dùng gỡ ứng dụng
+* Thu hồi quyền
+
+Meta gửi event để:
+
+* Ứng dụng xóa dữ liệu người dùng
+* Vô hiệu token
+
+📌 **Bắt buộc triển khai để tuân thủ chính sách Meta**.
+
+---
+
+## **10. Quyền & App Review**
+
+* Một số webhook field yêu cầu:
+
+  * Permission được duyệt
+  * App ở trạng thái Live
+
+📌 Nếu app chưa duyệt → chỉ nhận event test.
+
+---
+
+## **11. Lỗi thường gặp**
+
+| Lỗi               | Nguyên nhân          |
+| ----------------- | -------------------- |
+| Webhook không gửi | App chưa live        |
+| Verify thất bại   | Sai verify_token     |
+| Không có event    | Chưa subscribe field |
+| Retry liên tục    | Server không trả 200 |
+
+---
+
+## **12. Giới hạn & lưu ý**
+
+* Webhook payload **không chứa đầy đủ dữ liệu**
+* Cần gọi lại Graph API để lấy chi tiết
+* Không đảm bảo 100% thứ tự sự kiện
+
+📌 Webhook ≠ Source of Truth, chỉ là trigger.
+
+---
+
+## **13. Versioning & thay đổi**
+
+* Webhooks phụ thuộc Graph API version
+* Một số field có thể bị deprecated
+* Meta thay đổi payload theo thời gian
+
+👉 Theo dõi **Graph API Changelog** thường xuyên.
+
+---
+
+## **14. Best Practices tổng thể**
+
+### **Kỹ thuật**
+
+* Queue event (RabbitMQ, Kafka…)
+* Xử lý async
+* Log đầy đủ payload
+
+### **Nghiệp vụ**
+
+* Dùng webhook để trigger
+* Không xử lý nghiệp vụ phức tạp ngay
+
+---
+
+## **15. Tổng kết**
+
+Meta Graph API Webhooks:
+
+* Là nền tảng cho kiến trúc realtime
+* Giúp tích hợp Facebook hiệu quả
+* Bắt buộc với hệ thống quy mô lớn
+
+Triển khai đúng giúp hệ thống:
+
+* Ổn định
+* Mở rộng tốt
+* Tuân thủ chính sách Meta
+
+---

@@ -1,9 +1,9 @@
 # TRỢ LÝ PHÁP LÝ - IMPLEMENTATION ROADMAP
 
 > **Project**: TroLyPhapLy (Legal Assistant & Q&A Platform)  
-> **Start Date**: 2026  
-> **Current Status**: SESSION 0 - Database Setup (In Progress)  
-> **Last Updated**: 2026-01-XX
+> **Start Date**: December 2025  
+> **Current Status**: SESSION 7 - API Optimization Completed  
+> **Last Updated**: December 23, 2025
 
 ---
 
@@ -11,11 +11,11 @@
 
 1. [Project Overview](#1-project-overview)
 2. [Architecture Summary](#2-architecture-summary)
-3. [Development Sessions](#3-development-sessions)
-4. [Completed Tasks](#4-completed-tasks)
-5. [Current Progress](#5-current-progress)
-6. [Pending Tasks](#6-pending-tasks)
-7. [Known Issues](#7-known-issues)
+3. [Environment Setup](#3-environment-setup)
+4. [Database Setup](#4-database-setup)
+5. [Security & API Keys](#5-security--api-keys)
+6. [Development Sessions](#6-development-sessions)
+7. [Known Issues & Solutions](#7-known-issues--solutions)
 8. [Next Steps](#8-next-steps)
 
 ---
@@ -26,7 +26,7 @@
 
 **TroLyPhapLy** là một nền tảng web mobile-first cung cấp:
 
-- **Legal Q&A**: Hỏi đáp về pháp luật và thủ tục hành chính
+- **Legal Q&A**: Hỏi đáp về pháp luật và thủ tục hành chính với AI (Gemini)
 - **Legal Library**: Thư viện văn bản pháp luật, án lệ, hướng dẫn thực hiện thủ tục hành chính
 - **Prompt Hub**: Quản lý và chia sẻ prompts AI hữu ích
 - **Fun AI Apps**: 20-30+ mini-apps tạo nội dung viral (tử vi, lời chúc, thơ...)
@@ -40,16 +40,15 @@
 - **Status**: Production-ready, fully functional
 - **Port**: 8686
 - **Domain**: tuvi.trolyphaply.vn
-- **Apps**: van-menh, tu-vi-chuyen-sau
 
-**TroLyPhapLy** (New):
+**TroLyPhapLy** (Current):
 
 - **Location**: `D:\DTL\trolyphaply\`
 - **Purpose**: Legal assistant + Q&A + fun apps
-- **Status**: **In development (SESSION 0)**
-- **Port**: 6666
+- **Status**: **SESSION 7 completed - API optimization**
+- **Dev Port**: 3456
+- **Prod Port**: 8686
 - **Domain**: trolyphaply.vn
-- **Relationship**: Will migrate 2 apps from FacebookApp (definition only, no results)
 
 ---
 
@@ -57,210 +56,632 @@
 
 ### 2.1. Tech Stack
 
-| Layer                | Technology                 | Version |
-| -------------------- | -------------------------- | ------- |
-| **Framework**        | Next.js (App Router)       | 16      |
-| **Language**         | TypeScript                 | Latest  |
-| **UI Library**       | React                      | 19      |
-| **Styling**          | Tailwind CSS               | Latest  |
-| **ORM**              | Prisma                     | 7       |
-| **Database**         | PostgreSQL (Supabase)      | Latest  |
-| **Storage**          | Supabase Storage           | -       |
-| **AI**               | Google Gemini API          | 1.5 Pro |
-| **Auth**             | bcryptjs + session cookies | -       |
-| **Image Processing** | Sharp                      | Latest  |
+| Layer               | Technology                 | Version |
+| ------------------- | -------------------------- | ------- |
+| **Framework**       | Next.js (App Router)       | 16.0.6  |
+| **Language**        | TypeScript                 | 5.x     |
+| **UI Library**      | React                      | 19      |
+| **Styling**         | Tailwind CSS               | Latest  |
+| **ORM**             | Prisma                     | 7       |
+| **Database**        | PostgreSQL (Supabase)      | Latest  |
+| **Storage**         | Supabase Storage           | -       |
+| **AI**              | Google Gemini 2.5 Flash    | Latest  |
+| **Auth**            | bcryptjs + session cookies | -       |
+| **Process Manager** | PM2                        | Latest  |
 
-### 2.2. Environment Configuration
-
-**Port**: 6666 (configured in `package.json`)
-
-**Supabase Project**:
-
-- **Project ID**: icqivkassoxfaukqbzyt
-- **URL**: https://icqivkassoxfaukqbzyt.supabase.co
-- **Region**: Southeast Asia
-
-**Gemini API** (Shared with FacebookApp):
-
-- 4 API keys configured in `.env`
-- Key 1: AIzaSyB5nGWaghYxZH8FM52U5AV5wkJhIJMp2WI
-- Keys 2-4: (configured but masked in logs)
-
-**Admin Credentials**:
-
-- **Email**: admin@trolyphaply.vn
-- **Password**: TroLy@PhapLy2026
-
-### 2.3. Database Schema (Planned)
+### 2.2. Database Schema
 
 ```prisma
 // 8 Models Total
 
 // Authentication
 model AdminUser {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  passwordHash  String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 // Legal Content
 model LegalDocument {
-  id              String   @id @default(cuid())
-  title           String
-  description     String?
-  content         String   @db.Text
-  documentType    String   // "law", "decree", "circular", etc.
-  documentNumber  String?
-  issuedBy        String?
-  issuedDate      DateTime?
-  effectiveDate   DateTime?
-  category        String
-  tags            String[]
-  slug            String   @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model Procedure {
-  id              String   @id @default(cuid())
-  title           String
-  description     String?
-  steps           Json     // Array of step objects
-  estimatedTime   String?
-  authority       String?
-  level           String?  // "commune", "district", "province", "national"
-  category        String
-  tags            String[]
-  slug            String   @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-// Prompt Management
-model Prompt {
   id          String   @id @default(cuid())
   title       String
-  body        String   @db.Text
-  category    String
+  docType     String   // law, decree, circular, decision
+  number      String
+  issuedDate  DateTime
+  effectDate  DateTime
+  status      String   @default("active")
+  summary     String?
+  fullText    String
+  chapters    Json?
   tags        String[]
-  isPublic    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Fun AI Apps (Migrated from FacebookApp logic)
+model Procedure {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  steps       Json
+  documents   Json?
+  fees        String?
+  timeframe   String?
+  agency      String
+  legalBasis  String?
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// AI Content
+model Prompt {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  description String?
+  content     String
+  tags        String[]
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model App {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  name            String
-  description     String?
-  category        String
-  icon            String?
-  inputSchema     Json
-  promptTemplate  String   @db.Text
-  type            String   // "text_only", "image_canvas", "image_ai"
-  renderConfig    Json?
-  shareConfig     Json?
-  isPublished     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  results         Result[]
-  statsDaily      AppStatsDaily[]
-  events          AppEvent[]
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  category      String
+  description   String
+  inputSchema   Json
+  outputFormat  String   @default("markdown")
+  systemPrompt  String
+  examplePrompts Json?
+  creatorCode   String?
+  status        String   @default("active")
+  usageCount    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Result {
-  id          String   @id @default(cuid())
-  appId       String
-  app         App      @relation(fields: [appId], references: [id], onDelete: Cascade)
-  inputData   Json
-  outputData  Json
-  imageUrl    String?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  appId     String
+  appSlug   String
+  input     Json
+  output    String
+  createdAt DateTime @default(now())
 
   @@index([appId])
+  @@index([createdAt])
+}
+
+// Analytics
+model AppStatDaily {
+  id        String   @id @default(cuid())
+  appId     String
+  date      DateTime
+  views     Int      @default(0)
+  generates Int      @default(0)
+  shares    Int      @default(0)
+
+  @@unique([appId, date])
+}
+
+model AppEvent {
+  id        String   @id @default(cuid())
+  appId     String
+  eventType String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([appId, eventType])
+  @@index([createdAt])
+}
+```
+
+---
+
+## 3. ENVIRONMENT SETUP
+
+### 3.1. Development
+
+```bash
+# Port: 3456
+npm run dev
+
+# Or with PM2
+pm2 start ecosystem.config.js --only trolyphaply-dev
+```
+
+**URL**: http://localhost:3456
+
+### 3.2. Production
+
+```bash
+# Port: 8686 (shared with FacebookApp domain)
+npm run build:prod
+npm run start:prod
+
+# Or with PM2 (recommended)
+pm2 start ecosystem.config.js --only trolyphaply-prod
+pm2 save
+pm2 startup
+```
+
+**URL**: https://trolyphaply.vn
+
+### 3.3. Environment Variables
+
+See `.env.example` for required variables:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL="https://icqivkassoxfaukqbzyt.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your_anon_key"
+DATABASE_URL="postgresql://..."
+
+# Google Gemini AI (5 keys for load balancing)
+GEMINI_API_KEY="AIzaSy..."
+GEMINI_API_KEY_1="AIzaSy..."
+GEMINI_API_KEY_2="AIzaSy..."
+GEMINI_API_KEY_3="AIzaSy..."
+GEMINI_API_KEY_4="AIzaSy..."
+
+# Admin
+ADMIN_SESSION_SECRET="your_random_secret"
+
+# App Config
+PORT=3456
+NODE_ENV=development
+```
+
+---
+
+## 4. DATABASE SETUP
+
+### 4.1. Supabase Connection
+
+**Project ID**: icqivkassoxfaukqbzyt  
+**Region**: Southeast Asia  
+**URL**: https://icqivkassoxfaukqbzyt.supabase.co
+
+### 4.2. Schema Installation
+
+**Option 1: Supabase SQL Editor (Recommended)**
+
+1. Go to https://supabase.com/dashboard/project/icqivkassoxfaukqbzyt
+2. Click **SQL Editor** → **New Query**
+3. Copy content from `prisma/schema.sql`
+4. Paste and click **Run**
+
+**Option 2: Prisma CLI**
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### 4.3. Seed Data
+
+```bash
+npm run seed
+# Or: node prisma/seed.ts
+```
+
+**Includes**:
+
+- Admin user: admin@trolyphaply.vn / TroLy@PhapLy2026
+- 4 legal documents
+- 4 procedures
+- 4 prompts
+- 2 apps (migrated from FacebookApp)
+
+---
+
+## 5. SECURITY & API KEYS
+
+### 5.1. API Key Protection
+
+**⚠️ CRITICAL**: Never commit `.env` to git!
+
+**Protection Layers**:
+
+1. **.gitignore** - Blocks .env files
+2. **Pre-commit hook** - Scans for API key patterns
+3. **GitHub Secret Scanning** - Auto-detects leaked keys
+
+### 5.2. Pre-commit Hook Setup
+
+Create `.git/hooks/pre-commit`:
+
+```bash
+#!/bin/sh
+# Prevent committing .env files
+if git diff --cached --name-only | grep -E "\.env$|\.env\..*"; then
+    echo "❌ ERROR: Attempting to commit .env file!"
+    exit 1
+fi
+
+# Detect Google API key patterns
+if git diff --cached | grep -E "AIzaSy[A-Za-z0-9_-]{33}"; then
+    echo "❌ ERROR: Detected Google API key in staged files!"
+    exit 1
+fi
+
+exit 0
+```
+
+Make executable:
+
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+### 5.3. API Key Rotation Strategy
+
+**Gemini API**: 5 keys with intelligent rotation
+
+- Keys 1-3: Primary pool for Answer generation (main Q&A)
+- Keys 4-5: Dedicated pool for ShareText generation
+- Circuit breaker: Auto-skip unhealthy keys (429 errors)
+- Cooldown: 60s after 3 consecutive failures
+
+---
+
+## 6. DEVELOPMENT SESSIONS
+
+### SESSION 0: Database Setup ✅
+
+- PostgreSQL schema created (8 tables)
+- Prisma ORM configured
+- Connection verified
+
+### SESSION 1: Seed Data ✅
+
+- Admin account seeded
+- Legal content seeded
+- Apps migrated from FacebookApp
+
+### SESSION 2: Design System ✅
+
+- Tailwind theme (navy #0B3B70 + gold #E5A100)
+- 25 reusable components created
+
+### SESSION 3: Home + Law Pages ✅
+
+- Q&A Hub with Gemini integration
+- Legal Library with search/filters
+- Document detail pages
+
+### SESSION 4: Prompts + Apps ✅
+
+- Prompts Hub CRUD
+- Fun AI Apps catalog
+- Dynamic form rendering
+
+### SESSION 5: Admin Dashboard ✅
+
+- Admin authentication
+- Statistics dashboard
+- Content management (CRUD for all models)
+
+### SESSION 6: PWA Setup ✅
+
+- Service worker with offline caching
+- Manifest.json with icons
+- SEO optimization
+
+### SESSION 7: API Optimization ✅ (December 22-23, 2025)
+
+**Problem**: API quota exhaustion (400 calls/10 questions)
+
+**Solution Phases**:
+
+#### Phase 1-3: Remove Redundant Layers
+
+- ✅ Removed OpenAI fallback (single model: gemini-2.5-flash)
+- ✅ Removed quality retry loop
+- ✅ Implemented circuit breaker (60s cooldown, 3 failures threshold)
+- **Result**: 400 → 16 calls (-96%)
+
+#### Phase 4-5: Smart Caching
+
+- ✅ In-memory cache with 24h TTL
+- ✅ ShareText timeout + smart local fallback (3s AI → local extract)
+- **Result**: 16 → 12-14 calls (additional -25%)
+
+#### Phase 6: Answer Length Control
+
+- ✅ Reduced maxOutputTokens: 4096 → 2400 (~900 words)
+- ✅ Added prompt constraints: "≤800 từ, không trích nguyên văn điều luật"
+- ✅ Answer validator: Check 4 sections (I→II→III→IV) + word count ≤900
+- ✅ Reprompt logic: If invalid → AI summarizes with strict requirements
+- **Result**: Answers now 600-900 words instead of 7000+ chars
+
+#### Phase 7: ShareText Improvements
+
+- ✅ Increased AI timeout: 3s → 5s
+- ✅ Separate key pool: Keys 4-5 dedicated for ShareText (reduce contention)
+- ✅ Improved fallback logic:
+  - Vietnamese text normalization (remove diacritics for keyword matching)
+  - YES/NO questions: Extract from Section II + IV with smart bullet detection
+  - Procedure questions: Extract 3 steps from Section III with priority ranking
+  - Shorten bullets to <70 chars (cut at natural breaks)
+  - Auto-detect icon: "không cần"/"được miễn" → ✅ | else → ⚠️
+- ✅ Adjusted length threshold: 150 → 140 words
+- **Result**: ShareText now 2-3 short bullets instead of 1 generic line
+
+**Final Metrics**:
+
+- **API calls**: 400 → 12-16 (-96% to -97.3%)
+- **Answer quality**: ✅ 4 sections, 600-900 words, no verbatim legal text
+- **ShareText quality**: ✅ 2-3 short bullets (<70 chars each), correct icon
+
+---
+
+## 7. KNOWN ISSUES & SOLUTIONS
+
+### Issue 1: Answer Too Long (7000+ chars)
+
+**Root Cause**: maxOutputTokens too high (4096), no length validator
+
+**Solution** (SESSION 7):
+
+```typescript
+// app/api/qa/route.ts
+maxOutputTokens: 2400; // Reduced from 4096
+temperature: 0.2;
+
+// Validator
+const wordCount = answer.split(/\s+/).length;
+if (wordCount > 900 || !hasAllSections) {
+  // Reprompt with strict requirements
+}
+```
+
+### Issue 2: ShareText Copies Entire Answer
+
+**Root Cause**: AI timeout (3s), fallback extracts wrong content
+
+**Solution** (SESSION 7):
+
+```typescript
+// Increase timeout
+callAIWithTimeout(prompt, options, 5000); // 3s → 5s
+
+// Use dedicated key pool
+callGeminiTextForShareText(); // Keys 4-5 only
+
+// Improved fallback
+function generateSmartLocalShareText() {
+  // Normalize Vietnamese
+  const normalized = normalizeVietnamese(text);
+
+  // Extract numbered bullets from Section II
+  // Shorten each to <70 chars
+  // Auto-detect icon based on keywords
+}
+```
+
+### Issue 3: API Keys Exhaustion
+
+**Root Cause**: 3/5 keys hit quota limit (429 errors)
+
+**Solution** (SESSION 7):
+
+```typescript
+// Circuit breaker
+if (health.failures >= 3) {
+  // Skip key for 60s cooldown
+}
+
+// Separate key pools
+// Answer: Keys 1-3 (primary)
+// ShareText: Keys 4-5 (dedicated)
+```
+
+---
+
+## 8. NEXT STEPS
+
+### 8.1. Immediate Tasks
+
+- [ ] Test with fresh questions (clear cache)
+- [ ] Monitor API quota usage (https://ai.dev/usage?tab=rate-limit)
+- [ ] Add more Gemini API keys if needed (currently 5)
+
+### 8.2. Future Enhancements
+
+- [ ] Add qa_prompts table support (dynamic prompts from DB)
+- [ ] Implement writing_styles customization
+- [ ] Add ShareText templates for different question types
+- [ ] Analytics dashboard for API usage tracking
+
+### 8.3. Deployment
+
+See [TODO-TroLyPhapLy.md](TODO-TroLyPhapLy.md) for deployment checklist.
+
+---
+
+## 📚 ADDITIONAL DOCUMENTATION
+
+- **TODO List**: [TODO-TroLyPhapLy.md](TODO-TroLyPhapLy.md)
+- **Environment Variables**: `.env.example`
+- **Git History**: Use `git log --oneline` to see session history
+
+---
+
+**Last Updated**: December 23, 2025  
+**Status**: ✅ SESSION 7 completed - Ready for production testing
+id String @id @default(cuid())
+email String @unique
+passwordHash String
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+// Legal Content
+model LegalDocument {
+id String @id @default(cuid())
+title String
+description String?
+content String @db.Text
+documentType String // "law", "decree", "circular", etc.
+documentNumber String?
+issuedBy String?
+issuedDate DateTime?
+effectiveDate DateTime?
+category String
+tags String[]
+slug String @unique
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+model Procedure {
+id String @id @default(cuid())
+title String
+description String?
+steps Json // Array of step objects
+estimatedTime String?
+authority String?
+level String? // "commune", "district", "province", "national"
+category String
+tags String[]
+slug String @unique
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+// Prompt Management
+model Prompt {
+id String @id @default(cuid())
+title String
+body String @db.Text
+category String
+tags String[]
+isPublic Boolean @default(true)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+// Fun AI Apps (Migrated from FacebookApp logic)
+model App {
+id String @id @default(cuid())
+slug String @unique
+name String
+description String?
+category String
+icon String?
+inputSchema Json
+promptTemplate String @db.Text
+type String // "text_only", "image_canvas", "image_ai"
+renderConfig Json?
+shareConfig Json?
+isPublished Boolean @default(false)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+results Result[]
+statsDaily AppStatsDaily[]
+events AppEvent[]
+}
+
+model Result {
+id String @id @default(cuid())
+appId String
+app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+inputData Json
+outputData Json
+imageUrl String?
+createdAt DateTime @default(now())
+
+@@index([appId])
 }
 
 // Analytics
 model AppStatsDaily {
-  id        String   @id @default(cuid())
-  appId     String
-  app       App      @relation(fields: [appId], references: [id], onDelete: Cascade)
-  date      DateTime @db.Date
-  views     Int      @default(0)
-  submits   Int      @default(0)
-  shares    Int      @default(0)
+id String @id @default(cuid())
+appId String
+app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+date DateTime @db.Date
+views Int @default(0)
+submits Int @default(0)
+shares Int @default(0)
 
-  @@unique([appId, date])
-  @@index([appId])
-  @@index([date])
+@@unique([appId, date])
+@@index([appId])
+@@index([date])
 }
 
 model AppEvent {
-  id          String   @id @default(cuid())
-  appId       String?
-  app         App?     @relation(fields: [appId], references: [id], onDelete: Cascade)
-  eventType   String   // "view", "submit", "share", "error"
-  metadata    Json?
-  createdAt   DateTime @default(now())
+id String @id @default(cuid())
+appId String?
+app App? @relation(fields: [appId], references: [id], onDelete: Cascade)
+eventType String // "view", "submit", "share", "error"
+metadata Json?
+createdAt DateTime @default(now())
 
-  @@index([appId])
-  @@index([eventType])
-  @@index([createdAt])
+@@index([appId])
+@@index([eventType])
+@@index([createdAt])
 }
+
 ```
 
 ### 2.4. Project Structure
 
 ```
+
 D:\DTL\trolyphaply\
-├── .next/                      # Next.js build output
-├── app/                        # Next.js App Router
-│   ├── api/                   # API routes
-│   │   ├── run/[slug]/       # App execution endpoint
-│   │   ├── apps/[slug]/      # Get app config
-│   │   ├── results/[id]/     # Get result data
-│   │   └── admin/            # Admin CRUD + login
-│   ├── a/[slug]/             # [TODO] Public app form page
-│   ├── r/[resultId]/         # [TODO] Result display page
-│   ├── law/                  # [TODO] Legal library pages
-│   ├── prompts/              # [TODO] Prompt hub pages
-│   ├── apps/                 # [TODO] Fun apps catalog
-│   ├── admin/                # [TODO] Admin dashboard UI
-│   ├── layout.tsx            # Root layout
-│   └── page.tsx              # Home page (Legal Q&A)
-├── lib/                       # [TODO] Utility libraries
-│   ├── prisma.ts             # DB client singleton
-│   ├── gemini.ts             # Gemini API wrapper
-│   ├── storage.ts            # Supabase storage helpers
-│   ├── auth.ts               # Admin auth (bcrypt)
-│   ├── analytics.ts          # Event logging
-│   └── render.ts             # Image rendering (Sharp + SVG)
-├── components/               # [TODO] React components
-│   ├── layout/              # AppShell, Header, BottomNav
-│   ├── ui/                  # Card, Button, Chip, etc.
-│   └── forms/               # Form components
-├── public/                   # Static assets
-│   ├── backgrounds/         # [TODO] App background images
-│   ├── icons/               # [TODO] PWA icons
-│   └── manifest.json        # [TODO] PWA manifest
+├── .next/ # Next.js build output
+├── app/ # Next.js App Router
+│ ├── api/ # API routes
+│ │ ├── run/[slug]/ # App execution endpoint
+│ │ ├── apps/[slug]/ # Get app config
+│ │ ├── results/[id]/ # Get result data
+│ │ └── admin/ # Admin CRUD + login
+│ ├── a/[slug]/ # [TODO] Public app form page
+│ ├── r/[resultId]/ # [TODO] Result display page
+│ ├── law/ # [TODO] Legal library pages
+│ ├── prompts/ # [TODO] Prompt hub pages
+│ ├── apps/ # [TODO] Fun apps catalog
+│ ├── admin/ # [TODO] Admin dashboard UI
+│ ├── layout.tsx # Root layout
+│ └── page.tsx # Home page (Legal Q&A)
+├── lib/ # [TODO] Utility libraries
+│ ├── prisma.ts # DB client singleton
+│ ├── gemini.ts # Gemini API wrapper
+│ ├── storage.ts # Supabase storage helpers
+│ ├── auth.ts # Admin auth (bcrypt)
+│ ├── analytics.ts # Event logging
+│ └── render.ts # Image rendering (Sharp + SVG)
+├── components/ # [TODO] React components
+│ ├── layout/ # AppShell, Header, BottomNav
+│ ├── ui/ # Card, Button, Chip, etc.
+│ └── forms/ # Form components
+├── public/ # Static assets
+│ ├── backgrounds/ # [TODO] App background images
+│ ├── icons/ # [TODO] PWA icons
+│ └── manifest.json # [TODO] PWA manifest
 ├── prisma/
-│   ├── schema.prisma        # [IN PROGRESS] Database schema
-│   └── seed.ts              # [TODO] Seed script
-├── .env                     # ✅ Environment variables (configured)
-├── .env.example             # ✅ Template
-├── .gitignore               # ✅ Git ignore rules
-├── package.json             # ✅ Dependencies (installed)
-├── tsconfig.json            # ✅ TypeScript config
-├── tailwind.config.ts       # ✅ Tailwind config
-├── next.config.ts           # ✅ Next.js config
-├── README.md                # ✅ Project documentation
-├── UX-UI-SPEC.md            # ✅ UX/UI specification
+│ ├── schema.prisma # [IN PROGRESS] Database schema
+│ └── seed.ts # [TODO] Seed script
+├── .env # ✅ Environment variables (configured)
+├── .env.example # ✅ Template
+├── .gitignore # ✅ Git ignore rules
+├── package.json # ✅ Dependencies (installed)
+├── tsconfig.json # ✅ TypeScript config
+├── tailwind.config.ts # ✅ Tailwind config
+├── next.config.ts # ✅ Next.js config
+├── README.md # ✅ Project documentation
+├── UX-UI-SPEC.md # ✅ UX/UI specification
 ├── IMPLEMENTATION-ROADMAP.md # ✅ This document
-└── generate-schema.js       # ✅ Script to generate Prisma schema
-```
+└── generate-schema.js # ✅ Script to generate Prisma schema
+
+````
 
 ---
 
@@ -334,7 +755,7 @@ D:\DTL\trolyphaply\
     "typescript": "^5"
   }
 }
-```
+````
 
 #### 4.3. Supabase Configuration
 

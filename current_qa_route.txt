@@ -1,0 +1,251 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { callAIText } from '@/lib/ai';
+import { createClient } from '@/lib/supabase';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { question, styleGuideId } = await request.json();
+
+    if (!question || typeof question !== 'string') {
+      return NextResponse.json(
+        { error: 'Câu hỏi không hợp lệ' },
+        { status: 400 }
+      );
+    }
+
+    if (question.trim().length === 0) {
+      return NextResponse.json(
+        { error: 'Câu hỏi không được để trống' },
+        { status: 400 }
+      );
+    }
+
+    if (question.length > 1000) {
+      return NextResponse.json(
+        { error: 'Câu hỏi quá dài (tối đa 1000 ký tự)' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createClient();
+
+    // Fetch active Q&A prompt from database
+    const { data: activePrompt } = await supabase
+      .from('qa_prompts')
+      .select(`
+        *,
+        writing_styles:qa_prompt_writing_styles(
+          priority,
+          style:legal_writing_styles(*)
+        )
+      `)
+      .eq('is_active', true)
+      .single();
+
+    // Fetch style guide
+    let styleGuide: any = null;
+    let examples: any[] = [];
+
+    if (styleGuideId) {
+      const { data: guide } = await supabase
+        .from('style_guides')
+        .select('*')
+        .eq('id', styleGuideId)
+        .single();
+
+      if (!guide) {
+        return NextResponse.json(
+          { error: 'Style guide không tồn tại' },
+          { status: 404 }
+        );
+      }
+
+      styleGuide = guide;
+
+      const { data: examplesData } = await supabase
+        .from('style_guide_examples')
+        .select('*')
+        .eq('style_guide_id', styleGuideId);
+
+      examples = examplesData || [];
+    } else {
+      const { data: guide } = await supabase
+        .from('style_guides')
+        .select('*')
+        .eq('is_default', true)
+        .single();
+
+      if (guide) {
+        styleGuide = guide;
+
+        const { data: examplesData } = await supabase
+          .from('style_guide_examples')
+          .select('*')
+          .eq('style_guide_id', guide.id);
+
+        examples = examplesData || [];
+      }
+    }
+
+    // Build system prompt
+    let systemPrompt = '';
+
+    if (activePrompt && activePrompt.prompt_text) {
+      systemPrompt = activePrompt.prompt_text;
+
+      if (activePrompt.writing_styles && activePrompt.writing_styles.length > 0) {
+        systemPrompt += `\n\nCAC VAN PHONG TRA LOI (uu tien theo thu tu):\n`;
+
+        activePrompt.writing_styles
+          .sort((a: any, b: any) => a.priority - b.priority)
+          .forEach((ws: any, index: number) => {
+            const style = ws.style;
+            systemPrompt += `\n${index + 1}. ${style.name}\n   ${style.description}\n   Vi du: ${style.example_content}\n`;
+          });
+      }
+    } else {
+      systemPrompt = `Ban la tro ly phap ly AI cua Viet Nam. Nhiem vu:
+1. Tra loi cac cau hoi ve phap luat va thu tuc hanh chinh VN
+2. Thong tin chinh xac, de hieu, cau truc ro rang
+3. Dua du lieu luat/van ban khi co
+4. Nhac tham van chuyen gia cho van de phuc tap
+5. Van phong than thien, de hieu`;
+    }
+
+    if (styleGuide) {
+      systemPrompt += `
+
+VAN PHONG TRA LOI: ${styleGuide.name}
+${styleGuide.description}
+
+DAC DIEM:
+${Array.isArray(styleGuide.characteristics) ? styleGuide.characteristics.map((c: string, i: number) => `${i + 1}. ${c}`).join('\n') : styleGuide.characteristics}
+
+GIONG DIEU: ${Array.isArray(styleGuide.tone) ? styleGuide.tone.join(', ') : styleGuide.tone}`;
+
+      if (examples && examples.length > 0) {
+        systemPrompt += `
+
+VI DU TRA LOI:
+
+${examples
+  .slice(0, 2)
+  .map(
+    (ex, i) => `Vi du ${i + 1}:
+TRUOC: ${ex.before}
+SAU: ${ex.after}
+`
+  )
+  .join('\n')}`;
+      }
+    }
+
+    systemPrompt += `
+
+Dinh dang cau tra loi:
+- Ngan gon, suc tich (200-300 tu)
+- Chia doan ro rang
+- Liet ke buoc neu la thu tuc
+- Dua vi du minh hoa neu can
+
+Luu y: Noi dung tham khao, khong thay the tu van phap ly chinh thuc.`;
+
+    const fullPrompt = `${systemPrompt}
+
+CAU HOI: ${question.trim()}
+
+Hay tra loi mot cach chuyen nghiep va de hieu.`;
+
+    // Prefer OpenAI, fallback Gemini
+    const answer = await callAIText(fullPrompt, {
+      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      geminiModel: 'gemini-2.5-pro',
+      temperature: 0.3,
+    });
+
+    if (!answer) {
+      return NextResponse.json(
+        { error: 'Không tạo được câu trả lời. Vui lòng thử lại.' },
+        { status: 500 }
+      );
+    }
+
+    // Generate share text
+    let shareText = '';
+    try {
+      const sharePrompt = `CÂU HỎI: ${question.trim()}
+CÂU TRẢ LỜI: ${answer.trim()}
+YÊU CẦU BẮT BUỘC:
+    Nội dung phải trả lời ĐẦY ĐỦ, TRỌN VẸN bản chất của câu hỏi
+    KHÔNG được dừng giữa chừng, KHÔNG được bỏ lửng câu hoặc ý
+    KHÔNG tự ý rút gọn làm mất ý pháp lý quan trọng
+    Nếu nội dung dài, hãy CHỦ ĐỘNG tóm gọn lại nhưng vẫn giữ đủ:
+        Kết luận rõ ràng (CÓ / KHÔNG / CÓ ĐIỀU KIỆN)
+        Lý do chính
+        Ví dụ hoặc tình huống minh họa ngắn (nếu cần)
+YÊU CẦU VỀ VĂN PHONG & HÌNH THỨC:
+    Văn phong tự nhiên, thân thiện như đang tư vấn trực tiếp
+    Dùng emoji phù hợp (😊 📌 ❗️ 👉 ...)
+    Độ dài khoảng 200–300 từ, ưu tiên rõ ràng hơn là dài
+    Bỏ hoàn toàn disclaimer và lưu ý pháp lý
+    Chia đoạn ngắn hoặc bullet points để dễ đọc
+    Kết thúc bằng 1 call-to-action nhẹ nhàng (ví dụ: “Nếu bạn đang gặp trường hợp tương tự…”) và kèm link: https://trolyphaply.vn/
+    TUYỆT ĐỐI KHÔNG dùng markdown (** * __ _)
+    Chỉ dùng plain text + emoji
+QUY TẮC CUỐI CÙNG:
+    Chỉ trả về DUY NHẤT nội dung bài đăng Facebook hoàn chỉnh
+    Không giải thích, không bình luận thêm, không meta text`;
+
+      const generatedText = await callAIText(sharePrompt, {
+        model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+        geminiModel: 'gemini-2.5-pro',
+        temperature: 0.8,
+        maxOutputTokens: 1500,
+      });
+
+      if (generatedText && generatedText.length > 100) {
+        shareText = generatedText;
+      }
+    } catch (shareError) {
+      console.warn('Failed to generate shareText, using fallback:', shareError);
+      shareText = '';
+    }
+
+    return NextResponse.json({
+      success: true,
+      answer: answer.trim(),
+      shareText: shareText.trim(),
+      question: question.trim(),
+      styleGuide: styleGuide
+        ? {
+            id: styleGuide.id,
+            name: styleGuide.name,
+          }
+        : null,
+    });
+  } catch (error: any) {
+    console.error('Q&A API Error:', error);
+
+    let userMessage = 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
+
+    if (error.status === 503 || error.message?.includes('overloaded')) {
+      userMessage = 'Hệ thống AI đang bận, vui lòng thử lại sau 10-20 giây.';
+    } else if (error.status === 429 || error.message?.includes('rate limit')) {
+      userMessage = 'Bạn đang gửi quá nhiều yêu cầu, vui lòng thử lại sau ít phút.';
+    } else if (error.status === 401 || error.message?.includes('API key')) {
+      userMessage = 'Lỗi xác thực hệ thống. Vui lòng liên hệ quản trị viên.';
+    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      userMessage = 'Lỗi kết nối mạng. Kiểm tra internet và thử lại.';
+    } else if (error.message?.includes('timeout')) {
+      userMessage = 'Câu hỏi phức tạp, hệ thống cần thêm thời gian. Thử câu hỏi ngắn hơn.';
+    }
+
+    return NextResponse.json(
+      {
+        error: userMessage,
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      },
+      { status: 500 }
+    );
+  }
+}

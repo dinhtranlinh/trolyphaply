@@ -1,0 +1,342 @@
+Dưới đây là **TÀI LIỆU LẬP TRÌNH TỔNG HỢP – FACEBOOK VIDEOS API** được **hệ thống hóa tương tự hai tài liệu trước**, dựa trên tài liệu chính thức tại
+👉 [https://developers.facebook.com/docs/videos/](https://developers.facebook.com/docs/videos/)
+và các trang liên quan trong hệ sinh thái **Meta Graph API**.
+
+Tài liệu này phù hợp để:
+
+* Làm **tài liệu kỹ thuật nội bộ**
+* Phục vụ **thiết kế – triển khai hệ thống**
+* Đào tạo lập trình viên làm việc với **video trên Facebook (Page, User, Live)**
+
+---
+
+# 📘 **TÀI LIỆU LẬP TRÌNH FACEBOOK VIDEOS API**
+
+*(Meta Platforms, Inc.)*
+
+---
+
+## **1. Tổng quan về Facebook Videos API**
+
+### **1.1 Facebook Videos API là gì**
+
+Facebook Videos API là tập hợp các endpoint trong **Graph API**, cho phép ứng dụng:
+
+* Tải video lên Facebook
+* Quản lý video (cập nhật, xóa)
+* Đăng video lên **Trang (Page)**, **User**, **Group**
+* Truy vấn thông tin video và chỉ số tương tác
+
+API này áp dụng cho:
+
+* Video thường
+* Video dài (long-form)
+* Live video
+* Reels (một phần chức năng)
+
+---
+
+### **1.2 Các đối tượng chính**
+
+| Đối tượng  | Mô tả                |
+| ---------- | -------------------- |
+| Video      | Nội dung video       |
+| Page       | Trang đăng video     |
+| Live Video | Video phát trực tiếp |
+| Comment    | Bình luận            |
+| Reaction   | Cảm xúc              |
+| Insights   | Chỉ số video         |
+
+---
+
+## **2. Kiến trúc & nguyên lý hoạt động**
+
+### **2.1 Graph API & Video Node**
+
+Video là một **node** trong Graph API, có:
+
+* ID riêng
+* Các field (title, description, length, status…)
+* Các edge (comments, reactions, insights)
+
+Ví dụ endpoint:
+
+```
+/{video-id}
+/{video-id}/comments
+/{video-id}/insights
+```
+
+---
+
+### **2.2 Quyền truy cập (Permissions)**
+
+Các permission thường dùng:
+
+* `pages_manage_posts`
+* `pages_read_engagement`
+* `pages_manage_metadata`
+* `pages_read_user_content`
+
+📌 Đăng video lên Page **bắt buộc Page Access Token**.
+
+---
+
+## **3. Bắt đầu – Đăng video lên Facebook Page**
+
+### **3.1 Chuẩn bị**
+
+1. Facebook App đã public
+2. Token hợp lệ (Page Access Token)
+3. App đã được duyệt permission cần thiết
+
+---
+
+### **3.2 Upload video cơ bản**
+
+Endpoint:
+
+```
+POST https://graph.facebook.com/{page-id}/videos
+```
+
+Tham số thường dùng:
+
+* `file_url` hoặc `source`
+* `title`
+* `description`
+* `published` (true/false)
+
+Ví dụ (upload từ URL):
+
+```bash
+POST /{page-id}/videos
+file_url=https://example.com/video.mp4
+title=Demo Video
+description=Video demo
+```
+
+---
+
+## **4. Upload video nâng cao (Resumable Upload)**
+
+### **4.1 Tại sao cần resumable upload**
+
+* Video dung lượng lớn
+* Tránh lỗi mạng
+* Cho phép upload theo từng phần
+
+---
+
+### **4.2 Quy trình upload theo pha**
+
+1. **Start phase** – khởi tạo upload
+2. **Transfer phase** – gửi từng chunk
+3. **Finish phase** – hoàn tất
+
+Quy trình này đặc biệt quan trọng với video > 1GB.
+
+---
+
+## **5. Quản lý Video**
+
+### **5.1 Lấy danh sách video của Page**
+
+```
+GET /{page-id}/videos
+```
+
+---
+
+### **5.2 Cập nhật video**
+
+```
+POST /{video-id}
+```
+
+Các trường cập nhật:
+
+* title
+* description
+* privacy
+* published
+
+---
+
+### **5.3 Xóa video**
+
+```
+DELETE /{video-id}
+```
+
+Yêu cầu quyền quản lý nội dung Page.
+
+---
+
+## **6. Bình luận & tương tác trên Video**
+
+### **6.1 Lấy bình luận**
+
+```
+GET /{video-id}/comments
+```
+
+### **6.2 Tạo bình luận**
+
+```
+POST /{video-id}/comments
+message=Nice video!
+```
+
+### **6.3 Reactions**
+
+```
+GET /{video-id}/reactions
+```
+
+---
+
+## **7. Facebook Live Video API**
+
+### **7.1 Tạo Live Video**
+
+```
+POST /{page-id}/live_videos
+```
+
+Trả về:
+
+* `stream_url`
+* `secure_stream_url`
+* `id`
+
+---
+
+### **7.2 Trạng thái Live Video**
+
+* `LIVE_NOW`
+* `SCHEDULED`
+* `ENDED`
+
+Có thể điều khiển live bằng API (start/stop).
+
+---
+
+## **8. Video Insights (Thông tin chi tiết)**
+
+### **8.1 Video Insights**
+
+```
+GET /{video-id}/insights
+```
+
+Chỉ số phổ biến:
+
+* total_video_views
+* total_video_impressions
+* total_video_avg_time_watched
+* total_video_complete_views
+
+---
+
+### **8.2 Page Video Insights**
+
+```
+GET /{page-id}/insights
+```
+
+📌 Yêu cầu quyền đọc engagement.
+
+---
+
+## **9. Privacy & Publishing**
+
+### **9.1 Trạng thái publish**
+
+* `published=true`: đăng ngay
+* `published=false`: lưu nháp
+
+---
+
+### **9.2 Quyền riêng tư**
+
+Áp dụng chủ yếu cho User video:
+
+* EVERYONE
+* FRIENDS
+* SELF
+
+(Page video luôn public theo Page visibility)
+
+---
+
+## **10. Webhooks cho Video**
+
+Bạn có thể nhận sự kiện:
+
+* Video published
+* New comments
+* Live video status change
+
+Cần:
+
+* Đăng ký Webhook
+* Subscribe Page events
+
+---
+
+## **11. Hạn mức & giới hạn**
+
+* Rate limit theo app & token
+* Giới hạn dung lượng video
+* Giới hạn thời lượng video live
+
+📌 Meta có thể thay đổi giới hạn theo từng version.
+
+---
+
+## **12. Lỗi thường gặp**
+
+| Mã lỗi | Nguyên nhân                 |
+| ------ | --------------------------- |
+| 100    | Sai tham số                 |
+| 190    | Token không hợp lệ          |
+| 200    | Thiếu permission            |
+| 368    | Nội dung vi phạm chính sách |
+
+---
+
+## **13. Versioning & Thay đổi sắp tới**
+
+* Videos API phụ thuộc Graph API version
+* Một số field/edge bị deprecate theo thời gian
+* Reels và Video đang được hợp nhất dần
+
+👉 Theo dõi Graph API Changelog thường xuyên.
+
+---
+
+## **14. Công cụ hỗ trợ**
+
+* Graph API Explorer
+* Access Token Debugger
+* Facebook SDKs
+* Postman Collection – Facebook API
+
+---
+
+## **15. Tổng kết**
+
+Facebook Videos API cho phép:
+
+* Tự động hóa đăng video
+* Quản lý nội dung video quy mô lớn
+* Phân tích hiệu quả truyền thông
+
+Triển khai đúng chuẩn giúp:
+
+* Ổn định
+* Bảo mật
+* Tuân thủ chính sách Meta
+
+---

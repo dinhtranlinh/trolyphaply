@@ -1,0 +1,468 @@
+Dưới đây là **Wireframe Admin UI** (mức “dev cầm là dựng được”), gồm **IA (Information Architecture), layout từng màn hình, component, trạng thái, luồng thao tác** cho hệ thống quản trị Facebook Pages automation của bạn.
+
+---
+
+## 1) IA tổng thể (Sitemap + Navigation)
+
+**Sidebar (trái)**
+
+1. **Dashboard**
+2. **Kết nối Facebook**
+3. **Pages**
+4. **Posts**
+5. **Auto Reply Rules**
+6. **Auto Message Rules**
+7. **CTA / Buttons**
+8. **Webhooks**
+9. **Event Stream**
+10. **Logs**
+11. **Settings**
+
+**Topbar (trên)**
+
+* **Page Switcher** (dropdown chọn Page “đang thao tác”) + ô search Page
+* **Connection Status** (Token OK / Expired / Missing perms)
+* **Quick Actions**: `Sync now` | `Safe mode` (global)
+* User badge (Admin)
+
+**Nguyên tắc UX**
+
+* Admin làm việc theo nhịp: **Chọn Page → Chọn Post → Gán Rule → Giám sát Event/Logs**
+* Tất cả “hành động nguy hiểm” đều có:
+
+  * Preview
+  * Confirm modal
+  * Log + undo (nếu undo được)
+
+---
+
+## 2) Layout khung chuẩn (áp dụng mọi màn hình)
+
+**A. Sidebar** | **B. Topbar** | **C. Content**
+
+* Content có 2 pattern:
+
+  1. **List view** (bảng + filter + bulk actions)
+  2. **Detail view** (tabs + side panel preview/log)
+
+**Mẫu header content**
+
+* Title + breadcrumbs
+* Actions (primary right): `Create` / `Sync` / `Save`
+* Status pills: Active/Inactive, Webhook status
+
+---
+
+## 3) Wireframe từng màn hình (chi tiết UI + states)
+
+### 3.1 Dashboard
+
+**Mục tiêu:** nhìn nhanh tình trạng hệ thống và Page đang chọn.
+
+**Layout**
+
+* Row 1 (KPI cards, 4–6 cards):
+
+  * Today comments
+  * Today replies sent
+  * Messages sent
+  * Failed events
+  * Webhook status
+  * Safe mode status
+* Row 2:
+
+  * Chart “Engagement trend” (7/14/30 ngày)
+  * Chart “Automation outcomes” (sent/failed/skipped)
+* Row 3:
+
+  * “Recent events” (timeline 20 events)
+  * “Top posts” (top comment/reaction)
+
+**States**
+
+* Empty: chưa kết nối FB → banner “Connect Facebook”
+* Partial: thiếu perms → banner “Missing permissions: …” + nút “Re-auth”
+
+**CTA**
+
+* `Connect Facebook`
+* `Sync now`
+* `Enable Safe Mode`
+
+---
+
+### 3.2 Kết nối Facebook
+
+**Mục tiêu:** admin tự xử lý token/perms/pages.
+
+**Sections**
+
+1. **Connection Card**
+
+   * App ID, App mode (Live/Dev)
+   * Token status: OK/Expired
+   * Buttons: `Connect/Reconnect` `Debug token` `Re-check permissions`
+2. **Permissions Checklist**
+
+   * List quyền cần: pages_show_list, pages_manage_posts, pages_read_engagement, pages_manage_engagement…
+   * Status: ✅/❌
+3. **Imported Pages**
+
+   * Table: Page name | Page ID | Role | Token status | Webhook | Actions
+   * Actions: `Add` `Remove` `Rotate token` `Open Page`
+
+**Critical UX**
+
+* Nếu token expired: show modal “Reconnect required”
+* Nếu thiếu quyền: show “Request permissions” button
+
+---
+
+### 3.3 Pages (List + Detail)
+
+#### Pages – List
+
+**Table columns**
+
+* Page (name + avatar)
+* Status (Connected / Token expiring / Broken)
+* Webhook (Active/Inactive)
+* Automations (Reply ON/OFF, Msg ON/OFF)
+* Last sync time
+* Actions: `View` `Sync` `Disable` (kill switch page)
+
+**Filters**
+
+* Status
+* Webhook Active
+* Automation enabled
+
+**Bulk actions**
+
+* Bulk sync
+* Bulk enable/disable automations
+
+#### Page – Detail
+
+**Header**
+
+* Page name + status pills
+* Actions: `Sync now` `Enable Safe Mode (page)` `Webhook settings`
+
+**Tabs**
+
+1. Overview
+2. Posts
+3. Automations
+4. Webhooks
+5. Logs
+
+**Overview tab**
+
+* KPI + chart (engagement, comments volume)
+* “Health check”: webhook OK? perms OK? queue OK?
+
+**Automations tab**
+
+* Toggles:
+
+  * Auto reply: ON/OFF
+  * Auto message: ON/OFF
+  * “Only reply once per user per X mins”
+  * “Rate limit X/min”
+* Quiet hours (time range)
+* Blacklist keywords (textarea)
+
+---
+
+### 3.4 Posts (List + Detail)
+
+#### Posts – List
+
+**Toolbar**
+
+* Date range picker
+* Search by keyword/post ID
+* Filter by: has rules / automation enabled / high comments
+
+**Table columns**
+
+* Post preview (first 1–2 lines)
+* Published time
+* Comments
+* Reactions
+* Assigned rules (reply rule / msg rule)
+* Status (Auto ON/OFF)
+* Actions: `Open` `Assign rules`
+
+#### Post – Detail (màn hình “trung tâm vận hành”)
+
+**Layout 2 cột**
+
+* **Left (70%)**
+
+  * Post content card (text/link/media)
+  * Stats row (comments/reactions)
+  * Comments feed (paginated, realtime badge)
+* **Right (30%)** “Automation panel”
+
+  * Section A: Assigned rules
+
+    * Auto Reply Rule: dropdown + status toggle
+    * Auto Message Rule: dropdown + status toggle
+  * Section B: Preview
+
+    * “Generate 10 previews” button
+    * Show 10 variants + “copy”
+  * Section C: Controls
+
+    * `Pause automations on this post`
+    * `Send message to commenters` (manual campaign)
+  * Section D: Recent actions log (reply/message attempts)
+
+**Important UI states**
+
+* Comment item shows:
+
+  * user name
+  * comment text
+  * tags: (Replied / Skipped / Failed)
+  * action buttons (admin override): `Reply now` `Do not reply` `Send message`
+
+---
+
+### 3.5 Auto Reply Rules (List + Builder)
+
+#### Rules – List
+
+**Table**
+
+* Rule name
+* Scope (Page-wide / specific posts)
+* Conditions (All/Keyword)
+* Rate limit (X/min)
+* Anti-duplicate window
+* Status
+* Actions: `Edit` `Duplicate` `Disable`
+
+**CTA**
+
+* `Create rule`
+
+#### Rule Builder – “Spin editor”
+
+**Layout**
+
+* Left: Form & editor
+* Right: Preview & validation
+
+**Form sections**
+
+1. Basic
+
+   * Rule name
+   * Status toggle
+2. Scope
+
+   * Apply to: selected Page(s) / selected Post(s)
+   * UI: multi-select
+3. Conditions
+
+   * Apply when:
+
+     * All comments
+     * Contains any keywords (chips)
+     * Exclude keywords
+     * Exclude admin comments toggle
+4. Reply Templates (core)
+
+   * Multi-template list (add/remove)
+   * Each template supports:
+
+     * `{full_name}`, `{first_name}`
+     * spin: `[hãy|vui lòng] [check|kiểm tra] ...`
+   * Weight (%) (optional) để ưu tiên template
+5. Anti-spam
+
+   * Rate limit slider (X replies/min)
+   * Cooldown per user (N minutes)
+   * No-repeat window (N hours) by hash
+6. Safety
+
+   * Safe mode inherits? (global/page)
+   * “Disable on error rate > X%”
+
+**Preview panel**
+
+* Button: `Generate 10 variants`
+* Show 10 samples (with dummy name) + highlight replaced variables
+* “Uniqueness meter” (tỷ lệ khác nhau theo token) – chỉ mang tính UI
+
+---
+
+### 3.6 Auto Message Rules (List + Builder)
+
+Tương tự Auto Reply nhưng thêm phần “Eligibility”.
+
+**Eligibility**
+
+* Trigger:
+
+  * On new comment
+  * On reaction
+  * Manual send from Post detail
+* Dedupe:
+
+  * “Only 1 message per user per post”
+  * “Do not message if already messaged in last X days”
+* Opt-out
+
+  * Keywords: STOP, HỦY, DỪNG… (chips)
+
+**Queue view link**
+
+* “View queue for this rule”
+
+---
+
+### 3.7 CTA / Buttons
+
+**Mục tiêu:** admin cấu hình CTA/“nút” (ở mức quản trị).
+
+**Screen**
+
+* CTA presets list:
+
+  * Name, Type (Message/Link/Call), Target, Status
+* Builder:
+
+  * Type select
+  * Label
+  * URL / Phone
+  * UTM builder (optional)
+* Preview card (desktop/mobile)
+
+**Apply**
+
+* Apply to Page default
+* Apply to specific Posts (nếu bạn triển khai theo post composer)
+
+---
+
+### 3.8 Webhooks
+
+**Webhooks status dashboard**
+
+* Per Page:
+
+  * Verify status
+  * Subscribed fields
+  * Last delivery time
+  * Delivery success rate
+* Actions:
+
+  * `Verify now`
+  * `Re-subscribe`
+  * `Test event` (sandbox)
+  * `Pause ingestion` (stop receiving/processing)
+
+**Delivery diagnostics**
+
+* Recent deliveries list:
+
+  * timestamp, object, field, response code, latency
+  * payload view (masked sensitive)
+
+---
+
+### 3.9 Event Stream (Realtime)
+
+**Timeline view**
+
+* Filter bar:
+
+  * Page
+  * Post
+  * Event type: comment/reaction/post
+  * Status: processed/skipped/failed
+* Stream items show:
+
+  * icon + type
+  * snippet
+  * action result (replied/messaged)
+  * link to Post detail
+* “Pause stream” toggle
+
+---
+
+### 3.10 Logs (Audit + Export)
+
+**Log table**
+
+* Time
+* Page
+* Post
+* User (commenter)
+* Action type: reply/message/skip/error/config-change
+* Result: success/failed + reason
+* Correlation ID (for debugging)
+* Export CSV
+
+**Drilldown (drawer)**
+
+* Request payload (masked)
+* Rule applied
+* Generated content variant hash
+* Retry count
+
+---
+
+### 3.11 Settings (Global)
+
+**Global safety controls**
+
+* Global Safe Mode (kill switch)
+* Global rate limit cap
+* Default cooldown
+* Default blacklist keywords
+* Quiet hours default
+* Token storage mode (env/secret manager flags)
+* Queue config (concurrency, retry policy)
+
+**Template utilities**
+
+* Spin syntax help
+* Variable mapping help
+* “Test generator” playground
+
+---
+
+## 4) Luồng thao tác chuẩn (Admin workflows)
+
+### Workflow 1: Setup lần đầu
+
+1. Kết nối Facebook → 2) Import Pages → 3) Enable Webhooks → 4) Sync Posts → 5) Tạo Rule → 6) Gán Rule cho Post
+
+**Done condition:** Post detail hiển thị “Auto Reply ON + previews OK + webhook active”.
+
+### Workflow 2: Bật auto reply cho một post
+
+Posts → chọn Post → Automation panel → chọn Rule → Generate preview → Enable → theo dõi Event Stream/Logs.
+
+### Workflow 3: Khắc phục sự cố
+
+Dashboard banner lỗi → Webhooks diagnostics → xem delivery fail → Logs drilldown → Disable rule/page safe mode nếu cần.
+
+---
+
+## 5) UI Components “đinh” cần có (để UX mượt)
+
+* Page Switcher (global context)
+* Rule selector (searchable dropdown)
+* Spin Editor + Preview generator
+* Status pills (Connected / Missing perms / Webhook active)
+* Timeline stream realtime
+* Drawer xem log/payload
+* Kill switch (global + per page + per post)
+* Quiet hours picker + rate limit slider
+

@@ -1,0 +1,27 @@
+┌─────────────────────────────────────────────────────────────────┐
+│  1. TRƯỚC KHI CODE                                              │
+│     - Đọc Docs/DEV-LOG.md (lessons learned)                     │
+│     - Đọc types/facebook-schemas.ts (schema registry)           │
+│     - Check copilot-instructions.md                             │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────────┐
+│  2. TRONG KHI CODE                                              │
+│     - Import types từ facebook-schemas.ts                       │
+│     - Dùng đúng field names (page_name, không phải name)        │
+│     - Dùng đúng UUID vs Facebook ID                             │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────────┐
+│  3. SAU KHI CODE                                                │
+│     - npm run check (validate)                                  │
+│     - Test trên localhost:3456                                  │
+│     - Ghi chép gotchas mới vào DEV-LOG.md                       │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────────┐
+│  4. DEPLOY                                                      │
+│     - .\scripts\deploy-to-prod.ps1 -DryRun (preview)            │
+│     - .\scripts\deploy-to-prod.ps1 (actual deploy)              │
+│     - Test trên localhost:8686                                  │
+└─────────────────────────────────────────────────────────────────┘

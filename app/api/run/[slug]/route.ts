@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { callGeminiText } from '@/lib/gemini';
+import { callAIText } from '@/lib/ai';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -77,7 +77,9 @@ export async function POST(
     }
 
     // Call Gemini AI
-    const aiResponse = await callGeminiText(finalPrompt, {
+    const aiResponse = await callAIText(finalPrompt, {
+      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      geminiModel: 'gemini-2.5-pro',
       temperature: app.temperature || 0.9,
       maxOutputTokens: app.max_tokens || 2048,
     });

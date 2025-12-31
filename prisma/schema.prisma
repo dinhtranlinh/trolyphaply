@@ -1,12 +1,12 @@
 // Prisma schema for TroLyPhapLy
+// Note: Prisma 7 - datasource moved to runtime config
+// Schema chỉ dùng để generate types, không dùng cho migrations
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+// Database connection configured at runtime via Supabase client
+// This schema is for type generation only
 
 model AdminUser {
   id        String   @id @default(uuid())
@@ -145,4 +145,141 @@ model AppEvent {
   app       App      @relation(fields: [appId], references: [id], onDelete: Cascade)
   result    Result?  @relation(fields: [resultId], references: [id], onDelete: SetNull)
   @@map("app_events")
+}
+
+// ============================================
+// FACEBOOK PAGE AUTOMATION MODELS
+// ============================================
+
+model FacebookConnection {
+  id                String   @id @default(uuid())
+  userAccessToken   String   @db.Text @map("user_access_token")
+  tokenExpiresAt    DateTime? @map("token_expires_at")
+  scopes            String[] @default([])
+  status            String   @default("active") // active, expired, revoked
+  lastVerifiedAt    DateTime? @map("last_verified_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  @@map("facebook_connection")
+}
+
+model FacebookPage {
+  id                String   @id @default(uuid())
+  pageId            String   @unique @map("page_id")
+  pageName          String   @map("page_name")
+  pageAccessToken   String   @db.Text @map("page_access_token")
+  category          String?
+  followerCount     Int?     @map("follower_count")
+  automationEnabled Boolean  @default(true) @map("automation_enabled")
+  status            String   @default("active") // active, inactive
+  lastSyncAt        DateTime? @map("last_sync_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  replyRules        AutoReplyRule[]
+  messageRules      AutoMessageRule[]
+  stats             PageStats[]
+  @@map("facebook_pages")
+}
+
+model AutoReplyRule {
+  id              String   @id @default(uuid())
+  name            String
+  pageId          String   @map("page_id")
+  postId          String?  @map("post_id") // null = áp dụng cho tất cả posts
+  triggerType     String   @default("all") @map("trigger_type") // all, keyword
+  keywords        String[] @default([]) // trigger keywords (OR logic)
+  excludeKeywords String[] @default([]) @map("exclude_keywords") // blacklist
+  replyTemplates  String[] @map("reply_templates") // Array of spin templates
+  priority        Int      @default(0) // Higher = execute first
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  page            FacebookPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  @@index([pageId, postId])
+  @@map("auto_reply_rules")
+}
+
+model AutoMessageRule {
+  id                String   @id @default(uuid())
+  name              String
+  pageId            String   @map("page_id")
+  triggerOn         String[] @map("trigger_on") // ["comment", "reaction"]
+  messageTemplate   String   @db.Text @map("message_template")
+  cooldownMinutes   Int      @default(1440) @map("cooldown_minutes") // 24h default
+  enabled           Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  page              FacebookPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  @@map("auto_message_rules")
+}
+
+model FacebookEvent {
+  id          String   @id @default(uuid())
+  eventType   String   @map("event_type") // comment, reaction, post
+  pageId      String   @map("page_id")
+  postId      String?  @map("post_id")
+  commentId   String?  @map("comment_id")
+  userId      String?  @map("user_id") // Facebook user ID
+  dedupeKey   String   @unique @map("dedupe_key") // For idempotency
+  payload     Json     // Full webhook payload
+  status      String   @default("received") // received, processed, failed
+  processedAt DateTime? @map("processed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  @@index([pageId, createdAt])
+  @@index([dedupeKey])
+  @@map("facebook_events")
+}
+
+model AutomationQueue {
+  id          String   @id @default(uuid())
+  jobType     String   @map("job_type") // reply_comment, send_message
+  pageId      String   @map("page_id")
+  targetId    String   @map("target_id") // comment_id or user_id
+  payload     Json     // Job data
+  scheduledAt DateTime @map("scheduled_at") // Execute after this time
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3) @map("max_attempts")
+  status      String   @default("pending") // pending, processing, completed, failed
+  error       String?  @db.Text
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  @@index([status, scheduledAt])
+  @@index([pageId])
+  @@map("automation_queue")
+}
+
+model AutomationLog {
+  id          String   @id @default(uuid())
+  actionType  String   @map("action_type") // reply_sent, message_sent, rule_matched
+  pageId      String   @map("page_id")
+  postId      String?  @map("post_id")
+  targetId    String?  @map("target_id") // comment_id, user_id
+  ruleId      String?  @map("rule_id")
+  contentSent String?  @db.Text @map("content_sent")
+  status      String   // success, failed, skipped
+  metadata    Json?    // Additional context
+  createdAt   DateTime @default(now()) @map("created_at")
+  @@index([pageId, createdAt])
+  @@index([actionType, status])
+  @@map("automation_logs")
+}
+
+model PageStats {
+  pageId          String   @map("page_id")
+  date            DateTime @db.Date
+  commentsTotal   Int      @default(0) @map("comments_total")
+  repliesSent     Int      @default(0) @map("replies_sent")
+  messagesSent    Int      @default(0) @map("messages_sent")
+  reactionsTotal  Int      @default(0) @map("reactions_total")
+  failedJobs      Int      @default(0) @map("failed_jobs")
+  page            FacebookPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  @@id([pageId, date])
+  @@map("page_stats")
+}
+
+model SystemConfig {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("system_config")
 }

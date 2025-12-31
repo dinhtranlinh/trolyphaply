@@ -1,13 +1,36 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+
+type Summary = {
+  views: number;
+  submits: number;
+  shares: number;
+  affiliate_clicks: number;
+};
+
+type Daily = {
+  date: string;
+  views: number;
+  submits: number;
+  shares: number;
+  affiliate_clicks: number;
+};
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+  const [summary, setSummary] = useState<Summary>({
+    views: 0,
+    submits: 0,
+    shares: 0,
+    affiliate_clicks: 0,
+  });
+  const [daily, setDaily] = useState<Daily[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -18,6 +41,37 @@ export default function AdminDashboard() {
     setAuthorized(true);
     setLoading(false);
   }, [router]);
+
+  useEffect(() => {
+    if (!authorized) return;
+
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true);
+        setStatsError(null);
+        const res = await fetch('/api/admin/stats');
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Không lấy được thống kê');
+        }
+        setSummary(data.summary || summary);
+        setDaily(data.daily || []);
+      } catch (err: any) {
+        setStatsError(err.message || 'Có lỗi khi lấy thống kê');
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [authorized]);
+
+  const dailyTotalSeries = useMemo(() => {
+    return daily.map((d) => ({
+      date: d.date,
+      total: d.views + d.submits + d.shares + d.affiliate_clicks,
+    }));
+  }, [daily]);
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -32,218 +86,83 @@ export default function AdminDashboard() {
     router.push('/admin');
   };
 
+  const cards: { key: keyof Summary; label: string; color: string }[] = [
+    { key: 'views', label: 'Lượt xem', color: 'bg-blue-50 text-blue-700' },
+    { key: 'submits', label: 'Gửi yêu cầu', color: 'bg-green-50 text-green-700' },
+    { key: 'shares', label: 'Chia sẻ', color: 'bg-orange-50 text-orange-700' },
+    { key: 'affiliate_clicks', label: 'Affiliate clicks', color: 'bg-purple-50 text-purple-700' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar Navigation */}
-      <aside className="w-64 bg-white shadow-lg h-screen sticky top-0 hidden md:block">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Admin Panel</h2>
-          <nav className="space-y-2">
-            <Link
-              href="/admin/dashboard"
-              className="flex items-center gap-3 px-4 py-3 text-gray-900 bg-blue-50 border-l-4 border-blue-600 font-medium"
-            >
-              <span>📊</span>
-              <span>Dashboard</span>
-            </Link>
-            <Link
-              href="/admin/documents"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>📜</span>
-              <span>Documents</span>
-            </Link>
-            <Link
-              href="/admin/procedures"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>📋</span>
-              <span>Procedures</span>
-            </Link>
-            <Link
-              href="/admin/ai-prompts"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>🎨</span>
-              <span>AI Prompts</span>
-            </Link>
-            <Link
-              href="/admin/apps"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>🎯</span>
-              <span>Apps</span>
-            </Link>
-            <Link
-              href="/admin/style-guides"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>✍️</span>
-              <span>Style Guides</span>
-            </Link>
-            <Link
-              href="/admin/video-prompts"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>🎬</span>
-              <span>Video Prompts</span>
-            </Link>
-            <Link
-              href="/admin/documents/import"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
-            >
-              <span>📥</span>
-              <span>Import/Export</span>
-            </Link>
-          </nav>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-sm text-gray-500">Tổng quan traffic và tương tác</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          >
+            Logout
+          </button>
         </div>
-      </aside>
+      </header>
 
-      {/* Main Content Area */}
-      <div className="flex-1">
-        {/* Header */}
-        <header className="bg-white shadow">
-          <div className="px-4 py-6 flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-            >
-              Logout
-            </button>
+      <main className="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
+        {statsError ? (
+          <div className="p-4 mb-6 bg-red-50 text-red-700 rounded border border-red-200">
+            {statsError}
           </div>
-        </header>
+        ) : null}
 
-        {/* Dashboard Content */}
-        <main className="p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Documents */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">📜</span>
-                <span className="text-sm font-medium text-gray-500">DOCUMENTS</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {cards.map((c) => (
+            <div key={c.key} className="bg-white rounded-lg shadow p-4">
+              <div className={`text-xs font-semibold inline-block px-2 py-1 rounded ${c.color}`}>
+                {c.label}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Legal Documents</h3>
-              <p className="text-gray-600 mb-4 text-sm">Manage legal documents library</p>
-              <Link
-                href="/admin/documents"
-                className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
-              >
-                Manage
-              </Link>
+              <div className="mt-3 text-3xl font-bold text-gray-900">
+                {statsLoading ? '...' : summary[c.key] || 0}
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Tổng cộng 30 ngày gần nhất</p>
             </div>
+          ))}
+        </div>
 
-            {/* Procedures */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">📋</span>
-                <span className="text-sm font-medium text-gray-500">PROCEDURES</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Procedures</h3>
-              <p className="text-gray-600 mb-4 text-sm">Manage administrative procedures</p>
-              <Link
-                href="/admin/procedures"
-                className="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium"
-              >
-                Manage
-              </Link>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Daily traffic (14 ngày)</h2>
+              <p className="text-sm text-gray-500">Tổng số event mỗi ngày (view + submit + share + affiliate)</p>
             </div>
-
-            {/* Prompts */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">💬</span>
-                <span className="text-sm font-medium text-gray-500">PROMPTS</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Q&A Prompts</h3>
-              <p className="text-gray-600 mb-4 text-sm">Manage prompts for Q&A system</p>
-              <Link
-                href="/admin/prompts"
-                className="inline-block px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm font-medium"
-              >
-                Manage
-              </Link>
-            </div>
-
-            {/* Apps */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">🎯</span>
-                <span className="text-sm font-medium text-gray-500">APPS</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Mini Apps</h3>
-              <p className="text-gray-600 mb-4 text-sm">Manage AI-powered applications</p>
-              <Link
-                href="/admin/apps"
-                className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium"
-              >
-                Manage
-              </Link>
-            </div>
-
-            {/* Style Guides */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">✍️</span>
-                <span className="text-sm font-medium text-gray-500">STYLE GUIDES</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Style Guides</h3>
-              <p className="text-gray-600 mb-4 text-sm">Manage writing style guides</p>
-              <Link
-                href="/admin/style-guides"
-                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
-              >
-                Manage
-              </Link>
-            </div>
-
-            {/* Video Prompts */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">🎬</span>
-                <span className="text-sm font-medium text-gray-500">VIDEO PROMPTS</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Video Prompts</h3>
-              <p className="text-gray-600 mb-4 text-sm">Manage video prompt templates</p>
-              <Link
-                href="/admin/video-prompts"
-                className="inline-block px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm font-medium"
-              >
-                Manage
-              </Link>
-            </div>
-
-            {/* Import/Export */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">📥</span>
-                <span className="text-sm font-medium text-gray-500">IMPORT/EXPORT</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Import/Export</h3>
-              <p className="text-gray-600 mb-4 text-sm">Import documents and export data</p>
-              <Link
-                href="/admin/documents/import"
-                className="inline-block px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
-              >
-                Import/Export
-              </Link>
-            </div>
-
-            {/* Analytics */}
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition opacity-60">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">📈</span>
-                <span className="text-sm font-medium text-gray-500">ANALYTICS</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Analytics</h3>
-              <p className="text-gray-600 mb-4 text-sm">View system statistics</p>
-              <button className="px-4 py-2 bg-gray-600 text-white rounded-lg cursor-not-allowed text-sm font-medium">
-                Coming Soon
-              </button>
-            </div>
+            {statsLoading && <span className="text-sm text-gray-400">Đang tải...</span>}
           </div>
-        </main>
-      </div>
+
+          {dailyTotalSeries.length === 0 ? (
+            <div className="text-sm text-gray-500">Chưa có dữ liệu.</div>
+          ) : (
+            <div className="space-y-2">
+              {dailyTotalSeries.map((d) => {
+                const max = Math.max(...dailyTotalSeries.map((v) => v.total), 1);
+                const pct = Math.min(100, Math.round((d.total / max) * 100));
+                return (
+                  <div key={d.date}>
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>{d.date}</span>
+                      <span>{d.total}</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500" style={{ width: `${pct}%` }}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

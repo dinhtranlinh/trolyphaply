@@ -21,10 +21,15 @@ interface StyleGuide {
   is_default: boolean;
 }
 
+
 export default function Home() {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [shareText, setShareText] = useState(''); // AI-generated shareable content
+  const [shareText, setShareText] = useState(''); // AI-generated shareable content (lazy)
+  const [shareLoading, setShareLoading] = useState(false);
+  const [mobileShareOpen, setMobileShareOpen] = useState(false);
+  const [mobileShareContent, setMobileShareContent] = useState('');
+  const [mobileShareUrl, setMobileShareUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [styleGuides, setStyleGuides] = useState<StyleGuide[]>([]);
@@ -91,28 +96,60 @@ export default function Home() {
     { icon: '🎲', label: 'Ứng dụng AI', href: '/apps' },
   ];
 
-  // Format text for social sharing - remove markdown and add appropriate formatting
-  const formatShareText = (rawAnswer: string): string => {
+  // Format text for social sharing - remove markdown, tidy whitespace and append source
+  const formatShareText = (rawAnswer: string, rawQuestion?: string): string => {
     let formatted = rawAnswer
-      // Remove markdown bold/italic
       .replace(/\*\*\*(.+?)\*\*\*/g, '$1')
       .replace(/\*\*(.+?)\*\*/g, '$1')
       .replace(/\*(.+?)\*\*/g, '$1')
       .replace(/\*(.+?)\*/g, '$1')
-      // Remove "Lưu ý quan trọng" section and similar disclaimers
-      .replace(/\*\*Lưu ý quan trọng:?\*\*/gi, '')
-      .replace(/Lưu ý quan trọng:?/gi, '')
-      .replace(/\*\*Lưu ý:?\*\*/gi, '')
-      .replace(/Lưu ý:?/gi, '')
-      // Remove disclaimer sentences
-      .replace(/Đây chỉ là thông tin tham khảo.*?\.?/gi, '')
-      .replace(/không thay thế.*?pháp lý.*?\.?/gi, '')
-      .replace(/nên tham khảo.*?chuyên gia.*?\.?/gi, '')
-      // Clean up extra whitespace
+      .replace(/__(.+?)__/g, '$1')
+      .replace(/_(.+?)_/g, '$1')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
 
-    return formatted;
+    const questionHeader = rawQuestion && rawQuestion.trim()
+      ? `Cau hoi: ${rawQuestion.trim()}\n\n`
+      : '';
+
+    const base = `${questionHeader}${formatted}`.trim();
+    const source =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : 'https://trolyphaply.vn';
+
+    return `${base}
+
+Nguon: ${source}`.trim();
+  };
+
+  // Lazy-generate shareText only when needed
+  const ensureShareText = async (): Promise<string> => {
+    if (shareText.trim()) return shareText;
+    if (!answer.trim()) return '';
+    try {
+      setShareLoading(true);
+      const res = await fetch('/api/share-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer, question }),
+      });
+      const contentType = res.headers.get('content-type') || '';
+      let data: any = null;
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      }
+      if (!res.ok || !data?.shareText) {
+        throw new Error(data?.error || `ShareText API error: ${res.status}`);
+      }
+      setShareText(data.shareText);
+      return data.shareText as string;
+    } catch (err) {
+      console.error('ShareText gen error', err);
+      return formatShareText(answer, question);
+    } finally {
+      setShareLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -140,7 +177,7 @@ export default function Home() {
       }
 
       setAnswer(data.answer);
-      setShareText(data.shareText || ''); // AI-generated shareable content
+      setShareText(''); // AI-generated shareable content
     } catch (err: any) {
       // Display user-friendly error message
       let errorMessage = err.message || 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
@@ -158,6 +195,78 @@ export default function Home() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const isMobileDevice = () => {
+    if (typeof navigator === 'undefined') return false;
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  };
+
+  const shareCopyAlertMessage = '\u2705 \u0110\u00e3 copy n\u1ed9i dung!\n\n\uD83D\uDC49 H\u00e3y d\u00e1n l\u00ean Facebook/Zalo \u0111\u1ec3 chia s\u1ebb v\u1edbi b\u1ea1n b\u00e8.';
+  const shareCopyErrorMessage = '\u26a0\ufe0f Kh\u00f4ng th\u1ec3 copy n\u1ed9i dung. Vui l\u00f2ng th\u1eed l\u1ea1i ho\u1eb7c d\u00f9ng n\u00fat Copy.';
+  const mobileShareTitle = 'Chia s\u1ebb Facebook';
+  const mobileShareHint =
+    'H\u00e3y copy n\u1ed9i dung tr\u01b0\u1edbc, sau \u0111\u00f3 m\u1edf Facebook \u0111\u1ec3 d\u00e1n.';
+  const mobileShareCopyLabel = 'Copy n\u1ed9i dung';
+  const mobileShareOpenLabel = 'M\u1edf Facebook';
+  const mobileShareCloseLabel = '\u0110\u00f3ng';
+
+  const fallbackCopyShareContent = (content: string) => {
+    if (typeof document === 'undefined') return false;
+    const textarea = document.createElement('textarea');
+    textarea.value = content;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      return document.execCommand('copy');
+    } catch (err) {
+      return false;
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  };
+
+  const copyShareContent = async (content: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(content);
+        return true;
+      } catch (err) {
+        // fall through to legacy copy
+      }
+    }
+    return fallbackCopyShareContent(content);
+  };
+
+  const handleFacebookShare = async () => {
+    const content = (await ensureShareText()) || formatShareText(answer, question);
+    const shareUrl = window.location.href;
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(content)}`;
+
+    const mobile = isMobileDevice();
+    if (mobile) {
+      setMobileShareContent(content);
+      setMobileShareUrl(fbUrl);
+      setMobileShareOpen(true);
+      return;
+    }
+
+    const copied = await copyShareContent(content);
+    if (!copied) {
+      window.alert(shareCopyErrorMessage);
+      return;
+    }
+
+    window.alert(shareCopyAlertMessage);
+
+    const popup = window.open(fbUrl, '_blank', 'width=900,height=700');
+    if (!popup) {
+      window.location.href = fbUrl;
     }
   };
 
@@ -344,44 +453,76 @@ export default function Home() {
                       <p className="text-sm font-medium text-[#1A2B49] mb-2">📤 Chia sẻ câu trả lời:</p>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => {
-                            // Use AI-generated shareText if available, fallback to formatted answer
-                            const content = shareText || formatShareText(answer);
-                            const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(content)}`;
-                            window.open(fbUrl, '_blank', 'width=600,height=400');
-                          }}
-                          className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] transition-colors text-sm font-medium"
+                          onClick={handleFacebookShare}
+                          disabled={shareLoading}
+                          className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                         >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                          </svg>
-                          Facebook
+                          {shareLoading ? (
+                            <>
+                              <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                              Đang xử lý...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                              </svg>
+                              Facebook
+                            </>
+                          )}
                         </button>
                         <button
-                          onClick={() => {
-                            const content = shareText || formatShareText(answer);
+                          onClick={async () => {
+                            const content = (await ensureShareText()) || formatShareText(answer, question);
                             const zaloUrl = `https://sp.zalo.me/share?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(content)}`;
                             window.open(zaloUrl, '_blank', 'width=600,height=400');
                           }}
-                          className="flex items-center gap-2 px-4 py-2 bg-[#0068FF] text-white rounded-lg hover:bg-[#0052CC] transition-colors text-sm font-medium"
+                          disabled={shareLoading}
+                          className="flex items-center gap-2 px-4 py-2 bg-[#0068FF] text-white rounded-lg hover:bg-[#0052CC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                         >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652.521 2.411-.343 6.237-.343 6.237s3.48-.908 5.513-2.051c.651.14 1.324.24 2.017.29.18.013.362.022.545.027.18-.005.362-.014.542-.027.693-.05 1.366-.15 2.017-.29 2.033 1.143 5.513 2.051 5.513 2.051s-.864-3.826-.343-6.237C22.255 17.727 24 14.608 24 11.111 24 4.975 18.627 0 12 0zm.545 19.644c-.18.013-.362.022-.545.027-.183-.005-.365-.014-.545-.027-5.621-.406-10.11-4.46-10.11-9.422C1.345 5.26 6.172.889 12 .889s10.655 4.37 10.655 9.733c0 4.962-4.489 9.016-10.11 9.422z"/>
-                          </svg>
-                          Zalo
+                          {shareLoading ? (
+                            <>
+                              <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                              Đang xử lý...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652.521 2.411-.343 6.237-.343 6.237s3.48-.908 5.513-2.051c.651.14 1.324.24 2.017.29.18.013.362.022.545.027.18-.005.362-.014.542-.027.693-.05 1.366-.15 2.017-.29 2.033 1.143 5.513 2.051 5.513 2.051s-.864-3.826-.343-6.237C22.255 17.727 24 14.608 24 11.111 24 4.975 18.627 0 12 0zm.545 19.644c-.18.013-.362.022-.545.027-.183-.005-.365-.014-.545-.027-5.621-.406-10.11-4.46-10.11-9.422C1.345 5.26 6.172.889 12 .889s10.655 4.37 10.655 9.733c0 4.962-4.489 9.016-10.11 9.422z"/>
+                              </svg>
+                              Zalo
+                            </>
+                          )}
                         </button>
                         <button
-                          onClick={() => {
-                            const content = shareText || formatShareText(answer);
-                            navigator.clipboard.writeText(content);
-                            alert('✅ Đã copy nội dung chia sẻ!');
+                          onClick={async () => {
+                            let content = await ensureShareText();
+                            if (!content) {
+                              content = formatShareText(answer, question);
+                            }
+                            const copied = await copyShareContent(content);
+                            if (copied) {
+                              alert(shareCopyAlertMessage);
+                            } else {
+                              alert(shareCopyErrorMessage);
+                            }
                           }}
-                          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                          disabled={shareLoading}
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                          Copy
+                          {shareLoading ? (
+                            <>
+                              <div className="animate-spin h-4 w-4 border-2 border-gray-700 border-t-transparent rounded-full"></div>
+                              Đang xử lý...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                              Copy
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -420,6 +561,50 @@ export default function Home() {
             </div>
           </div>
         </div>
+        {mobileShareOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+            <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-900">{mobileShareTitle}</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                {mobileShareHint}
+              </p>
+              <div className="mt-4 space-y-2">
+                <button
+                  onClick={async () => {
+                    const copied = await copyShareContent(mobileShareContent);
+                    if (copied) {
+                      window.alert(shareCopyAlertMessage);
+                    } else {
+                      window.alert(shareCopyErrorMessage);
+                    }
+                  }}
+                  className="w-full rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
+                >
+                  {mobileShareCopyLabel}
+                </button>
+                <button
+                  onClick={() => {
+                    if (!mobileShareUrl) {
+                      window.alert(shareCopyErrorMessage);
+                      return;
+                    }
+                    setMobileShareOpen(false);
+                    window.location.href = mobileShareUrl;
+                  }}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  {mobileShareOpenLabel}
+                </button>
+                <button
+                  onClick={() => setMobileShareOpen(false)}
+                  className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
+                >
+                  {mobileShareCloseLabel}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </AppShell>
   );
 }

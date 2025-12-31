@@ -3,9 +3,10 @@ module.exports = {
     {
       // Development server
       name: 'trolyphaply-dev',
-      script: 'npm',
-      args: 'run dev',
+      script: 'node_modules/next/dist/bin/next',
+      args: 'dev -p 3456',
       cwd: 'D:\\DTL\\trolyphaply',
+      interpreter: 'node',
       env: {
         NODE_ENV: 'development',
         PORT: 3456,
@@ -17,9 +18,10 @@ module.exports = {
     {
       // Production server
       name: 'trolyphaply-prod',
-      script: 'npm',
-      args: 'run start:prod',
-      cwd: 'D:\\DTL\\trolyphaply',
+      script: 'node_modules/next/dist/bin/next',
+      args: 'start -p 8686',
+      cwd: 'D:\\DTL\\trolyphaply-prod-release',
+      interpreter: 'node',
       env: {
         NODE_ENV: 'production',
         PORT: 8686,

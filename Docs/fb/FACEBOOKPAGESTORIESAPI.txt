@@ -1,0 +1,270 @@
+Dưới đây là **TÀI LIỆU LẬP TRÌNH TỔNG HỢP – FACEBOOK PAGE STORIES API**, được trình bày **tương tự các tài liệu trước (Pages API, Login, Videos)**, dựa trên tài liệu chính thức tại
+👉 [https://developers.facebook.com/docs/page-stories-api/](https://developers.facebook.com/docs/page-stories-api/)
+
+Tài liệu này phù hợp để:
+
+* Làm **tài liệu kỹ thuật nội bộ**
+* Thiết kế & triển khai **hệ thống đăng Story tự động cho Page**
+* Đào tạo lập trình viên làm việc với **Story Facebook Page**
+
+---
+
+# 📘 **TÀI LIỆU LẬP TRÌNH FACEBOOK PAGE STORIES API**
+
+*(Meta Platforms, Inc.)*
+
+---
+
+## **1. Tổng quan về Page Stories API**
+
+### **1.1 Facebook Page Stories là gì**
+
+**Page Stories** là định dạng nội dung ngắn hạn (ephemeral content):
+
+* Hiển thị trong vòng **24 giờ**
+* Xuất hiện ở khu vực Stories trên Facebook
+* Hỗ trợ **ảnh (image)** và **video**
+
+**Page Stories API** cho phép ứng dụng:
+
+* Đăng Story lên Facebook Page
+* Quản lý vòng đời Story
+* Tích hợp Story vào hệ thống tự động (CMS, lịch đăng, truyền thông số)
+
+📌 **Lưu ý quan trọng:**
+Page Stories API **chỉ áp dụng cho Page**, **không áp dụng cho tài khoản cá nhân (User)**.
+
+---
+
+## **2. Điều kiện sử dụng Page Stories API**
+
+### **2.1 Điều kiện bắt buộc**
+
+Ứng dụng cần:
+
+1. Facebook App hợp lệ
+2. Page Access Token
+3. Page thuộc quyền quản lý của app
+4. App được duyệt quyền phù hợp
+
+---
+
+### **2.2 Permissions cần thiết**
+
+| Permission              | Mục đích               |
+| ----------------------- | ---------------------- |
+| `pages_manage_posts`    | Đăng nội dung lên Page |
+| `pages_read_engagement` | Đọc tương tác          |
+| `pages_show_list`       | Lấy danh sách Page     |
+
+📌 Không có permission → **không thể đăng Story**.
+
+---
+
+## **3. Kiến trúc & nguyên lý hoạt động**
+
+### **3.1 Vị trí trong Graph API**
+
+Page Stories là một **edge** của Page node:
+
+```
+POST /{page-id}/stories
+```
+
+Story sau khi tạo:
+
+* Có ID riêng
+* Tồn tại tối đa 24 giờ
+* Không chỉnh sửa nội dung sau khi đăng
+
+---
+
+### **3.2 So sánh Story và Post**
+
+| Tiêu chí          | Story           | Post           |
+| ----------------- | --------------- | -------------- |
+| Thời gian tồn tại | 24h             | Không giới hạn |
+| API chỉnh sửa     | ❌               | ✅              |
+| API xóa           | ❌ (tự hết hạn)  | ✅              |
+| Mục đích          | Nhanh, ngắn hạn | Nội dung chính |
+
+---
+
+## **4. Bắt đầu – Đăng Story lên Page**
+
+### **4.1 Endpoint chính**
+
+```
+POST https://graph.facebook.com/{page-id}/stories
+```
+
+---
+
+### **4.2 Đăng Story dạng ảnh (Image Story)**
+
+**Tham số:**
+
+* `image_url` – URL ảnh (HTTPS)
+* `access_token` – Page Access Token
+
+**Ví dụ:**
+
+```bash
+POST /{page-id}/stories
+image_url=https://example.com/story.jpg
+```
+
+📌 Ảnh phải:
+
+* Truy cập công khai
+* Định dạng được Facebook hỗ trợ
+* Phù hợp chính sách nội dung
+
+---
+
+### **4.3 Đăng Story dạng video (Video Story)**
+
+**Tham số:**
+
+* `video_url`
+* `access_token`
+
+Ví dụ:
+
+```bash
+POST /{page-id}/stories
+video_url=https://example.com/story.mp4
+```
+
+📌 Video Story:
+
+* Thời lượng giới hạn (ngắn)
+* Không dùng resumable upload
+* Upload trực tiếp từ URL
+
+---
+
+## **5. Nội dung & giới hạn kỹ thuật**
+
+### **5.1 Giới hạn chính**
+
+| Thuộc tính         | Giới hạn               |
+| ------------------ | ---------------------- |
+| Thời gian hiển thị | 24 giờ                 |
+| Chỉnh sửa          | Không hỗ trợ           |
+| Caption            | Không hỗ trợ           |
+| Link click         | Không hỗ trợ trực tiếp |
+
+📌 Page Stories API **không hỗ trợ text-only story**.
+
+---
+
+### **5.2 Chính sách nội dung**
+
+Story phải tuân thủ:
+
+* Facebook Community Standards
+* Page Content Policy
+* Không vi phạm bản quyền, spam, nội dung cấm
+
+---
+
+## **6. Truy vấn & theo dõi Story**
+
+### **6.1 Lấy danh sách Story của Page**
+
+Facebook **không cung cấp endpoint public** để:
+
+* Liệt kê tất cả Story đang active
+* Lấy Story ID sau khi đăng
+
+📌 API mang tính **fire-and-forget** (đăng → hiển thị → tự hết hạn).
+
+---
+
+### **6.2 Insights cho Story**
+
+Hiện tại:
+
+* Page Stories API **không hỗ trợ insights chi tiết** qua API
+* Chỉ xem được trong Facebook Page UI
+
+---
+
+## **7. Webhooks & Story Events**
+
+### **7.1 Webhooks**
+
+Meta **không cung cấp webhook riêng cho Story lifecycle**:
+
+* Không có event khi story hết hạn
+* Không có event view story
+
+📌 Story API thiên về **đăng nội dung**, không phải theo dõi.
+
+---
+
+## **8. Lỗi thường gặp**
+
+| Mã lỗi | Nguyên nhân                 |
+| ------ | --------------------------- |
+| 100    | Thiếu hoặc sai tham số      |
+| 190    | Token không hợp lệ          |
+| 200    | Thiếu permission            |
+| 368    | Nội dung vi phạm chính sách |
+| 10     | App chưa được duyệt quyền   |
+
+---
+
+## **9. Versioning & Thay đổi**
+
+* Page Stories API phụ thuộc Graph API version
+* Có thể thay đổi giới hạn media
+* Có khả năng bị hợp nhất với Video/Reels API trong tương lai
+
+📌 Khuyến nghị:
+
+> Luôn theo dõi **Graph API Changelog** khi sử dụng Story trong hệ thống tự động.
+
+---
+
+## **10. Best Practices**
+
+### **10.1 Kỹ thuật**
+
+* Kiểm tra token trước khi gọi API
+* Validate URL media
+* Retry khi lỗi mạng
+
+### **10.2 Nghiệp vụ**
+
+* Dùng Story cho:
+
+  * Thông báo nhanh
+  * Sự kiện ngắn hạn
+  * Truyền thông tức thời
+* Không dùng Story cho nội dung bắt buộc lưu trữ
+
+---
+
+## **11. Ứng dụng thực tế**
+
+Page Stories API phù hợp cho:
+
+* CMS tự động đăng nội dung
+* Hệ thống truyền thông số
+* Lịch đăng bài cho cơ quan, tổ chức
+* Chiến dịch truyền thông ngắn hạn
+
+---
+
+## **12. Tổng kết**
+
+Facebook Page Stories API:
+
+* Cho phép đăng Story lên Page
+* Đơn giản, ít endpoint
+* Hạn chế về quản lý & theo dõi
+* Phù hợp tích hợp tự động hóa nội dung
+
+---

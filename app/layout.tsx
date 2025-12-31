@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -86,25 +86,31 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="TroLyPhapLy" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '856285397321094',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v24.0'
+    });
+    FB.AppEvents.logPageView();   
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+            `,
+          }}
+        />
         {children}
-        
-        {/* Service Worker Registration */}
-        <Script id="sw-register" strategy="afterInteractive">
-          {`
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(
-                  (registration) => {
-                    console.log('ServiceWorker registered:', registration.scope);
-                  },
-                  (error) => {
-                    console.error('ServiceWorker registration failed:', error);
-                  }
-                );
-              });
-            }
-          `}
-        </Script>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

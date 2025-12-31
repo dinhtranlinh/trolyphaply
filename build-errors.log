@@ -1,0 +1,29 @@
+﻿
+> trolyphaply@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.6 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 10.2s
+   Running TypeScript ...
+npm : Failed to compile.
+At line:1 char:1
++ npm run build 2>&1 | Out-File -Encoding utf8 build-errors.log; Get-Co ...
++ ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to compile.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./app/api/facebook/connection/verify/route.ts:53:26
+Type error: Property 'app_id' does not exist on type 'TokenInfo'. Did you mean 'appId'?
+
+[0m [90m 51 |[39m         expiresAt[33m:[39m tokenInfo[33m.[39mexpiresAt[33m,[39m
+ [90m 52 |[39m         userId[33m:[39m tokenInfo[33m.[39muser_id[33m,[39m
+[31m[1m>[22m[39m[90m 53 |[39m         appId[33m:[39m tokenInfo[33m.[39mapp_id[33m,[39m
+ [90m    |[39m                          [31m[1m^[22m[39m
+ [90m 54 |[39m         scopes[33m:[39m tokenInfo[33m.[39mscopes[33m,[39m
+ [90m 55 |[39m         hasRequiredPermissions[33m:[39m permCheck[33m.[39mvalid[33m,[39m
+ [90m 56 |[39m         missingPermissions[33m:[39m permCheck[33m.[39mmissing[0m
+Next.js build worker exited with code: 1 and signal: null

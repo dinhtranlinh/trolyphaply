@@ -1,0 +1,282 @@
+Dưới đây là **TÀI LIỆU LẬP TRÌNH TỔNG HỢP – FACEBOOK LOGIN (LOGIN CONNECT)** được **tổng hợp – hệ thống hóa** từ tài liệu chính thức tại
+👉 [https://developers.facebook.com/docs/facebook-login/login-connect/](https://developers.facebook.com/docs/facebook-login/login-connect/)
+và các trang liên quan trong hệ sinh thái Meta Developers.
+
+Tài liệu được viết theo hướng **dùng cho kỹ thuật / triển khai thực tế**, phù hợp để:
+
+* Lưu trữ nội bộ
+* Đào tạo lập trình viên
+* Làm tài liệu thiết kế hệ thống (SDD / TDD)
+
+---
+
+# 📘 **TÀI LIỆU LẬP TRÌNH FACEBOOK LOGIN (LOGIN CONNECT)**
+
+*(Meta Platforms, Inc.)*
+
+---
+
+## **1. Tổng quan về Facebook Login (Login Connect)**
+
+### **1.1 Facebook Login là gì**
+
+Facebook Login là giải pháp **xác thực người dùng (Authentication)** do Meta cung cấp, cho phép:
+
+* Người dùng đăng nhập vào ứng dụng/website bên thứ ba
+* Sử dụng tài khoản Facebook
+* Không cần tạo tài khoản mới
+
+Facebook Login được xây dựng trên **OAuth 2.0** và tích hợp chặt chẽ với **Graph API**.
+
+---
+
+### **1.2 Login Connect là gì**
+
+**Login Connect** là tập hợp các cơ chế giúp:
+
+* Kết nối tài khoản Facebook với tài khoản nội bộ của hệ thống bạn
+* Đồng bộ thông tin người dùng
+* Kiểm soát quyền truy cập (permissions)
+
+Login Connect nhấn mạnh vào:
+
+* Bảo mật
+* Trải nghiệm người dùng
+* Tuân thủ chính sách dữ liệu của Meta
+
+---
+
+## **2. Kiến trúc tổng thể Facebook Login**
+
+### **2.1 Thành phần chính**
+
+| Thành phần        | Vai trò                   |
+| ----------------- | ------------------------- |
+| Facebook App      | Định danh ứng dụng        |
+| User              | Người dùng Facebook       |
+| App Access Token  | Token xác thực ứng dụng   |
+| User Access Token | Token xác thực người dùng |
+| Graph API         | Truy vấn dữ liệu          |
+| Permissions       | Phạm vi quyền             |
+
+---
+
+### **2.2 Luồng đăng nhập cơ bản (OAuth 2.0)**
+
+1. Ứng dụng chuyển hướng người dùng đến Facebook Login Dialog
+2. Người dùng đăng nhập và cấp quyền
+3. Facebook trả về **authorization code**
+4. Backend đổi code lấy **access token**
+5. Ứng dụng gọi Graph API để lấy thông tin người dùng
+
+---
+
+## **3. Các phương thức triển khai Facebook Login**
+
+### **3.1 Login cho Web**
+
+* Sử dụng Facebook JavaScript SDK
+* Redirect-based OAuth flow
+* Phù hợp website truyền thống
+
+### **3.2 Login cho Mobile App**
+
+* iOS SDK / Android SDK
+* Hỗ trợ SSO
+* Trải nghiệm native
+
+### **3.3 Login cho Backend / Server-side**
+
+* Dùng OAuth redirect + code exchange
+* Phù hợp hệ thống microservices, bảo mật cao
+
+---
+
+## **4. Thiết lập Facebook Login**
+
+### **4.1 Tạo Facebook App**
+
+* Truy cập: [https://developers.facebook.com/apps/](https://developers.facebook.com/apps/)
+* Chọn loại ứng dụng phù hợp (Consumer / Business)
+* Thêm sản phẩm **Facebook Login**
+
+---
+
+### **4.2 Cấu hình Facebook Login**
+
+Các cấu hình quan trọng:
+
+* Valid OAuth Redirect URIs
+* Client OAuth Settings
+* App Domains
+* Privacy Policy URL
+* Terms of Service URL
+
+---
+
+## **5. Permissions (Quyền truy cập)**
+
+### **5.1 Các permission phổ biến**
+
+| Permission     | Mục đích          |
+| -------------- | ----------------- |
+| public_profile | Tên, ảnh đại diện |
+| email          | Email người dùng  |
+| user_birthday  | Ngày sinh         |
+| user_gender    | Giới tính         |
+| user_friends   | Danh sách bạn bè  |
+
+📌 **Lưu ý:**
+
+* `public_profile` là mặc định
+* Các quyền khác cần **App Review**
+
+---
+
+### **5.2 App Review**
+
+* Bắt buộc với permission mở rộng
+* Cần mô tả use case rõ ràng
+* Có video demo và test account
+
+---
+
+## **6. Access Token & Quản lý Token**
+
+### **6.1 Các loại token**
+
+| Token      | Đối tượng      |
+| ---------- | -------------- |
+| App Token  | Ứng dụng       |
+| User Token | Người dùng     |
+| Page Token | Trang Facebook |
+
+---
+
+### **6.2 Thời hạn token**
+
+* Short-lived token (~1–2 giờ)
+* Long-lived token (60 ngày)
+
+Có thể đổi token ngắn hạn sang dài hạn bằng Graph API.
+
+---
+
+## **7. Lấy thông tin người dùng**
+
+### **7.1 Endpoint cơ bản**
+
+```
+GET https://graph.facebook.com/me
+```
+
+### **7.2 Trường dữ liệu phổ biến**
+
+```
+GET /me?fields=id,name,email,picture
+```
+
+Dữ liệu trả về phụ thuộc permission đã cấp.
+
+---
+
+## **8. Account Linking (Kết nối tài khoản)**
+
+Login Connect cho phép:
+
+* Liên kết Facebook account với tài khoản nội bộ
+* Tránh tạo trùng tài khoản
+* Hỗ trợ login nhiều phương thức
+
+Quy trình:
+
+1. Người dùng login Facebook
+2. Backend kiểm tra user_id Facebook
+3. Gán với user nội bộ (hoặc tạo mới)
+
+---
+
+## **9. Bảo mật & Best Practices**
+
+### **9.1 Khuyến nghị bảo mật**
+
+* Xác thực token bằng `/debug_token`
+* Không lưu token ở frontend
+* Sử dụng HTTPS bắt buộc
+* Kiểm tra `app_id` & `user_id`
+
+---
+
+### **9.2 Tuân thủ chính sách dữ liệu**
+
+* Chỉ lưu dữ liệu cần thiết
+* Cung cấp cơ chế xóa dữ liệu người dùng
+* Tuân thủ **Facebook Platform Policies**
+
+---
+
+## **10. Webhooks & Deauthorization**
+
+### **10.1 User Deauthorization Callback**
+
+Khi người dùng:
+
+* Gỡ quyền ứng dụng
+* Xóa ứng dụng khỏi Facebook
+
+Facebook sẽ gửi callback → backend phải:
+
+* Xóa token
+* Vô hiệu liên kết tài khoản
+
+---
+
+## **11. Lỗi thường gặp & xử lý**
+
+| Lỗi                  | Nguyên nhân        |
+| -------------------- | ------------------ |
+| Invalid redirect_uri | Sai cấu hình OAuth |
+| Invalid token        | Token hết hạn      |
+| Permissions error    | Chưa được duyệt    |
+| App not active       | App chưa public    |
+
+---
+
+## **12. Thay đổi & Versioning**
+
+* Facebook Login phụ thuộc Graph API version
+* Một số permission bị deprecated theo thời gian
+* Cần theo dõi changelog chính thức của Meta
+
+📌 Khuyến nghị: Luôn dùng **Graph API version mới nhất ổn định**
+
+---
+
+## **13. Nhật ký thay đổi (Changelog)**
+
+Meta công bố thay đổi tại:
+
+* Facebook Platform Changelog
+* Graph API Changelog
+* Login product updates
+
+---
+
+## **14. Công cụ hỗ trợ phát triển**
+
+* Graph API Explorer
+* Access Token Debugger
+* Facebook SDKs (JS, Android, iOS)
+* Postman collections
+
+---
+
+## **15. Tổng kết**
+
+Facebook Login (Login Connect) là:
+
+* Giải pháp đăng nhập tiêu chuẩn, an toàn
+* Phù hợp hệ thống web, mobile, enterprise
+* Cần triển khai đúng chuẩn OAuth & chính sách Meta
+
+---

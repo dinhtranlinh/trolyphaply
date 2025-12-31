@@ -1,0 +1,365 @@
+
+# 📘 **PRD – HỆ THỐNG QUẢN TRỊ FACEBOOK PAGES (ADMIN-ONLY)**
+
+## 1. Thông tin chung
+
+* **Tên sản phẩm:** Facebook Page Automation – Admin Console
+* **Đối tượng sử dụng:** **Admin hệ thống (duy nhất)**
+* **Mục tiêu:**
+
+  * Quản trị tập trung các Page Facebook
+  * Cấu hình tự động hóa tương tác **an toàn – có kiểm soát**
+  * Giám sát realtime, audit đầy đủ
+  * Giảm rủi ro vi phạm chính sách Facebook
+
+---
+
+## 2. Phạm vi & nguyên tắc thiết kế
+
+### 2.1 Phạm vi (Scope)
+
+✔️ Trong scope:
+
+* Kết nối Facebook App / Token
+* Quản lý Page
+* Quản lý Post
+* Auto reply bình luận (spin content)
+* Auto message (inbox)
+* CTA / Button bài viết
+* Webhooks
+* Logs, audit, rate limit
+
+❌ Ngoài scope:
+
+* Phân quyền người dùng
+* UI cho Editor/User
+* Chatbot AI
+* CRM
+
+---
+
+### 2.2 Nguyên tắc thiết kế (Admin-first)
+
+* **Admin làm mọi thứ**
+* Mọi hành động:
+
+  * Có preview
+  * Có log
+  * Có bật/tắt nhanh
+* Ưu tiên:
+
+  * An toàn > Tốc độ
+  * Kiểm soát > Tự do
+  * Tránh spam > Tối đa tương tác
+
+---
+
+## 3. User Persona (duy nhất)
+
+**Admin hệ thống**
+
+* Có kiến thức kỹ thuật / vận hành
+* Quản lý nhiều Page
+* Chịu trách nhiệm nếu Page bị cảnh báo / khóa
+
+---
+
+# 4. USER STORIES & ACCEPTANCE CRITERIA (ADMIN-ONLY)
+
+---
+
+## MODULE A – KẾT NỐI FACEBOOK (ADMIN)
+
+### User Story A1
+
+**Là Admin**, tôi muốn **kết nối Facebook App & tài khoản** để hệ thống có quyền thao tác Page.
+
+**Acceptance Criteria**
+
+* Đăng nhập Facebook (OAuth)
+* Hiển thị:
+
+  * App ID
+  * Trạng thái App (Live / Dev)
+* Lưu **User Access Token** an toàn
+* Có nút:
+
+  * “Kiểm tra token”
+  * “Kết nối lại”
+
+---
+
+### User Story A2
+
+**Là Admin**, tôi muốn **xem & quản lý toàn bộ Page** từ token.
+
+**Acceptance Criteria**
+
+* Lấy `/me/accounts`
+* Hiển thị:
+
+  * Page ID
+  * Page name
+  * Quyền
+* Có nút:
+
+  * Thêm Page
+  * Gỡ Page khỏi hệ thống
+* Lưu Page Access Token
+
+---
+
+## MODULE B – QUẢN LÝ PAGE (ADMIN)
+
+### User Story B1
+
+**Là Admin**, tôi muốn **xem dashboard Page** để theo dõi hiệu quả.
+
+**Acceptance Criteria**
+
+* KPI cards:
+
+  * Tổng bài viết
+  * Tổng comment
+  * Tổng reaction
+* Có biểu đồ theo ngày
+* Chọn Page từ dropdown toàn cục
+
+---
+
+### User Story B2
+
+**Là Admin**, tôi muốn **bật/tắt toàn bộ tự động hóa theo Page**.
+
+**Acceptance Criteria**
+
+* Toggle:
+
+  * Auto reply
+  * Auto message
+  * Webhook active
+* Thay đổi có hiệu lực ngay
+* Ghi log cấu hình
+
+---
+
+## MODULE C – QUẢN LÝ BÀI VIẾT (ADMIN)
+
+### User Story C1
+
+**Là Admin**, tôi muốn **xem danh sách bài viết của Page**.
+
+**Acceptance Criteria**
+
+* Table hiển thị:
+
+  * Post ID
+  * Nội dung rút gọn
+  * Ngày đăng
+  * Comment / Reaction
+* Filter theo thời gian
+* Click vào Post → chi tiết
+
+---
+
+### User Story C2
+
+**Là Admin**, tôi muốn **gán cấu hình tự động cho từng bài viết**.
+
+**Acceptance Criteria**
+
+* Mỗi Post có:
+
+  * Rule auto reply
+  * Rule auto message
+* Có preview nội dung trả lời
+* Có toggle bật/tắt riêng cho Post
+
+---
+
+## MODULE D – AUTO REPLY BÌNH LUẬN (SPIN CONTENT)
+
+### User Story D1
+
+**Là Admin**, tôi muốn **tạo & quản lý rule trả lời bình luận tự động**.
+
+**Acceptance Criteria**
+
+* CRUD Rule
+* Rule gồm:
+
+  * Tên
+  * Áp dụng cho Page / Post
+  * Điều kiện (tất cả / keyword)
+  * Trạng thái Active
+
+---
+
+### User Story D2
+
+**Là Admin**, tôi muốn **soạn nội dung trả lời không trùng nhau**.
+
+**Acceptance Criteria**
+
+* Editor hỗ trợ:
+
+  * `{full_name}`, `{first_name}`
+  * Spin `[a|b|c]`
+* Hiển thị ≥10 bản preview ngẫu nhiên
+* Không dùng 2 câu giống nhau liên tiếp
+
+---
+
+### User Story D3
+
+**Là Admin**, tôi muốn **kiểm soát chống spam**.
+
+**Acceptance Criteria**
+
+* Giới hạn:
+
+  * X reply/phút
+  * 1 reply/user/N phút
+* Không reply:
+
+  * Comment của Page
+  * Comment chứa blacklist keyword
+* Có “Safe mode” (tắt nhanh)
+
+---
+
+## MODULE E – AUTO MESSAGE (INBOX)
+
+### User Story E1
+
+**Là Admin**, tôi muốn **cấu hình gửi tin nhắn cho người đã tương tác**.
+
+**Acceptance Criteria**
+
+* Trigger:
+
+  * Comment
+  * Reaction
+* Có template message
+* Có preview trước khi gửi
+
+---
+
+### User Story E2
+
+**Là Admin**, tôi muốn **quản lý hàng đợi gửi tin nhắn**.
+
+**Acceptance Criteria**
+
+* Queue:
+
+  * Pending / Sent / Failed
+* Retry có giới hạn
+* Cooldown theo user
+* Có opt-out keyword
+
+---
+
+## MODULE F – CTA / NÚT BÀI VIẾT
+
+### User Story F1
+
+**Là Admin**, tôi muốn **cấu hình CTA cho bài viết/Page**.
+
+**Acceptance Criteria**
+
+* Chọn loại CTA:
+
+  * Nhắn tin
+  * Link
+  * Gọi điện
+* Có preview
+* Có bật/tắt nhanh
+
+---
+
+## MODULE G – WEBHOOKS (ADMIN)
+
+### User Story G1
+
+**Là Admin**, tôi muốn **quản lý Webhook theo Page**.
+
+**Acceptance Criteria**
+
+* Hiển thị trạng thái:
+
+  * Active / Inactive
+* Có nút:
+
+  * Verify
+  * Re-subscribe
+* Nhận:
+
+  * Comment
+  * Reaction
+  * Post
+
+---
+
+### User Story G2
+
+**Là Admin**, tôi muốn **xem stream sự kiện realtime**.
+
+**Acceptance Criteria**
+
+* Timeline sự kiện
+* Filter theo Page / Post
+* Có retry khi lỗi
+
+---
+
+## MODULE H – LOGS & AUDIT (ADMIN)
+
+### User Story H1
+
+**Là Admin**, tôi muốn **xem toàn bộ nhật ký hệ thống**.
+
+**Acceptance Criteria**
+
+* Log:
+
+  * Reply
+  * Message
+  * Cấu hình
+* Filter theo:
+
+  * Thời gian
+  * Page
+  * Post
+* Export CSV
+
+---
+
+## 5. Non-functional Requirements (Admin)
+
+* Webhook response < 5s
+* Không mất sự kiện
+* Token mã hóa khi lưu
+* Có kill-switch toàn hệ thống
+* Tuân thủ Facebook Platform Policies
+
+---
+
+## 6. KPI thành công (Admin perspective)
+
+* Không bị Facebook cảnh báo spam
+* ≥95% webhook xử lý thành công
+* Không trùng nội dung reply
+* Có thể audit 100% hành động
+
+---
+
+## 7. Deliverables cho DEV
+
+* PRD (tài liệu này)
+* API Spec
+* DB Schema
+* Wireframe Admin UI
+* Test cases (happy + edge)
+
+---

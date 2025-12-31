@@ -1,0 +1,10 @@
+
+> trolyphaply@0.1.0 start:prod
+> next start -p 8686
+
+   ▲ Next.js 16.0.6
+   - Local:         http://localhost:8686
+   - Network:       http://192.168.50.107:8686
+
+ ✓ Starting...
+ ✓ Ready in 934ms

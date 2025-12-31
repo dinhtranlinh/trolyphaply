@@ -101,3 +101,18 @@ export async function getAppStats(
     { views: 0, submits: 0, shares: 0, affiliate_clicks: 0 }
   );
 }
+
+// Lightweight client-side share tracker (safe no-op; extend to Supabase if needed)
+export function trackShare(
+  platform: 'facebook' | 'zalo' | 'copy',
+  type: string = 'unknown',
+  url?: string
+): void {
+  try {
+    if (typeof console !== 'undefined') {
+      console.debug('trackShare', { platform, type, url });
+    }
+  } catch {
+    // ignore
+  }
+}

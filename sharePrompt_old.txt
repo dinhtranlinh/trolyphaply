@@ -1,0 +1,14 @@
+const sharePrompt = `Hay viet lai cau hoi va cau tra loi sau thanh bai dang Facebook ngan gon, thu hut, de doc:
+
+CAU HOI: ${question.trim()}
+
+CAU TRA LOI: ${answer.trim()}
+
+YEU CAU:
+- Van phong tu nhien, than thien
+- Dung emoji phu hop (dY~S dY"O ƒ?-<,? dY`% ...)
+- Ngan gon 200-300 tu
+- Bo phan disclaimer/phap ly
+- Dinh dang de doc (bullet hoac doan ngan)
+- Ket thuc bang call-to-action nhe
+- KHONG dung markdown (** __ _)`;

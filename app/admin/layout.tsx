@@ -12,7 +12,9 @@ import {
   AppWindow,
   LogOut,
   Menu,
-  X
+  X,
+  Facebook,
+  Users
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -57,6 +59,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Hỏi/Đáp', href: '/admin/qa-prompts', icon: MessageSquare },
     { name: 'Văn Phong', href: '/admin/legal-styles', icon: Palette },
     { name: 'Mini Apps', href: '/admin/apps', icon: AppWindow },
+    { name: 'Khach hang', href: '/admin/customers', icon: Users },
+    { name: 'Facebook Automation', href: '/admin/facebook', icon: Facebook },
   ];
 
   if (loading) {
