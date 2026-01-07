@@ -331,8 +331,30 @@ Nguon: ${source}`.trim();
 
             {/* Suggested Questions */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium text-[#1A2B49]">💡 Gợi ý câu hỏi</span>
+                            <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-base font-medium text-[#1A2B49] truncate">💡 Gợi ý câu hỏi</span>
+                  <span className="text-xs font-medium text-[#8897AC] hidden sm:inline">
+                AI hỗ trợ • Beta
+              </span>
+                </div>
+                <button
+                onClick={handleSubmit}
+                disabled={!question.trim() || loading}
+                className="h-10 sm:h-12 min-w-[120px] sm:min-w-[160px] px-4 sm:px-5 rounded-xl bg-[#D42426] shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-white font-semibold text-sm sm:text-base hover:bg-[#b01b1d] active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>🎄 Trợ lý đang tổng hợp dữ liệu...</span>
+                  </div>
+                ) : (
+                  <>
+                    🎁 Hỏi ngay
+                    <ArrowRightIcon className="w-[18px] h-[18px]" />
+                  </>
+                )}
+              </button>
               </div>
               
               {suggestedQuestions.map((group, groupIdx) => (
@@ -360,31 +382,6 @@ Nguon: ${source}`.trim();
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Button Row */}
-            <div className="flex items-center justify-between pt-2">
-              <div className="text-xs font-medium text-[#8897AC]">
-                AI hỗ trợ • Beta
-              </div>
-              
-              <button
-                onClick={handleSubmit}
-                disabled={!question.trim() || loading}
-                className="h-12 min-w-[160px] px-5 rounded-xl bg-[#D42426] shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-white font-semibold text-base hover:bg-[#b01b1d] active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
-                    <span>🎄 Trợ lý đang tổng hợp dữ liệu...</span>
-                  </div>
-                ) : (
-                  <>
-                    🎁 Hỏi ngay
-                    <ArrowRightIcon className="w-[18px] h-[18px]" />
-                  </>
-                )}
-              </button>
             </div>
 
             {/* Error Display */}

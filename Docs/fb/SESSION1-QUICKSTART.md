@@ -16,12 +16,12 @@ Ensure your `.env` has these values:
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
+SUPABASE_SERVICE_ROLE_KEY=<REDACTED>
 
 # Facebook
-FACEBOOK_APP_ID=856285397321094
+FACEBOOK_APP_ID=YOUR_APP_ID
 FACEBOOK_APP_SECRET=your_app_secret
-FACEBOOK_VERIFY_TOKEN=trolyphaply_webhook_secret_xyz789abc
+FACEBOOK_VERIFY_TOKEN=YOUR_VERIFY_TOKEN
 ```
 
 ## Step 2: Start Development Server
@@ -250,7 +250,7 @@ curl -X POST http://localhost:3456/api/facebook/safe-mode \
 3. Check server logs: `tail -f dev3456.err`
 4. Test verification:
    ```bash
-   curl "http://localhost:3456/api/facebook/webhooks?hub.mode=subscribe&hub.verify_token=trolyphaply_webhook_secret_xyz789abc&hub.challenge=test123"
+   curl "http://localhost:3456/api/facebook/webhooks?hub.mode=subscribe&hub.verify_token=YOUR_VERIFY_TOKEN&hub.challenge=test123"
    # Should return: test123
    ```
 

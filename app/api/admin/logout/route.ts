@@ -8,7 +8,16 @@ import { cookies } from 'next/headers';
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
-    cookieStore.delete('admin_session');
+    const cookieDomain = process.env.ADMIN_SESSION_COOKIE_DOMAIN;
+    if (cookieDomain) {
+      cookieStore.delete({
+        name: 'admin_session',
+        path: '/',
+        domain: cookieDomain
+      });
+    } else {
+      cookieStore.delete('admin_session');
+    }
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
+import { requireAdminCustomersAccess } from '@/lib/adminCustomersSecurity';
+import { buildPhoneRecord, normalizePhone } from '@/lib/phoneSecurity';
 
 const chunkArray = <T,>(items: T[], size: number) => {
   const chunks: T[][] = [];
@@ -9,12 +11,18 @@ const chunkArray = <T,>(items: T[], size: number) => {
   return chunks;
 };
 
+const MAX_IMPORT_LINES = 2000;
+const MAX_IN_CLAUSE = 50;
+
 /**
  * POST /api/admin/customers/import
  * Import customers from TXT (name|phone), skip duplicates
  */
 export async function POST(request: NextRequest) {
   try {
+    const guardResponse = requireAdminCustomersAccess(request);
+    if (guardResponse) return guardResponse;
+
     const supabase = createClient();
     const body = await request.json();
     const content = typeof body?.content === 'string' ? body.content : '';
@@ -37,11 +45,25 @@ export async function POST(request: NextRequest) {
     }
 
     const lines = content.split(/\r?\n/);
+    const nonEmptyLineCount = lines.filter((line: string) => line.trim()).length;
+    if (nonEmptyLineCount > MAX_IMPORT_LINES) {
+      return NextResponse.json(
+        { success: false, error: `Max ${MAX_IMPORT_LINES} lines allowed` },
+        { status: 400 }
+      );
+    }
     const errors: string[] = [];
     let skipped = 0;
 
     const seenPhones = new Set<string>();
-    const toInsert: { name: string; phone: string }[] = [];
+    const toInsert: {
+      name: string;
+      phone: string | null;
+      phone_hash: string;
+      phone_encrypted: string;
+      phone_last4: string;
+      raw_phone: string;
+    }[] = [];
 
     lines.forEach((raw: string, index: number) => {
       const line = raw.trim();
@@ -61,13 +83,28 @@ export async function POST(request: NextRequest) {
         return;
       }
 
-      if (seenPhones.has(phone)) {
+      const normalized = normalizePhone(phone);
+      if (!normalized) {
+        errors.push(`Line ${index + 1}: Invalid phone`);
+        return;
+      }
+
+      const record = buildPhoneRecord(normalized);
+      const phoneHash = record.phoneHash;
+      if (seenPhones.has(phoneHash)) {
         skipped += 1;
         return;
       }
 
-      seenPhones.add(phone);
-      toInsert.push({ name, phone });
+      seenPhones.add(phoneHash);
+      toInsert.push({
+        name,
+        phone: null,
+        phone_hash: phoneHash,
+        phone_encrypted: record.phoneEncrypted,
+        phone_last4: record.phoneLast4,
+        raw_phone: phone
+      });
     });
 
     if (toInsert.length === 0) {
@@ -77,16 +114,40 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const phoneList = toInsert.map((row) => row.phone);
-    const { data: existing, error: existingError } = await supabase
-      .from('customers')
-      .select('phone')
-      .in('phone', phoneList);
+    const phoneHashList = toInsert.map((row) => row.phone_hash);
+    const rawPhoneList = toInsert.map((row) => row.raw_phone);
 
-    if (existingError) throw existingError;
+    const existingPhones = new Set<string>();
+    const existingRawPhones = new Set<string>();
 
-    const existingPhones = new Set((existing || []).map((row) => row.phone));
-    const newRows = toInsert.filter((row) => !existingPhones.has(row.phone));
+    const hashChunks = chunkArray(phoneHashList, MAX_IN_CLAUSE);
+    for (const chunk of hashChunks) {
+      if (chunk.length === 0) continue;
+      const { data: existingHashes, error: existingError } = await supabase
+        .from('customers')
+        .select('phone_hash')
+        .in('phone_hash', chunk);
+      if (existingError) throw existingError;
+      (existingHashes || []).forEach((row) => {
+        if (row.phone_hash) existingPhones.add(row.phone_hash);
+      });
+    }
+
+    const phoneChunks = chunkArray(rawPhoneList, MAX_IN_CLAUSE);
+    for (const chunk of phoneChunks) {
+      if (chunk.length === 0) continue;
+      const { data: existingLegacy, error: legacyError } = await supabase
+        .from('customers')
+        .select('phone')
+        .in('phone', chunk);
+      if (legacyError) throw legacyError;
+      (existingLegacy || []).forEach((row) => {
+        if (row.phone) existingRawPhones.add(row.phone);
+      });
+    }
+    const newRows = toInsert.filter(
+      (row) => !existingPhones.has(row.phone_hash) && !existingRawPhones.has(row.raw_phone)
+    );
     skipped += toInsert.length - newRows.length;
 
     if (newRows.length === 0) {
@@ -96,14 +157,15 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const insertedRows: { id: string; phone: string }[] = [];
-    const chunks = chunkArray(newRows, 500);
+    const insertedRows: { id: string }[] = [];
+    const insertRows = newRows.map(({ raw_phone, ...row }) => row);
+    const chunks = chunkArray(insertRows, 500);
 
     for (const chunk of chunks) {
       const { data, error } = await supabase
         .from('customers')
         .insert(chunk)
-        .select('id, phone');
+        .select('id');
       if (error) throw error;
       insertedRows.push(...(data || []));
     }

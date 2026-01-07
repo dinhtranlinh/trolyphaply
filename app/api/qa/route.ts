@@ -2,10 +2,116 @@ import { NextRequest, NextResponse } from 'next/server';
 import { callAIText } from '@/lib/ai';
 import { createClient } from '@/lib/supabase';
 import { getAnswerFromCache, saveAnswerToCache } from '@/lib/cache';
+import { randomUUID } from 'crypto';
 
 // SESSION 3 OPTIMIZATION: Removed quality retry loop (-50% API calls)
 // SESSION 5 OPTIMIZATION: Added cache layer (24h TTL)
 // Single attempt with improved prompt for better first-time accuracy
+
+const SESSION_COOKIE_NAME = 'qa_session_id';
+const CONTEXT_TARGET_CHARS = 700;
+const CONTEXT_MAX_CHARS = 900;
+
+function cleanSummaryLine(line: string): string {
+  return line
+    .replace(/^[\-\*\u2022]\s+/, '')
+    .replace(/^\d+\.\s+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function collectSummaryLines(text: string): string[] {
+  return text
+    .split('\n')
+    .map(cleanSummaryLine)
+    .filter((line) => line.length >= 35 && !/^#/.test(line) && !/^I{1,3}\./.test(line));
+}
+
+function buildSessionSummary(answer: string): string {
+  const sections: string[] = [];
+  const sectionIIMatch = answer.match(/# II\.([\s\S]+?)(?=\n#|$)/);
+  if (sectionIIMatch) sections.push(sectionIIMatch[1]);
+  const sectionIIIMatch = answer.match(/# III\.([\s\S]+?)(?=\n#|$)/);
+  if (sectionIIIMatch) sections.push(sectionIIIMatch[1]);
+  const sectionIVMatch = answer.match(/# IV\.([\s\S]+?)(?=\n#|$)/);
+  if (sectionIVMatch) sections.push(sectionIVMatch[1]);
+
+  let candidates: string[] = [];
+  for (const section of sections) {
+    candidates = candidates.concat(collectSummaryLines(section));
+  }
+
+  if (candidates.length === 0) {
+    candidates = collectSummaryLines(answer);
+  }
+
+  let summary = '';
+  for (const line of candidates) {
+    const next = summary ? `${summary}\n${line}` : line;
+    if (next.length > CONTEXT_MAX_CHARS) break;
+    summary = next;
+    if (summary.length >= CONTEXT_TARGET_CHARS) break;
+  }
+
+  if (!summary) {
+    summary = answer.replace(/\s+/g, ' ').trim().slice(0, CONTEXT_MAX_CHARS);
+  }
+
+  return summary.trim();
+}
+
+async function loadSessionContext(supabase: any, sessionId: string): Promise<string> {
+  if (!sessionId) return '';
+  try {
+    const { data, error } = await supabase
+      .from('qa_session_contexts')
+      .select('context')
+      .eq('session_id', sessionId)
+      .single();
+
+    if (error) {
+      const code = (error as any).code;
+      if (code !== 'PGRST116' && code !== '42P01') {
+        console.warn('[qa] session context load error:', error.message || error);
+      }
+      return '';
+    }
+
+    return data?.context || '';
+  } catch (err: any) {
+    console.warn('[qa] session context load error:', err?.message || err);
+    return '';
+  }
+}
+
+async function saveSessionContext(supabase: any, sessionId: string, context: string): Promise<void> {
+  if (!sessionId || !context) return;
+  try {
+    const { error } = await supabase
+      .from('qa_session_contexts')
+      .upsert({ session_id: sessionId, context }, { onConflict: 'session_id' });
+
+    if (error) {
+      const code = (error as any).code;
+      if (code !== '42P01') {
+        console.warn('[qa] session context save error:', error.message || error);
+      }
+    }
+  } catch (err: any) {
+    console.warn('[qa] session context save error:', err?.message || err);
+  }
+}
+
+function buildSuccessResponse(sessionId: string, payload: any) {
+  const response = NextResponse.json(payload);
+  response.cookies.set(SESSION_COOKIE_NAME, sessionId, {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  return response;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +139,9 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = createClient();
+
+    const sessionId = request.cookies.get(SESSION_COOKIE_NAME)?.value || randomUUID();
+    const sessionContext = await loadSessionContext(supabase, sessionId);
 
     // Fetch active Q&A prompt from database
     const { data: activePrompt } = await supabase
@@ -209,32 +318,44 @@ CAU TRUC BAT BUOC (AI phai tuan thu format nay):
 ---
 Luu y: KHONG DUOC phep dung lai cho den khi viet xong phan IV.`;
 
+    if (sessionContext) {
+      systemPrompt += `\n\nNGU CANH PHIEN TRUOC (tom tat cau tra loi truoc, chi dung neu lien quan):\n${sessionContext}\n`;
+    }
+
     const fullPrompt = `${systemPrompt}
 
 CAU HOI: ${question.trim()}
 
 Bat dau viet ngay (co du 4 phan I→II→III→IV):`;
 
+    const cacheKey = sessionContext || '';
+    const useCache = true;
+
     // SESSION 5: Check cache first
-    const cachedAnswer = getAnswerFromCache(question.trim());
-    if (cachedAnswer) {
-      console.log('[qa] Cache HIT - returning cached answer', {
-        qLen: question.trim().length,
-        answerLength: cachedAnswer.length,
-      });
-      
-      return NextResponse.json({
-        success: true,
-        answer: cachedAnswer,
-        question: question.trim(),
-        fromCache: true,
-        styleGuide: styleGuide
-          ? {
-              id: styleGuide.id,
-              name: styleGuide.name,
-            }
-          : null,
-      });
+    if (useCache) {
+      const cachedAnswer = getAnswerFromCache(question.trim(), cacheKey);
+      if (cachedAnswer) {
+        console.log('[qa] Cache HIT - returning cached answer', {
+          qLen: question.trim().length,
+          answerLength: cachedAnswer.length,
+        });
+
+        const summary = buildSessionSummary(cachedAnswer);
+        await saveSessionContext(supabase, sessionId, summary);
+
+        return buildSuccessResponse(sessionId, {
+          success: true,
+          answer: cachedAnswer,
+          question: question.trim(),
+          fromCache: true,
+          styleGuide: styleGuide
+            ? {
+                id: styleGuide.id,
+                name: styleGuide.name,
+              }
+            : null,
+        });
+      }
     }
 
     console.log('[qa] Cache MISS - generating new answer', {
@@ -314,10 +435,16 @@ Tom tat lai (du 4 muc, ≤800 tu):`;
             originalWords: wordCount,
             newWords: newWordCount
           });
-          saveAnswerToCache(question.trim(), shortenedAnswer.trim());
-          return NextResponse.json({
+          const finalAnswer = shortenedAnswer.trim();
+          if (useCache) {
+            saveAnswerToCache(question.trim(), finalAnswer, cacheKey);
+            console.log('[qa] Answer saved to cache');
+          }
+          const summary = buildSessionSummary(finalAnswer);
+          await saveSessionContext(supabase, sessionId, summary);
+          return buildSuccessResponse(sessionId, {
             success: true,
-            answer: shortenedAnswer.trim(),
+            answer: finalAnswer,
             question: question.trim(),
             fromCache: false,
             styleGuide: styleGuide
@@ -338,12 +465,18 @@ Tom tat lai (du 4 muc, ≤800 tu):`;
     }
 
     // SESSION 5: Save to cache (use original answer if reprompt failed)
-    saveAnswerToCache(question.trim(), answer.trim());
-    console.log('[qa] Answer saved to cache');
+    const finalAnswer = answer.trim();
+    if (useCache) {
+      saveAnswerToCache(question.trim(), finalAnswer, cacheKey);
+      console.log('[qa] Answer saved to cache');
+    }
 
-    return NextResponse.json({
+    const summary = buildSessionSummary(finalAnswer);
+    await saveSessionContext(supabase, sessionId, summary);
+
+    return buildSuccessResponse(sessionId, {
       success: true,
-      answer: answer.trim(),
+      answer: finalAnswer,
       question: question.trim(),
       fromCache: false,
       styleGuide: styleGuide
@@ -356,18 +489,31 @@ Tom tat lai (du 4 muc, ≤800 tu):`;
   } catch (error: any) {
     console.error('Q&A API Error:', error);
 
-    let userMessage = 'Đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại sau.';
+    const errorText = `${error?.message || ''} ${error?.cause?.message || ''}`.toLowerCase();
+    const errorStatus = error?.status || error?.code || error?.cause?.status;
 
-    if (error.status === 503 || error.message?.includes('overloaded')) {
-      userMessage = 'Máy chủ AI của Google đang bị quá tải, vui lòng thử lại sau.';
-    } else if (error.status === 429 || error.message?.includes('rate limit')) {
-      userMessage = 'Bạn đang gửi quá nhiều yêu cầu, vui lòng thử lại sau ít phút.';
-    } else if (error.status === 401 || error.message?.includes('API key')) {
-      userMessage = 'Lỗi xác thực hệ thống. Vui lòng liên hệ quản trị viên.';
-    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
-      userMessage = 'Lỗi kết nối mạng. Kiểm tra internet và thử lại.';
-    } else if (error.message?.includes('timeout')) {
-      userMessage = 'Câu hỏi phức tạp, hệ thống cần thêm thời gian. Thử câu hỏi ngắn hơn.';
+    let userMessage = '\u0110\u00e3 x\u1ea3y ra l\u1ed7i khi x\u1eed l\u00fd c\u00e2u h\u1ecfi. Vui l\u00f2ng th\u1eed l\u1ea1i sau.';
+
+    if (errorText.includes('reported as leaked')) {
+      userMessage = '\u0110\u00e3 ph\u00e1t hi\u1ec7n API key b\u1ecb r\u00f2 r\u1ec9. Vui l\u00f2ng thay key m\u1edbi trong .env.';
+    } else if (
+      errorStatus === 429 ||
+      errorText.includes('quota') ||
+      errorText.includes('exceeded') ||
+      errorText.includes('rate limit') ||
+      errorText.includes('billing')
+    ) {
+      userMessage = '\u0110ang h\u1ebft quota ho\u1eb7c v\u01b0\u1ee3t gi\u1edbi h\u1ea1n. Vui l\u00f2ng ch\u1edd reset quota ho\u1eb7c thay key.';
+    } else if (errorStatus === 503 || errorText.includes('overloaded')) {
+      userMessage = '\u004d\u00e1y ch\u1ee7 AI \u0111ang qu\u00e1 t\u1ea3i, vui l\u00f2ng th\u1eed l\u1ea1i sau.';
+    } else if (errorStatus === 429 || errorText.includes('rate limit')) {
+      userMessage = '\u0042\u1ea1n \u0111ang g\u1eedi qu\u00e1 nhi\u1ec1u y\u00eau c\u1ea7u, vui l\u00f2ng th\u1eed l\u1ea1i sau \u00edt ph\u00fat.';
+    } else if (errorStatus === 401 || errorText.includes('api key')) {
+      userMessage = '\u004c\u1ed7i x\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng. Vui l\u00f2ng li\u00ean h\u1ec7 qu\u1ea3n tr\u1ecb vi\u00ean.';
+    } else if (errorText.includes('network') || errorText.includes('fetch')) {
+      userMessage = '\u004c\u1ed7i k\u1ebft n\u1ed1i m\u1ea1ng. Ki\u1ec3m tra internet v\u00e0 th\u1eed l\u1ea1i.';
+    } else if (errorText.includes('timeout')) {
+      userMessage = '\u0043\u00e2u h\u1ecfi ph\u1ee9c t\u1ea1p, h\u1ec7 th\u1ed1ng c\u1ea7n th\u00eam th\u1eddi gian. Th\u1eed c\u00e2u h\u1ecfi ng\u1eafn h\u01a1n.';
     }
 
     return NextResponse.json(

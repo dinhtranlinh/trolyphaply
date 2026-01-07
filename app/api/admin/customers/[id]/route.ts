@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
+import { requireAdminCustomersAccess } from '@/lib/adminCustomersSecurity';
+import { buildPhoneRecord, decryptPhone, normalizePhone } from '@/lib/phoneSecurity';
 
 /**
  * PATCH /api/admin/customers/[id]
@@ -10,6 +12,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guardResponse = requireAdminCustomersAccess(request);
+    if (guardResponse) return guardResponse;
+
     const { id } = await params;
     const supabase = createClient();
     const body = await request.json();
@@ -34,10 +39,19 @@ export async function PATCH(
       );
     }
 
+    const normalizedPhone = normalizePhone(phone);
+    if (!normalizedPhone) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid phone' },
+        { status: 400 }
+      );
+    }
+
+    const { phoneEncrypted, phoneHash, phoneLast4 } = buildPhoneRecord(normalizedPhone);
     const { data: existing } = await supabase
       .from('customers')
       .select('id')
-      .eq('phone', phone)
+      .or(`phone_hash.eq.${phoneHash},phone.eq.${phone}`)
       .neq('id', id)
       .maybeSingle();
 
@@ -52,7 +66,10 @@ export async function PATCH(
       .from('customers')
       .update({
         name,
-        phone,
+        phone: null,
+        phone_encrypted: phoneEncrypted,
+        phone_hash: phoneHash,
+        phone_last4: phoneLast4,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -78,7 +95,15 @@ export async function PATCH(
       if (linkError) throw linkError;
     }
 
-    return NextResponse.json({ success: true, data: customer });
+    const safeCustomer = {
+      id: customer?.id,
+      name: customer?.name,
+      phone: customer?.phone_encrypted ? decryptPhone(customer.phone_encrypted) : '',
+      created_at: customer?.created_at,
+      updated_at: customer?.updated_at
+    };
+
+    return NextResponse.json({ success: true, data: safeCustomer });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
@@ -96,6 +121,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guardResponse = requireAdminCustomersAccess(request);
+    if (guardResponse) return guardResponse;
+
     const { id } = await params;
     const supabase = createClient();
 

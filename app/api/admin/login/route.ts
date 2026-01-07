@@ -77,13 +77,25 @@ export async function POST(req: NextRequest) {
 
     // Set cookie
     const cookieStore = await cookies();
-    cookieStore.set('admin_session', sessionToken, {
+    const cookieDomain = process.env.ADMIN_SESSION_COOKIE_DOMAIN;
+    const cookieOptions: {
+      httpOnly: boolean;
+      secure: boolean;
+      sameSite: 'lax' | 'strict' | 'none';
+      maxAge: number;
+      path: string;
+      domain?: string;
+    } = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    });
+      path: '/'
+    };
+    if (cookieDomain) {
+      cookieOptions.domain = cookieDomain;
+    }
+    cookieStore.set('admin_session', sessionToken, cookieOptions);
     console.log('🍪 [SERVER] Cookie set successfully');
 
     // Store session in memory or database (for production, use Redis or database)

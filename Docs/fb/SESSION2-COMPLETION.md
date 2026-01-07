@@ -807,14 +807,14 @@ Add these to your `.env`:
 
 ```env
 # Facebook App (from Developer Dashboard)
-FACEBOOK_APP_ID=856285397321094
+FACEBOOK_APP_ID=YOUR_APP_ID
 FACEBOOK_APP_SECRET=your_app_secret_here
 
 # Token Encryption (32 bytes)
 FACEBOOK_TOKEN_ENCRYPTION_KEY=change-this-to-32-byte-secret-key
 
 # Webhook (from SESSION 1)
-FACEBOOK_VERIFY_TOKEN=trolyphaply_webhook_secret_xyz789abc
+FACEBOOK_VERIFY_TOKEN=YOUR_VERIFY_TOKEN
 ```
 
 **Important**: Change `FACEBOOK_TOKEN_ENCRYPTION_KEY` in production!

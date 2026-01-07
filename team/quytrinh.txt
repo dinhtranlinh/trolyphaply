@@ -1,0 +1,66 @@
+PHIÊN LÀM VIỆC:
+1) Đọc docs: constitution + contracts + versions-lock + known-issues + changelog + adr liên quan.
+2) Tóm tắt hiện trạng + contract liên quan (<=10 dòng).
+3) Impact analysis (DB/API/modules).
+4) Chia patch nhỏ, mỗi patch có verify/tests.
+5) Contract/migration trước → script verify → implement → docs/changelog.
+6) Không đoán version API. Không chắc → verify script hoặc yêu cầu link/version.
+7) Không hardcode secrets.
+8) Không sửa ngoài scope.
+9) Patch xong phải liệt kê file đã đổi.
+10) Kết thúc: session log + next steps.
+
+
+
+Góp ý thêm để “triệt để” hơn (2 kỹ thuật mạnh)
+(1) “Schema/Contract auto-check”
+Nếu bạn dùng TS/Node:
+dùng zod/io-ts hoặc OpenAPI để validate request/response runtime
+Nếu bạn dùng Python:
+dùng pydantic models cho entity/DTO
+→ Khi contract sai là fail ngay, không chờ tới production.
+(2) “Context Pack” cho AI (giải quyết quá tải)
+Thay vì đưa cả dự án:
+Mỗi phiên bạn chuẩn bị 1 gói gồm:
+Constitution (rút gọn 1 trang)
+Contracts liên quan (chỉ phần đụng tới)
+Changelog phiên gần nhất
+Tree thư mục + 5 file quan trọng
+→ Giảm việc AI “quên” và “trôi logic”.
+
+Quy trình làm việc nghiêm ngặt theo phiên 7 bước, có “cổng kiểm soát”:
+
+Bước 0 — Khóa phạm vi (Scope Lock)
+Viết 5–10 dòng: mục tiêu phiên này, ngoài phạm vi là gì.
+Giới hạn: tối đa 1–3 hạng mục chức năng/phiên.
+Bước 1 — Đọc “đúng tài liệu bắt buộc”
+AI phải đọc:
+Constitution
+Contracts (DB/API)
+Versions
+ADR liên quan
+Changelog phiên gần nhất
+Bước 2 — Phân tích tác động (Impact Analysis)
+AI bắt buộc trả lời:
+Thay đổi này động tới: bảng nào, endpoint nào, service nào?
+Có thay schema không? Nếu có → migration plan?
+Có thay contract không? Nếu có → update contract trước.
+Bước 3 — Lập kế hoạch nhỏ hóa (Work Breakdown)
+Chia thành các “patch” nhỏ (Patch 1, Patch 2…)
+Mỗi patch phải có: mục tiêu, file sẽ sửa, test sẽ chạy, tiêu chí hoàn thành.
+Bước 4 — “Contract-first” (đây là điểm mấu chốt)
+Trước khi code luồng chính:
+Update contract/schema docs (hoặc schema file)
+Nếu thêm field DB → migration + cập nhật entity contract
+Bước 5 — Script test tách luồng 
+Viết script nhỏ ở /scripts/verify/...
+Test kết nối, token, query DB, gọi API ngoài
+Chạy OK rồi mới merge vào main flow.
+Bước 6 — Implement theo patch + tự kiểm
+Mỗi patch xong phải:
+chạy test (hoặc script verify)
+scan secret (tối thiểu grep key patterns)
+đảm bảo naming/contract đúng
+Bước 7 — Cập nhật tài liệu + nhật ký phiên
+Update changelog + session log
+Update known-issues nếu phát sinh lỗi mới

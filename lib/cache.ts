@@ -38,8 +38,8 @@ function isValid(entry: CacheEntry<any> | undefined): boolean {
 /**
  * Get cached answer for question (null if not found or expired)
  */
-export function getAnswerFromCache(question: string): string | null {
-  const key = hashQuestion(question);
+export function getAnswerFromCache(question: string, contextKey?: string): string | null {
+  const key = hashQuestion(contextKey ? `${question}|||${contextKey}` : question);
   const entry = answerCache.get(key);
   
   if (!isValid(entry)) {
@@ -55,8 +55,8 @@ export function getAnswerFromCache(question: string): string | null {
 /**
  * Save answer to cache
  */
-export function saveAnswerToCache(question: string, answer: string): void {
-  const key = hashQuestion(question);
+export function saveAnswerToCache(question: string, answer: string, contextKey?: string): void {
+  const key = hashQuestion(contextKey ? `${question}|||${contextKey}` : question);
   answerCache.set(key, {
     data: answer,
     timestamp: Date.now(),

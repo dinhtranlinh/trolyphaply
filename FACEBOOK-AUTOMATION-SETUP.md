@@ -23,8 +23,8 @@
 ```env
 # Supabase (Already configured)
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<REDACTED>
+SUPABASE_SERVICE_ROLE_KEY=<REDACTED>
 
 # Facebook Token Encryption
 FACEBOOK_TOKEN_ENCRYPTION_KEY=your-32-character-encryption-key-here

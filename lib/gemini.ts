@@ -116,6 +116,11 @@ function isQuotaOrAuthError(error: any): boolean {
   );
 }
 
+function isLeakedKeyError(error: any): boolean {
+  const message = (error?.message || '').toString().toLowerCase();
+  return message.includes('reported as leaked') || message.includes('key was reported as leaked');
+}
+
 export async function callGeminiText(
   prompt: string,
   options?: {
@@ -184,6 +189,14 @@ export async function callGeminiText(
       const isOverloaded =
         error?.status === 503 || error?.code === 503 || error?.message?.toLowerCase().includes('overloaded');
       const isQuota = isQuotaOrAuthError(error);
+      const isLeaked = isLeakedKeyError(error);
+
+      if (isLeaked) {
+        markKeyFailure(apiKey, error);
+        dropApiKey(apiKey);
+        console.warn(`[Gemini] Key ...${apiKey.slice(-6)} reported leaked and removed from pool.`);
+        continue;
+      }
 
       if (isQuota || isOverloaded) {
         // Mark key as failed (Circuit Breaker)
@@ -253,6 +266,10 @@ export async function callGeminiTextForShareText(
     console.log(`[ShareText] Success with key: ...${apiKey.slice(-6)}`);
     return result.response.text();
   } catch (error: any) {
+    if (isLeakedKeyError(error)) {
+      dropApiKey(apiKey);
+      console.warn(`[ShareText] Key ...${apiKey.slice(-6)} reported leaked and removed from pool.`);
+    }
     markKeyFailure(apiKey, error);
     console.warn(`[ShareText] Key ...${apiKey.slice(-6)} failed: ${error?.message}`);
     throw error;

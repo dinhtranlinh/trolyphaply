@@ -105,6 +105,14 @@ export default function CustomersPage() {
   const [importing, setImporting] = useState(false);
   const [importResults, setImportResults] = useState<ImportResults | null>(null);
 
+  const [gateStatus, setGateStatus] = useState<'checking' | 'required' | 'ok' | 'blocked'>(
+    'checking'
+  );
+  const [gateError, setGateError] = useState('');
+  const [pinInput, setPinInput] = useState('');
+  const [totpInput, setTotpInput] = useState('');
+  const [verifyingGate, setVerifyingGate] = useState(false);
+
   const importPreview = useMemo(
     () => (importText ? buildImportPreview(importText) : { total: 0, valid: 0, invalid: 0 }),
     [importText]
@@ -121,19 +129,55 @@ export default function CustomersPage() {
 
   useEffect(() => {
     if (!authorized) return;
-    fetchTags();
+    checkGate();
   }, [authorized]);
 
   useEffect(() => {
-    if (!authorized) return;
+    if (!authorized || gateStatus !== 'ok') return;
+    fetchTags();
+  }, [authorized, gateStatus]);
+
+  useEffect(() => {
+    if (!authorized || gateStatus !== 'ok') return;
     fetchCustomers();
-  }, [authorized, search, tagFilter]);
+  }, [authorized, gateStatus, search, tagFilter]);
+
+  const checkGate = async () => {
+    try {
+      setGateStatus('checking');
+      const res = await fetch('/api/admin/customers/2fa/status', { cache: 'no-store' });
+      const data = await res.json();
+      if (res.status === 403) {
+        router.push('/admin/dashboard');
+        return;
+      }
+      if (res.ok && data.success) {
+        setGateStatus(data.verified ? 'ok' : 'required');
+        setGateError('');
+      } else {
+        setGateStatus('blocked');
+        setGateError(data.error || 'Access denied');
+      }
+    } catch (err) {
+      setGateStatus('blocked');
+      setGateError('Access check failed');
+    }
+  };
 
   const fetchTags = async () => {
     try {
       setTagsLoading(true);
       const res = await fetch('/api/admin/customer-tags');
       const data = await res.json();
+      if (res.status === 401) {
+        setGateStatus('required');
+        setGateError(data.error || 'Two-factor required');
+        return;
+      }
+      if (res.status === 403) {
+        router.push('/admin/dashboard');
+        return;
+      }
       if (res.ok && data.success) {
         setTags(data.data || []);
       } else {
@@ -155,6 +199,15 @@ export default function CustomersPage() {
 
       const res = await fetch(`/api/admin/customers?${params.toString()}`);
       const data = await res.json();
+      if (res.status === 401) {
+        setGateStatus('required');
+        setGateError(data.error || 'Two-factor required');
+        return;
+      }
+      if (res.status === 403) {
+        router.push('/admin/dashboard');
+        return;
+      }
       if (res.ok && data.success) {
         setCustomers(data.customers || []);
       } else {
@@ -363,6 +416,10 @@ export default function CustomersPage() {
       alert('Please select a TXT file');
       return;
     }
+    if (importPreview.total > 2000) {
+      alert('Max 2000 lines allowed');
+      return;
+    }
     setImporting(true);
     try {
       const res = await fetch('/api/admin/customers/import', {
@@ -384,10 +441,108 @@ export default function CustomersPage() {
     }
   };
 
+  const handleVerifyGate = async () => {
+    const pin = pinInput.trim();
+    const code = totpInput.trim();
+    if (!pin || !code) {
+      setGateError('PIN and code are required');
+      return;
+    }
+
+    setVerifyingGate(true);
+    try {
+      const res = await fetch('/api/admin/customers/2fa/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, code })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setGateStatus('ok');
+        setGateError('');
+        setPinInput('');
+        setTotpInput('');
+      } else {
+        setGateStatus('required');
+        setGateError(data.error || 'Verification failed');
+      }
+    } catch (err) {
+      setGateError('Verification failed');
+    } finally {
+      setVerifyingGate(false);
+    }
+  };
+
   if (!authorized) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  if (gateStatus === 'checking') {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  if (gateStatus !== 'ok') {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-lg bg-white p-6 shadow">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {'X\u00e1c minh truy c\u1eadp'}
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            {'Khu v\u1ef1c n\u00e0y y\u00eau c\u1ea7u PIN v\u00e0 m\u00e3 2FA.'}
+          </p>
+
+          {gateError && (
+            <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {gateError}
+            </div>
+          )}
+
+          {gateStatus === 'required' && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="text-sm text-gray-600">{'M\u00e3 PIN'}</label>
+                <input
+                  type="password"
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  placeholder="Enter PIN"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">2FA</label>
+                <input
+                  value={totpInput}
+                  onChange={(e) => setTotpInput(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  placeholder="123456"
+                />
+              </div>
+              <button
+                onClick={handleVerifyGate}
+                disabled={verifyingGate}
+                className="w-full rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {verifyingGate ? 'Verifying...' : 'Verify'}
+              </button>
+            </div>
+          )}
+
+          {gateStatus === 'blocked' && (
+            <div className="mt-4 text-sm text-gray-600">
+              {'Truy c\u1eadp b\u1ecb t\u1eeb ch\u1ed1i. Vui l\u00f2ng li\u00ean h\u1ec7 qu\u1ea3n tr\u1ecb vi\u00ean.'}
+            </div>
+          )}
+        </div>
       </div>
     );
   }

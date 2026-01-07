@@ -1,62 +1,75 @@
+import os
 import google.generativeai as genai
 from google.api_core import exceptions
 
-# --- CẤU HÌNH ---
-# Dán danh sách các API Key của bạn vào đây
-API_KEYS = [
-    "AIzaSyC4RV8rJ9K6JeQj7xfroLI0AcGhcVjvpUw",
-    "AIzaSyBEJvV_qYX7bH4WYKSWcQ0fIr5wa5AVWXI",
-    "AIzaSyBrlt9K9m4WARAbrXuB_5gwGTHxIBGGjEM",
-    "AIzaSyDcuZ-DHRLp5xxGWc4YNGHZwhM2giTgAug",
-    "AIzaSyBTj7lbU_lGVVg8ymr5wK6qUoxyqG4dNw0",
-]
-# ----------------
+# NOTE: Do NOT hardcode API keys here. Load from ENV instead.
 
-def check_key_models(api_key, index):
-    print(f"\n{'='*10} Đang kiểm tra Key #{index + 1} {'='*10}")
-    print(f"Key: {api_key[:10]}...******") # Chỉ hiện 1 phần key để bảo mật
-    
+
+def load_env_file(filename: str) -> None:
+    if not os.path.exists(filename):
+        return
+    with open(filename, "r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip("\"'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
+def collect_keys() -> list:
+    keys = []
+    for idx in range(0, 11):
+        name = "GEMINI_API_KEY" if idx == 0 else f"GEMINI_API_KEY_{idx}"
+        value = os.environ.get(name, "").strip()
+        if value:
+            keys.append(value)
+    return keys
+
+
+def check_key_models(api_key: str, index: int) -> None:
+    print(f"\n{'='*10} Checking Key #{index + 1} {'='*10}")
     genai.configure(api_key=api_key)
-    
+
     try:
-        # Lấy danh sách các model
         models = genai.list_models()
-        
         available_models = []
-        for m in models:
-            # Chỉ lấy các model hỗ trợ tạo nội dung (loại bỏ các model embedding nếu không cần)
-            if 'generateContent' in m.supported_generation_methods:
-                # Làm sạch tên model (bỏ đoạn models/ ở đầu)
-                model_name = m.name.replace("models/", "")
-                available_models.append(model_name)
-        
+        for model in models:
+            if "generateContent" in model.supported_generation_methods:
+                name = model.name.replace("models/", "")
+                available_models.append(name)
+
         if available_models:
-            print("✅ TRẠNG THÁI: HỢP LỆ")
-            print(f"📋 Số lượng model truy cập được: {len(available_models)}")
-            print("🔹 Danh sách Model:")
-            for model in available_models:
-                print(f"   - {model}")
+            print("PASS: Key is valid")
+            print(f"Models available: {len(available_models)}")
         else:
-            print("⚠️ Key hợp lệ nhưng không tìm thấy model nào hỗ trợ generateContent.")
-
+            print("WARN: Key valid but no generateContent model found")
     except exceptions.InvalidArgument:
-        print("❌ TRẠNG THÁI: KHÔNG HỢP LỆ (Sai Key)")
+        print("FAIL: Invalid key")
     except exceptions.PermissionDenied:
-        print("❌ TRẠNG THÁI: TỪ CHỐI TRUY CẬP (Quyền hạn hoặc Billing)")
-    except Exception as e:
-        print(f"❌ LỖI KHÁC: {str(e)}")
+        print("FAIL: Permission denied (quota/billing)")
+    except Exception as exc:
+        print(f"FAIL: Error checking key: {exc}")
 
-def main():
-    if not API_KEYS or "YOUR_API_KEY" in API_KEYS[0]:
-        print("❗ Vui lòng điền API Key thực tế vào biến API_KEYS trong file script.")
+
+def main() -> None:
+    load_env_file(".env")
+    load_env_file(".env.local")
+
+    api_keys = collect_keys()
+    if not api_keys:
+        print("FAIL: Missing GEMINI_API_KEY or GEMINI_API_KEY_1..n in env")
         return
 
-    print(f"Bắt đầu kiểm tra {len(API_KEYS)} keys...")
-    
-    for i, key in enumerate(API_KEYS):
+    print(f"Starting check for {len(api_keys)} keys...")
+    for i, key in enumerate(api_keys):
         check_key_models(key, i)
-        
-    print(f"\n{'='*10} HOÀN TẤT {'='*10}")
+
+    print(f"\n{'='*10} DONE {'='*10}")
+
 
 if __name__ == "__main__":
     main()

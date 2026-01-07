@@ -22,6 +22,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const adminCustomersHref = process.env.NEXT_PUBLIC_ADMIN_CUSTOMERS_BASE_URL
+    ? `${process.env.NEXT_PUBLIC_ADMIN_CUSTOMERS_BASE_URL.replace(/\/+$/, '')}/admin/customers`
+    : '/admin/customers';
 
   useEffect(() => {
     // Check authentication
@@ -59,7 +62,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Hỏi/Đáp', href: '/admin/qa-prompts', icon: MessageSquare },
     { name: 'Văn Phong', href: '/admin/legal-styles', icon: Palette },
     { name: 'Mini Apps', href: '/admin/apps', icon: AppWindow },
-    { name: 'Khach hang', href: '/admin/customers', icon: Users },
+    {
+      name: 'Khach hang',
+      href: adminCustomersHref,
+      icon: Users,
+      external: adminCustomersHref.startsWith('http')
+    },
     { name: 'Facebook Automation', href: '/admin/facebook', icon: Facebook },
   ];
 
@@ -101,18 +109,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || 
-                               (item.href !== '/admin' && pathname?.startsWith(item.href));
-              
+              const itemPath = item.href.startsWith('http')
+                ? (() => {
+                    try {
+                      return new URL(item.href).pathname;
+                    } catch {
+                      return item.href;
+                    }
+                  })()
+                : item.href;
+              const isActive = pathname === itemPath || 
+                               (itemPath !== '/admin' && pathname?.startsWith(itemPath));
+
+              const classes = `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+              }`;
+
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className={classes}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <Icon className="h-5 w-5" />
+                    {item.name}
+                  </a>
+                );
+              }
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                  className={classes}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon className="h-5 w-5" />

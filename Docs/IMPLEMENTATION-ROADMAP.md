@@ -220,15 +220,15 @@ See `.env.example` for required variables:
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL="https://icqivkassoxfaukqbzyt.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your_anon_key"
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<REDACTED>
 DATABASE_URL="postgresql://..."
 
 # Google Gemini AI (5 keys for load balancing)
-GEMINI_API_KEY="AIzaSy..."
-GEMINI_API_KEY_1="AIzaSy..."
-GEMINI_API_KEY_2="AIzaSy..."
-GEMINI_API_KEY_3="AIzaSy..."
-GEMINI_API_KEY_4="AIzaSy..."
+GEMINI_API_KEY=<REDACTED>
+GEMINI_API_KEY_1=<REDACTED>
+GEMINI_API_KEY_2=<REDACTED>
+GEMINI_API_KEY_3=<REDACTED>
+GEMINI_API_KEY_4=<REDACTED>
 
 # Admin
 ADMIN_SESSION_SECRET="your_random_secret"
@@ -768,7 +768,7 @@ D:\DTL\trolyphaply\
 
 ```env
 SUPABASE_URL=https://icqivkassoxfaukqbzyt.supabase.co
-SUPABASE_ANON_KEY=eyJhbGci...
+SUPABASE_ANON_KEY=<REDACTED>
 DATABASE_URL=postgresql://postgres.icqivkassoxfaukqbzyt:[password]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true
 DIRECT_URL=postgresql://postgres.icqivkassoxfaukqbzyt:[password]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
 ```
@@ -781,10 +781,10 @@ DIRECT_URL=postgresql://postgres.icqivkassoxfaukqbzyt:[password]@aws-0-ap-southe
 **API Keys** (Shared with FacebookApp):
 
 ```env
-GEMINI_API_KEY_1=AIzaSyB5nGWaghYxZH8FM52U5AV5wkJhIJMp2WI
-GEMINI_API_KEY_2=[key2]
-GEMINI_API_KEY_3=[key3]
-GEMINI_API_KEY_4=[key4]
+GEMINI_API_KEY_1=<REDACTED>
+GEMINI_API_KEY_2=<REDACTED>
+GEMINI_API_KEY_3=<REDACTED>
+GEMINI_API_KEY_4=<REDACTED>
 ```
 
 #### 4.5. Environment Setup
@@ -798,7 +798,7 @@ GEMINI_API_KEY_4=[key4]
 
 ```env
 ADMIN_EMAIL=admin@trolyphaply.vn
-ADMIN_PASSWORD=TroLy@PhapLy2026
+ADMIN_PASSWORD=<REDACTED>
 ```
 
 #### 4.6. Documentation
@@ -1386,18 +1386,18 @@ DIRECT_URL=postgresql://postgres.icqivkassoxfaukqbzyt:[PASSWORD]@aws-0-ap-southe
 
 # Supabase Storage
 SUPABASE_URL=https://icqivkassoxfaukqbzyt.supabase.co
-SUPABASE_ANON_KEY=[KEY]
-SUPABASE_SERVICE_ROLE_KEY=[KEY]
+SUPABASE_ANON_KEY=<REDACTED>
+SUPABASE_SERVICE_ROLE_KEY=<REDACTED>
 
 # Gemini API (Shared with FacebookApp)
-GEMINI_API_KEY_1=AIzaSyB5nGWaghYxZH8FM52U5AV5wkJhIJMp2WI
-GEMINI_API_KEY_2=[KEY2]
-GEMINI_API_KEY_3=[KEY3]
-GEMINI_API_KEY_4=[KEY4]
+GEMINI_API_KEY_1=<REDACTED>
+GEMINI_API_KEY_2=<REDACTED>
+GEMINI_API_KEY_3=<REDACTED>
+GEMINI_API_KEY_4=<REDACTED>
 
 # Admin Account
 ADMIN_EMAIL=admin@trolyphaply.vn
-ADMIN_PASSWORD=TroLy@PhapLy2026
+ADMIN_PASSWORD=<REDACTED>
 
 # App Config
 NEXT_PUBLIC_APP_URL=http://localhost:6666
